@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "table_print"
   gem.homepage = "http://github.com/arches/table_print"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Turn objects into nicely formatted columns for easy reading}
+  gem.description = %Q{TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different).}
   gem.email = "archslide@gmail.com"
   gem.authors = ["Chris Doyle"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
