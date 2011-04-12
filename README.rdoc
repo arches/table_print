@@ -1,6 +1,27 @@
 = table_print
 
-Description goes here.
+Turn objects into nicely formatted columns for easy reading
+
+TablePrint formats an object or array of objects into columns for easy reading. To do this,
+it assumes the objects in your array all respond to the same methods.
+
+== Installation
+
+  # Install as a standalone gem
+  $ gem install table_print
+
+  # Install within rails
+  In your Gemfile: gem 'table_print'
+  $ bundle install
+
+== Usage
+
+  # Outside rails
+  $ irb
+  > require 'table_print'
+
+  # Inside rails, the gem has already been required by your Gemfile so all you need to do is
+  $ rails c
 
 == Contributing to table_print
  
@@ -14,6 +35,5 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2011 Chris Doyle. See LICENSE.txt for
-further details.
+Copyright (c) 2011 Chris Doyle. See LICENSE.txt for further details.
 
