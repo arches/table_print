@@ -43,8 +43,8 @@ on your model.
   # Maybe all you care about is their mailing info
   > tp User.limit(30), {:only => [:address, :city, :state, :zip]}
 
-If you're not using ActiveRecord, the TablePrint default is to show all the methods on your object. Thus, the *:include*
-option is useless at the moment. You are still able to use *:only* and *:include*.
+If you're not using ActiveRecord, the TablePrint default is to show all the methods on your object. Thus, the <b>:include</b>
+option is useless at the moment. You are still able to use <b>:only</b> and <b>:include</b>.
 
 == Contributing to table_print
  
