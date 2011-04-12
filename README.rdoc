@@ -19,9 +19,32 @@ it assumes the objects in your array all respond to the same methods.
   # Outside rails
   $ irb
   > require 'table_print'
+  > tp array_of_objects, options = {}
 
   # Inside rails, the gem has already been required by your Gemfile so all you need to do is
   $ rails c
+  > tp array_of_objects, options = {}
+
+And you should see something like this:
+
+  NAME              | SUMMARY                         | TITLE
+  -----------------------------------------------------------------------
+  Michael Connelly  | Another book by Michael Con...  | The Fifth Witness
+  Manning Mardale   | From acclaimed historian Ma...  | Malcolm X
+  Tina Fey          | Worth it. -Trees                | Bossypants
+
+TablePrint tries to use sensible defaults to choose the columns to show. If you're inspecting ActiveRecord objects, it
+uses the ActiveRecord column names. You can customize the output to show fewer columns, or show other methods you've written
+on your model.
+
+  # Maybe you story a user's hourly rate but you want to see their yearly income
+  > tp User.limit(30), {:include => :yearly_income, :except => :hourly_rate}
+
+  # Maybe all you care about is their mailing info
+  > tp User.limit(30), {:only => [:address, :city, :state, :zip]}
+
+If you're not using ActiveRecord, the TablePrint default is to show all the methods on your object. Thus, the *:include*
+option is useless at the moment. You are still able to use *:only* and *:include*.
 
 == Contributing to table_print
  
