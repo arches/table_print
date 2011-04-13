@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{table_print}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
-  s.date = %q{2011-04-11}
+  s.date = %q{2011-04-13}
   s.description = %q{TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different).}
   s.email = %q{archslide@gmail.com}
   s.extra_rdoc_files = [
@@ -25,7 +25,9 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "lib/table_print.rb",
+    "table_print.gemspec",
     "test/helper.rb",
+    "test/test_column.rb",
     "test/test_table_print.rb"
   ]
   s.homepage = %q{http://github.com/arches/table_print}
@@ -35,6 +37,7 @@ Gem::Specification.new do |s|
   s.summary = %q{Turn objects into nicely formatted columns for easy reading}
   s.test_files = [
     "test/helper.rb",
+    "test/test_column.rb",
     "test/test_table_print.rb"
   ]
 
