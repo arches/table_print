@@ -3,14 +3,15 @@
 #   handle multi-level includes like 'tp User.all, :include => "blogs.title"' and ActiveRecord associations
 #   allow other output venues besides 'puts'
 #   allow fine-grained formatting
+#   on-the-fly column definitions (pass a proc as an include, eg 'tp User.all, :include => {:column_name => "Zodiac", :display_method => lambda {|u| find_zodiac_sign(u.birthday)}}')
+#   allow user to pass ActiveRelation instead of a data array? That could open up so many options!
+#   a :short_booleans method could save a little space (replace true/false with T/F or 1/0)
 #
 # bugs
 #
 #   handle multibyte (see https://skitch.com/arches/r3cbg/multibyte-bug)
 
 class TablePrint
-
-  MAX_FIELD_LENGTH = 30
 
   # TODO: make options for things like MAX_FIELD_LENGTH
   # TODO: make options for things like separator
@@ -22,6 +23,9 @@ class TablePrint
   # TODO: use *args instead of options
   def tp(data, options = {})
     data = wrap(data).compact
+
+    # TODO: need to do a better job of handling options.
+    options[:column_options] ||= {}
 
     # nothing to see here
     if data.empty?
@@ -40,37 +44,26 @@ class TablePrint
     # TODO: stop checking field length once we hit the max
     # TODO: don't check field length on fixed-width columns
 
-    field_lengths = {}
+    # make columns for all the display methods
+    columns = display_methods.collect { |m| Column.new(data, m, options[:column_options][m]) }
+
+    output = [] # a list of rows.  we'll join this with newlines when we're done
 
     # column headers
-    display_methods.each do |m|
-      field_lengths[m] = m.to_s.length
-    end
-
-    data.each do |obj|
-      display_methods.each do |m|
-        field_value = truncate(obj.send(m).to_s)
-        field_lengths[m] = [field_lengths[m], field_value.length].max
-      end
-    end
-
-    output = []
-
     row = []
-    display_methods.each do |m|
-      field_value = truncate(m.to_s)
-      field_length = field_lengths[m]
-      row << ("%-#{field_length}s" % field_value.upcase)
+    columns.each do |column|
+      row << column.formatted_header
     end
     output << row.join(separator)
+
+    # a row of hyphens to separate the headers from the data
     output << ("-" * row.join(separator).length)
 
-    data.each do |obj|
+    # the data!
+    data.each do |data_obj|
       row = []
-      display_methods.each do |m|
-        field_value = truncate(obj.send(m).to_s)
-        field_length = field_lengths[m]
-        row << ("%-#{field_length}s" % field_value)
+      columns.each do |column|
+        row << column.formatted_field_value(data_obj)
       end
       output << row.join(separator)
     end
@@ -79,14 +72,6 @@ class TablePrint
   end
 
   private
-
-  def truncate(field_value)
-    if field_value.length > MAX_FIELD_LENGTH
-      field_value = field_value[0..MAX_FIELD_LENGTH-1]
-      field_value[-3..-1] = "..."
-    end
-    field_value
-  end
 
   def get_display_methods(data_obj, options)
     # determine what methods we're going to use
@@ -153,6 +138,7 @@ class TablePrint
   end
 
   def clean_display_methods(data_obj, display_methods)
+    # TODO: this should probably be inside Column
     clean_methods = []
     display_methods.each do |m|
       next if m.nil?
@@ -173,6 +159,58 @@ class TablePrint
       [object]
     end
   end
+
+  class Column
+    attr_accessor :name, :display_method, :options, :data, :field_length, :max_field_length
+
+    def initialize(data, display_method, options = {})
+      options ||= {}  # could have been passed an explicit nil
+      self.data = data  # HACK? would rather not keep pointers to the data set all over the place
+      self.display_method = display_method
+      self.name = options[:name] || display_method.gsub("_", " ")
+      self.max_field_length = options[:max_field_length] || 30
+      self.max_field_length = [self.max_field_length, 1].max  # numbers less than one are meaningless
+    end
+
+    def formatted_header
+      "%-#{self.field_length}s" % truncate(self.name.upcase)
+    end
+
+    def formatted_field_value(data_obj)
+      "%-#{self.field_length}s" % truncate(data_obj.send(self.display_method).to_s)
+    end
+
+    def field_length
+      return @field_length if defined?(@field_length) # we don't want to loop every time this is called!
+
+      # fixed-width fields don't require the full loop below
+      case data.first.send(self.display_method)
+        when Time
+          return [data.first.send(self.display_method).to_s.length, self.max_field_length].min
+        when TrueClass, FalseClass
+          return 5
+      end
+
+      length = self.name.length
+      self.data.each do |data_obj|
+        length = [length, data_obj.send(self.display_method).to_s.length].max
+        break if length >= self.max_field_length # we're never going to longer than the global max, so why keep going
+      end
+      @field_length = [length, self.max_field_length].min
+      @field_length
+    end
+
+    private
+    
+    def truncate(field_value)
+      copy = String.new(field_value)
+      if copy.length > self.max_field_length
+        copy = copy[0..self.max_field_length-1]
+        copy[-3..-1] = "..." unless self.max_field_length <= 3 # don't use ellipses when the string is tiny
+      end
+      copy
+    end
+  end
 end
 
 module Kernel
@@ -180,7 +218,7 @@ module Kernel
     start = Time.now
     table_print = TablePrint.new
     puts table_print.tp(data, options)
-    return Time.now - start
+    Time.now - start
   end
 
   module_function :tp

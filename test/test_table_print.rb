@@ -29,10 +29,6 @@ class MyClass
 end
 
 class TablePrint
-  def _truncate(field_value)
-    truncate(field_value)
-  end
-
   def _get_display_methods(data_obj, options)
     get_display_methods(data_obj, options)
   end
@@ -82,16 +78,6 @@ class TestTablePrint < Test::Unit::TestCase
         assert_equal [], @tp._get_default_display_methods({})
         assert_equal [], @tp._get_default_display_methods(10)
         assert_equal [], @tp._get_default_display_methods(1.0)
-      end
-    end
-
-    context 'The truncate function' do
-      should 'let short strings pass through' do
-        assert_equal "asdf", @tp._truncate("asdf")
-      end
-
-      should 'truncate long strings with ellipses' do
-        assert_equal "123456789012345678901234567...", @tp._truncate("1234567890123456789012345678901234567890")
       end
     end
 
