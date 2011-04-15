@@ -24,9 +24,6 @@ class TablePrint
   def tp(data, options = {})
     data = wrap(data).compact
 
-    # TODO: need to do a better job of handling options.
-    options[:column_options] ||= {}
-
     # nothing to see here
     if data.empty?
       return "No data."
@@ -45,7 +42,7 @@ class TablePrint
     # TODO: don't check field length on fixed-width columns
 
     # make columns for all the display methods
-    columns = display_methods.collect { |m| Column.new(data, m, options[:column_options][m]) }
+    columns = display_methods.collect { |m| Column.new(data, m, options[m] || options[m.to_sym]) }
 
     output = [] # a list of rows.  we'll join this with newlines when we're done
 
@@ -131,7 +128,7 @@ class TablePrint
     return [] if [Float, Fixnum, String, Numeric, Array, Hash].include? data_obj.class
 
     # custom class
-    methods = data_obj.class.instance_methods - Object.instance_methods
+    methods = data_obj.class.instance_methods - Object.instance_methods # TODO: need to filter based on data_obj.class, if it's a Hash or Array we're missing a lot here
     methods.delete_if { |m| m[-1].chr == "=" } # don't use assignment methods
     methods.map! { |m| m.to_s } # make any symbols into strings
     methods
@@ -165,11 +162,13 @@ class TablePrint
 
     def initialize(data, display_method, options = {})
       options ||= {}  # could have been passed an explicit nil
-      self.data = data  # HACK? would rather not keep pointers to the data set all over the place
       self.display_method = display_method
       self.name = options[:name] || display_method.gsub("_", " ")
       self.max_field_length = options[:max_field_length] || 30
       self.max_field_length = [self.max_field_length, 1].max  # numbers less than one are meaningless
+
+      # initialization
+      self.initialize_field_length(data)
     end
 
     def formatted_header
@@ -180,24 +179,28 @@ class TablePrint
       "%-#{self.field_length}s" % truncate(data_obj.send(self.display_method).to_s)
     end
 
-    def field_length
-      return @field_length if defined?(@field_length) # we don't want to loop every time this is called!
+    def initialize_field_length(data)
 
-      # fixed-width fields don't require the full loop below
-      case data.first.send(self.display_method)
-        when Time
-          return [data.first.send(self.display_method).to_s.length, self.max_field_length].min
-        when TrueClass, FalseClass
-          return 5
-      end
+      length = self.name.length # it has to at least be long enough for the column header!
+      
+      data.each do |data_obj|
+        next if data_obj.nil?
 
-      length = self.name.length
-      self.data.each do |data_obj|
+        # fixed-width fields don't require the full loop
+        case data_obj.send(self.display_method)
+          when Time
+            length = data_obj.send(self.display_method).to_s.length
+            break
+          when TrueClass, FalseClass
+            length = [5, length].max
+            break
+        end
+
         length = [length, data_obj.send(self.display_method).to_s.length].max
         break if length >= self.max_field_length # we're never going to longer than the global max, so why keep going
       end
-      @field_length = [length, self.max_field_length].min
-      @field_length
+
+      self.field_length = [length, self.max_field_length].min   # never bigger than the max
     end
 
     private
@@ -223,3 +226,4 @@ module Kernel
 
   module_function :tp
 end
+

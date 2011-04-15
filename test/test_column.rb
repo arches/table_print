@@ -17,19 +17,19 @@ class TestTablePrint < Test::Unit::TestCase
   context 'Instantiating a Column' do
     context 'with a display_method' do
       setup do
-        @column = TablePrint::Column.new([], "display_method_name")
+        @column = TablePrint::Column.new([], "to_s")
       end
       should 'remember the display method' do
-        assert_equal "display_method_name", @column.display_method
+        assert_equal "to_s", @column.display_method
       end
       should 'set the name' do
-        assert_equal "display method name", @column.name
+        assert_equal "to s", @column.name
       end
     end
 
     context 'with a column name in the options' do
       setup do
-        @column = TablePrint::Column.new([], "display_method_name", {:name => "test_tube"})
+        @column = TablePrint::Column.new([], "first", {:name => "test_tube"})
       end
 
       should 'set the name according to the options' do
@@ -87,6 +87,13 @@ class TestTablePrint < Test::Unit::TestCase
       should 'always be 5' do
         assert_equal 5, TablePrint::Column.new([[true]], "first", :name => "dur").field_length
         assert_equal 5, TablePrint::Column.new([[false]], "first", :name => "dur").field_length
+      end
+    end
+
+    context 'when the column is boolean and the data is not the limiting factor' do
+      should 'be the column name length' do
+        assert_equal 7, TablePrint::Column.new([[true]], "unshift").field_length
+        assert_equal 8, TablePrint::Column.new([[false]], "unshift", :name => "durables").field_length
       end
     end
   end
