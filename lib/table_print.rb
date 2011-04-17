@@ -13,6 +13,16 @@
 
 class TablePrint
 
+  OBJECT_CLASSES = [String, Bignum, Regexp, ThreadError, Numeric, SystemStackError, IndexError,
+                    SecurityError, SizedQueue, IO, Range, Object, Exception, NoMethodError, TypeError, Integer, Dir,
+                    ZeroDivisionError, Kernel, RegexpError, SystemExit, NotImplementedError, Hash,
+                    Interrupt, SyntaxError, Enumerable, Struct, Class, Continuation, IOError, Proc,
+                    RangeError, Data, Thread, Array, NoMemoryError, Time, MatchData,
+                    ConditionVariable, Method, Mutex, StopIteration, Comparable, ArgumentError, Float,
+                    FloatDomainError, UnboundMethod, ThreadGroup, Precision, RuntimeError, FalseClass, Fixnum, Queue,
+                    StandardError, EOFError, LoadError, NameError, NilClass, TrueClass, MatchingData,
+                    LocalJumpError, Binding, SignalException, SystemCallError, File, ScriptError, Module, Symbol]
+
   # TODO: make options for things like MAX_FIELD_LENGTH
   # TODO: make options for things like separator
   # TODO: make options for things like column order
@@ -128,7 +138,13 @@ class TablePrint
     return [] if [Float, Fixnum, String, Numeric, Array, Hash].include? data_obj.class
 
     # custom class
-    methods = data_obj.class.instance_methods - Object.instance_methods # TODO: need to filter based on data_obj.class, if it's a Hash or Array we're missing a lot here
+    methods = data_obj.class.instance_methods
+    OBJECT_CLASSES.each do |oclass|
+      if data_obj.is_a? oclass
+        methods = methods - oclass.instance_methods  # we're only interested in custom methods, not ruby core methods
+      end
+    end
+
     methods.delete_if { |m| m[-1].chr == "=" } # don't use assignment methods
     methods.map! { |m| m.to_s } # make any symbols into strings
     methods
@@ -232,13 +248,5 @@ module Kernel
 
   module_function :tp
 end
-
-
-
-
-
-
-
-
 
 

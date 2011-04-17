@@ -60,6 +60,18 @@ class ManyMethods
   end
 end
 
+class StringInheritor < String
+  attr_accessor :title
+end
+
+class ArrayInheritor < Array
+  attr_accessor :title
+end
+
+class HashInheritor < Hash
+  attr_accessor :title
+end
+
 class TestTablePrint < Test::Unit::TestCase
 
   # TODO: active record tests if defined?(ActiveRecord)
@@ -103,6 +115,22 @@ class TestTablePrint < Test::Unit::TestCase
     context 'The default display methods for a custom class with one attr_accessor' do
       should 'only be the attr setter' do
         assert_equal ["title"], @tp._get_default_display_methods(OneAttrAccessor.new)
+      end
+      
+      context 'that subclasses Hash' do
+        should 'only be the attr setter' do
+          assert_equal ["title"], @tp._get_default_display_methods(HashInheritor.new)
+        end
+      end
+      context 'that subclasses Array' do
+        should 'only be the attr setter' do
+          assert_equal ["title"], @tp._get_default_display_methods(ArrayInheritor.new)
+        end
+      end
+      context 'that subclasses String' do
+        should 'only be the attr setter' do
+          assert_equal ["title"], @tp._get_default_display_methods(StringInheritor.new)
+        end
       end
     end
 
