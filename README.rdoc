@@ -46,6 +46,24 @@ on your model.
 If you're not using ActiveRecord, the TablePrint default is to show all the methods on your object. Thus, the <b>:include</b>
 option is useless at the moment. You are still able to use <b>:only</b> and <b>:include</b>.
 
+=== Column options
+
+Pass options to individual columns through the options hash by using the display method as the hash key. Eg, if you wanted
+to rename the <b>pay_rate</b> column to <b>Special User Payment Teir</b>,
+
+  tp User.all, :pay_rate => {:name => "Special User Payment Teir"}
+
+Columns have other options, including:
+
+<b>name</b>: Use this in the column header instead of the name of the display method.
+
+<b>max_field_length:</b> <i>(default: 30)</i> Field lengths are determined based on the data in the column. Setting your own max
+will ensure that the column is as skinny as possible, but never above the number you provide.
+
+<b>field_length:</b> Useful for very large data sets, this option will explicitly set the column width regardless of the data
+it contains.
+
+
 == Contributing to table_print
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
