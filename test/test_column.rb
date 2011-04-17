@@ -27,13 +27,47 @@ class TestTablePrint < Test::Unit::TestCase
       end
     end
 
-    context 'with a column name in the options' do
-      setup do
-        @column = TablePrint::Column.new([], "first", {:name => "test_tube"})
+    context 'with options including' do
+      context 'name' do
+        setup do
+          @column = TablePrint::Column.new([], "first", {:name => "test_tube"})
+        end
+
+        should 'set the name according to the options' do
+          assert_equal "test_tube", @column.name
+        end
       end
 
-      should 'set the name according to the options' do
-        assert_equal "test_tube", @column.name
+      context 'a field_length' do
+        context 'that is valid' do
+          setup do
+            @column = TablePrint::Column.new(["short"], "first", {:field_length => 20})
+          end
+
+          should 'set the field length according to the options' do
+            assert_equal 20, @column.field_length
+          end
+        end
+
+        context 'that is less than 1' do
+          setup do
+            @column = TablePrint::Column.new(["short"], "first", {:field_length => 0})
+          end
+
+          should 'ignore the field_length' do
+            assert_equal 5, @column.field_length
+          end
+        end
+
+        context 'that is bigger than the max' do
+          setup do
+            @column = TablePrint::Column.new(["short"], "first", {:field_length => 20, :max_field_length => 10})
+          end
+
+          should 'respect the max_field_length' do
+            assert_equal 10, @column.field_length
+          end
+        end
       end
     end
   end

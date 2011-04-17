@@ -161,10 +161,10 @@ class TablePrint
     attr_accessor :name, :display_method, :options, :data, :field_length, :max_field_length
 
     def initialize(data, display_method, options = {})
-      options ||= {}  # could have been passed an explicit nil
+      self.options = options || {}    # could have been passed an explicit nil
       self.display_method = display_method
-      self.name = options[:name] || display_method.gsub("_", " ")
-      self.max_field_length = options[:max_field_length] || 30
+      self.name = self.options[:name] || display_method.gsub("_", " ")
+      self.max_field_length = self.options[:max_field_length] || 30
       self.max_field_length = [self.max_field_length, 1].max  # numbers less than one are meaningless
 
       # initialization
@@ -180,24 +180,30 @@ class TablePrint
     end
 
     def initialize_field_length(data)
+      # skip all this nonsense if we've been explicitly told what to do
+      if self.options[:field_length] and self.options[:field_length] > 0
+        length = self.options[:field_length]
+      else
+        length = self.name.length # it has to at least be long enough for the column header!
 
-      length = self.name.length # it has to at least be long enough for the column header!
-      
-      data.each do |data_obj|
-        next if data_obj.nil?
+        start = Time.now
+        data.each do |data_obj|
+          next if data_obj.nil?
 
-        # fixed-width fields don't require the full loop
-        case data_obj.send(self.display_method)
-          when Time
-            length = data_obj.send(self.display_method).to_s.length
-            break
-          when TrueClass, FalseClass
-            length = [5, length].max
-            break
+          # fixed-width fields don't require the full loop
+          case data_obj.send(self.display_method)
+            when Time
+              length = data_obj.send(self.display_method).to_s.length
+              break
+            when TrueClass, FalseClass
+              length = [5, length].max
+              break
+          end
+
+          length = [length, data_obj.send(self.display_method).to_s.length].max
+          break if length >= self.max_field_length # we're never going to longer than the global max, so why keep going
+          break if (Time.now - start) > 2 # assume if we loop for more than 2s that we've made it through a representative sample, and bail
         end
-
-        length = [length, data_obj.send(self.display_method).to_s.length].max
-        break if length >= self.max_field_length # we're never going to longer than the global max, so why keep going
       end
 
       self.field_length = [length, self.max_field_length].min   # never bigger than the max
@@ -226,4 +232,13 @@ module Kernel
 
   module_function :tp
 end
+
+
+
+
+
+
+
+
+
 
