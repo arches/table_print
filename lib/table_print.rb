@@ -14,6 +14,7 @@
 
 class TablePrint
 
+  # We need this set of built-in types when we determine the default display methods for a given object
   OBJECT_CLASSES = [String, Bignum, Regexp, ThreadError, Numeric, SystemStackError, IndexError,
                     SecurityError, SizedQueue, IO, Range, Object, Exception, NoMethodError, TypeError, Integer, Dir,
                     ZeroDivisionError, Kernel, RegexpError, SystemExit, NotImplementedError, Hash,
@@ -24,23 +25,23 @@ class TablePrint
                     StandardError, EOFError, LoadError, NameError, NilClass, TrueClass, MatchingData,
                     LocalJumpError, Binding, SignalException, SystemCallError, File, ScriptError, Module, Symbol]
 
-  attr_accessor :column_helpers, :display_methods, :separator
+  attr_accessor :columns, :display_methods, :separator
 
-  # TODO: make options for things like column order
   def initialize(options = {})
+    # TODO: make options for things like column order
   end
 
-  # TODO: show documentation if invoked with no arguments
-  # TODO: use *args instead of options
   def tp(data, options = {})
+    # TODO: show documentation if invoked with no arguments
+    # TODO: use *args instead of options
+
+    self.separator = options[:separator] || " | "
+
     stack = wrap(data).compact
 
-    # nothing to see here
     if stack.empty?
       return "No data."
     end
-
-    self.separator = options[:separator] || " | "
 
     self.display_methods = get_display_methods(data.first, options) # these are all strings now
     unless self.display_methods.length > 0
@@ -48,9 +49,9 @@ class TablePrint
     end
 
     # make columns for all the display methods
-    column_helpers = {}
+    self.columns = {}
     self.display_methods.each do |m|
-      column_helpers[m] = ColumnHelper.new(data, m, options[m] || options[m.to_sym])
+      self.columns[m] = ColumnHelper.new(data, m, options[m] || options[m.to_sym])
     end
 
     output = [] # a list of rows.  we'll join this with newlines when we're done
@@ -58,34 +59,30 @@ class TablePrint
     # column headers
     row = []
     self.display_methods.each do |m|
-      row << column_helpers[m].formatted_header
+      row << self.columns[m].formatted_header
     end
     output << row.join(self.separator)
 
     # a row of hyphens to separate the headers from the data
-    output << ("-" * row.join(self.separator).length)
+    output << ("-" * output.first.length)
 
     while stack.length > 0
-      do_row(stack, column_helpers, output)
+      format_row(stack, output)
     end
 
     output.join("\n")
   end
 
-  def show_rows(output, method_tree, data)
-  end
-
   private
 
-  # TODO: rename
-  def do_row(stack, columns, output)
+  def format_row(stack, output)
 
     # method_chain is a dot-delimited list of methods, eg "user.blogs.url". It represents the path from the top-level
     # objects to the data_obj.
-    #
-    # data_obj is a particular
     data_obj, method_chain = stack.shift
-    method_chain ||= "" # top level objects don't have a method_chain, give them one so we don't have to null-check everywhere
+
+    # top level objects don't have a method_chain, give them one so we don't have to null-check everywhere
+    method_chain ||= ""
 
     # represent method_chain strings we've seen for this row as a tree of hash keys.
     # eg, if we have columns for "user.blogs.url" and "user.blogs.title", we only want to add one set of user.blogs to the stack
@@ -99,7 +96,7 @@ class TablePrint
     # dive right in!
     row = []
     self.display_methods.each do |m|
-      column = columns[m]
+      column = self.columns[m]
 
       # If this column happens to begin a recursion, get those objects on the stack. Pass in the stack-tracking info
       # we've saved: method_chain and method_hash.
@@ -110,7 +107,7 @@ class TablePrint
       found_data = true unless row[-1].strip.empty?
     end
 
-    output << row.join(" | ") if found_data
+    output << row.join(self.separator) if found_data
   end
 
   # Sort out the user options into a set of display methods we're going to show. This always returns strings.
@@ -124,7 +121,7 @@ class TablePrint
     #   :only - discard the default set of methods in favor of this list
     #   :cascade - show all methods in child objects
 
-    if options.has_key? :only or options.has_key? "only"
+    if options.has_key? :only
       display_methods = wrap(options[:only]).map { |m| m.to_s }
       return display_methods if display_methods.length > 0
     else
@@ -136,13 +133,10 @@ class TablePrint
     display_methods.uniq.compact
   end
 
+  # Sniff the data class for non-standard methods to use as a baseline for display
   def get_default_display_methods(data_obj)
     # ActiveRecord
     return data_obj.class.columns.collect { |c| c.name } if defined?(ActiveRecord) and data_obj.is_a? ActiveRecord::Base
-
-    # base types
-    # TODO: fill out this list. any way to get this programatically? do we actually want to filter out all base ruby types? important question for custom classes inheriting from base types
-    return [] if [Float, Fixnum, String, Numeric, Array, Hash].include? data_obj.class
 
     # custom class
     methods = data_obj.class.instance_methods
@@ -158,6 +152,8 @@ class TablePrint
   end
 
   # borrowed from rails
+  # turn objects into an array
+  # TODO: this method is duped, put it someplace everyone can see it
   def wrap(object)
     if object.nil?
       []
@@ -197,7 +193,7 @@ class TablePrint
         if self.method.start_with? method_chain
           current_method = self.method.split(".").last
           if data_obj.respond_to? current_method
-            cell_value = data_obj.send(current_method)
+            cell_value = self.method.split(".").inject(data_obj) { |obj, m| obj.send(m) unless obj.nil? or not obj.respond_to? m }
           end
         end
       end
@@ -254,11 +250,13 @@ class TablePrint
       # if this isn't the top level, subtract out the part of the chain we've already called before we check for further chaining
       test_method = String.new(method[method_chain.length, method.length])
       test_method = test_method[1, test_method.length] if test_method.start_with? "."
-      return test_method.include? "."
+
+      test_method.include? "."
     end
 
     private
 
+    # borrowed from rails
     # turn objects into an array
     def wrap(object)
       if object.nil?
@@ -273,9 +271,9 @@ class TablePrint
     # cut off field_value based on our previously determined width
     def truncate(field_value)
       copy = String.new(field_value)
-      if copy.length > self.max_field_length
-        copy = copy[0..self.max_field_length-1]
-        copy[-3..-1] = "..." unless self.max_field_length <= 3 # don't use ellipses when the string is tiny
+      if copy.length > self.field_length
+        copy = copy[0..self.field_length-1]
+        copy[-3..-1] = "..." unless self.field_length <= 3 # don't use ellipses when the string is tiny
       end
       copy
     end
@@ -320,9 +318,6 @@ class TablePrint
         current_method = current_method[method_chain.length, current_method.length]
         current_method.split(".").detect { |m| m != "" }
       end
-    end
-
-    def cell_value(data_obj)
     end
   end
 

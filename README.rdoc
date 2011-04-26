@@ -44,7 +44,33 @@ on your model.
   > tp User.limit(30), {:only => [:address, :city, :state, :zip]}
 
 If you're not using ActiveRecord, the TablePrint default is to show all the methods on your object. Thus, the <b>:include</b>
-option is useless at the moment. You are still able to use <b>:only</b> and <b>:include</b>.
+option is useless at the moment. You are still able to use <b>:only</b> and <b>:except</b>.
+
+You can reference nested objects with the method chain required to reach them. Say you had some users who wrote books, and those
+books had photos.
+
+  > tp array_of_objects, :only => ["name", "books.title", "books.photos.caption"]
+
+  NAME              | BOOKS > TITLE     | BOOKS > PHOTOS > CAPTION
+  -------------------------------------------------------------------------
+  Michael Connelly  |                   |
+                    | The Fifth Witness |
+                    |                   | Susan was running, fast, away...
+                    |                   | Along came a spider.
+                    | Malcolm X         |
+                    | Bossypants        |
+                    |                   | Yes! Yes! A thousand times ye...
+                    |                   | Don't see many like you aroun...
+  Carrot Top        |                   |
+  Milton Greene     |                   |
+                    | How I Learned     |
+                    |                   | Once upon a time, I was a sma...
+                    |                   | Lemons are yellow, limes are ...
+                    |                   | Never as a woman her age. I l...
+                    | Desperados        |
+                    |                   | Avast.
+                    |                   | Giraffes lived a peaceful exi...
+
 
 === Column options
 
@@ -61,7 +87,7 @@ Columns have other options, including:
 will ensure that the column is as skinny as possible, but never above the number you provide.
 
 <b>field_length:</b> Useful for very large data sets, this option will explicitly set the column width regardless of the data
-it contains.
+it contains. The max_field_length option takes precedence over field_length - ie, field_length can't be longer than max_field_length.
 
 
 == Contributing to table_print
