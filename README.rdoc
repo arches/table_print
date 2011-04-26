@@ -25,7 +25,7 @@ it assumes the objects in your array all respond to the same methods.
   $ rails c
   > tp array_of_objects, options = {}
 
-And you should see something like this:
+You should see something like this:
 
   NAME              | SUMMARY                         | TITLE
   -----------------------------------------------------------------------
