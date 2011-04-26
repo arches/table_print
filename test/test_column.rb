@@ -20,7 +20,7 @@ class TestTablePrint < Test::Unit::TestCase
         @column = TablePrint::ColumnHelper.new([], "to_s")
       end
       should 'remember the display method' do
-        assert_equal ["to_s"], @column.display_chain
+        assert_equal "to_s", @column.method
       end
       should 'set the name' do
         assert_equal "to s", @column.name
@@ -130,6 +130,13 @@ class TestTablePrint < Test::Unit::TestCase
         assert_equal 8, TablePrint::ColumnHelper.new([[false]], "unshift", :name => "durables").field_length
       end
     end
+
+    context 'when the method is recursive' do
+      should 'find the maximum width of the data' do
+        assert_equal 26, TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.photo_url", :max_field_length => 30).field_length
+      end
+    end
+
   end
 
 end
