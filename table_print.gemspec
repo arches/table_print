@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{table_print}
-  s.version = "0.1.2"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
-  s.date = %q{2011-04-17}
+  s.date = %q{2011-04-26}
   s.description = %q{TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different).}
   s.email = %q{archslide@gmail.com}
   s.extra_rdoc_files = [
