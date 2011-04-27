@@ -5,8 +5,25 @@ class TablePrint
     def _truncate(field_value)
       truncate(field_value)
     end
+
     def _get_current_method(method_chain)
       get_current_method(method_chain)
+    end
+
+    def _add_to_stack?(method_chain, method_hash)
+      add_to_stack?(method_chain, method_hash)
+    end
+
+    def _formatted_cell_value(data_obj, method_chain)
+      formatted_cell_value(data_obj, method_chain)
+    end
+
+    def _find_data_length(data, method_chain, start)
+      find_data_length(data, method_chain, start)
+    end
+
+    def _add_stack_objects(stack, data_obj, method_chain, start)
+      add_stack_objects(stack, data_obj, method_chain, start)
     end
   end
 end
@@ -58,6 +75,15 @@ class TestTablePrint < Test::Unit::TestCase
 
         should 'set the name according to the options' do
           assert_equal "test_tube", @column.name
+        end
+
+        context 'when the method name contains dots' do
+          setup do
+            @column = TablePrint::ColumnHelper.new(["short"], "method1.method2", {:name => "test_tube"})
+          end
+          should 'use the option' do
+            assert_equal "TEST_TUBE", @column.formatted_header
+          end
         end
       end
 
@@ -132,40 +158,100 @@ class TestTablePrint < Test::Unit::TestCase
         assert_equal "METHOD1 > METHOD2", @column.formatted_header
       end
     end
+
+    context 'when the user passes a name in the column options' do
+      setup do
+        @column = TablePrint::ColumnHelper.new(["short"], "method1.method2", {:name => "whoop"})
+      end
+      should 'use that name instead of the method name' do
+        assert_equal "WHOOP", @column.formatted_header
+      end
+    end
   end
 
   # def formatted_cell_value(data_obj, method_chain)
+  context 'The formatted_cell_value method' do
+    should 'return whitespace if the method chain does not exactly match the column definition method' do
+      assert_equal "               ", TablePrint::ColumnHelper.new([], "captions.text")._formatted_cell_value("test", "id")
+      assert_equal "               ", TablePrint::ColumnHelper.new([], "captions.text")._formatted_cell_value("test", "captions")
+    end
+
+    should 'return whitespace if the method chain begins the ' do
+      assert_equal "no, really, ...", TablePrint::ColumnHelper.new([], "captions.text")._formatted_cell_value(MyNestedClass.setup.first.captions.first, "captions")
+    end
+  end
+
   # def add_stack_objects(stack, data_obj, method_chain, method_hash)
+  context 'The add_stack_objects method' do
+    context 'when objects need to be added to the stack' do
+      setup do
+        @tp = TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.text")
+        @stack = [1, 2, 3]
+        @tp._add_stack_objects(@stack, MyNestedClass.setup.first, "", {})
+      end
+      should 'increase stack size' do
+        assert_equal 4, @stack.size
+      end
+      should 'push the new objects on the front of the stack' do
+        assert_equal MyNestedClass::Caption, @stack.first.first.class
+      end
+      should 'include the updated method_chain in the stack' do
+        assert_equal "captions", @stack.first.last
+      end
+    end
+  end
+
+
   # def add_to_stack?(method_chain, method_hash = {})
+  context 'The add_to_stack? method' do
+    should 'appropriately respond to its arguments' do
+
+      # our first method produces an array, so yes, stack 'em up
+      assert TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.text")._add_to_stack?("", {})
+
+      # captions has already been called, so it gets popped off our method chain. text is the final method, so no, don't stack
+      assert !TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.text")._add_to_stack?("captions", {})
+
+      # the method isn't one of ours, so there's nothing for us to do
+      assert !TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.text")._add_to_stack?("id", {})
+
+      # another column has already added the captions to the stack, so there's no need for us to do it
+      assert !TablePrint::ColumnHelper.new(MyNestedClass.setup, "captions.text")._add_to_stack?("", {"captions" => {}})
+    end
+  end
+
   # def wrap(object)
 
   # def truncate(field_value)
-#  context 'The truncate function' do
-#    should 'let short strings pass through' do
-#      assert_equal "asdf", TablePrint::ColumnHelper.new([], "")._truncate("asdf")
-#    end
-#
-#    should 'truncate long strings with ellipses' do
-#      assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new([], "")._truncate("1234567890123456789012345678901234567890")
-#    end
-#
-#    context 'when given a max length in the options' do
-#      should 'truncate long strings with ellipses' do
-#        assert_equal "1234567...", TablePrint::ColumnHelper.new([], "", :max_field_length => 10)._truncate("1234567890123456789012345678901234567890")
-#      end
-#    end
-#
-#    context 'when the max length is tiny' do
-#      should 'truncate long strings without ellipses' do
-#        assert_equal "1", TablePrint::ColumnHelper.new([], "", :max_field_length => -10)._truncate("1234567890123456789012345678901234567890")
-#        assert_equal "1", TablePrint::ColumnHelper.new([], "", :max_field_length => 0)._truncate("1234567890123456789012345678901234567890")
-#        assert_equal "1", TablePrint::ColumnHelper.new([], "", :max_field_length => 1)._truncate("1234567890123456789012345678901234567890")
-#        assert_equal "12", TablePrint::ColumnHelper.new([], "", :max_field_length => 2)._truncate("1234567890123456789012345678901234567890")
-#        assert_equal "123", TablePrint::ColumnHelper.new([], "", :max_field_length => 3)._truncate("1234567890123456789012345678901234567890")
-#        assert_equal "1...", TablePrint::ColumnHelper.new([], "", :max_field_length => 4)._truncate("1234567890123456789012345678901234567890")
-#      end
-#    end
-#  end
+  context 'The truncate function' do
+    should 'let short strings pass through' do
+      assert_equal "asdf", TablePrint::ColumnHelper.new(["a long long long string"], "first")._truncate("asdf")
+    end
+
+    should 'truncate long strings with ellipses' do
+      # have to put long data in the data set to field_length is pushed out to the default max_field_length
+      assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first")._truncate("1234567890123456789012345678901234567890")
+    end
+
+    context 'with a non-default field length' do
+      should 'truncate long strings with ellipses' do
+        tp = TablePrint::ColumnHelper.new([], "")
+        tp.field_length = 10
+        assert_equal "1234567...", tp._truncate("1234567890123456789012345678901234567890")
+      end
+    end
+
+    context 'when the max length is tiny' do
+      should 'truncate long strings without ellipses' do
+        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first", :field_length => -10)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first", :field_length => 0)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "1", TablePrint::ColumnHelper.new([], "", :field_length => 1)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "12", TablePrint::ColumnHelper.new([], "", :field_length => 2)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "123", TablePrint::ColumnHelper.new([], "", :field_length => 3)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "1...", TablePrint::ColumnHelper.new([], "", :field_length => 4)._truncate("1234567890123456789012345678901234567890")
+      end
+    end
+  end
 
   # def initialize_field_length(data)
   context 'The field length function' do
@@ -209,8 +295,36 @@ class TestTablePrint < Test::Unit::TestCase
   end
 
   # def find_data_length(data, method, start)
-  context '' do
+  context 'The find_data_length method' do
+    context 'when method_chain is a top level method' do
+      setup do
+        @tp = TablePrint::ColumnHelper.new([], "")
+        @tp._find_data_length(MyNestedClass.setup, "title", Time.now)
+      end
+      should 'set field_length to the longest value in the data set' do
+        assert_equal 16, @tp.field_length
+      end
+    end
 
+    context 'when method_chain is not a top level method' do
+      setup do
+        @tp = TablePrint::ColumnHelper.new([], "")
+        @tp._find_data_length(MyNestedClass.setup, "captions.text", Time.now)
+      end
+      should 'set field_length to the longest value in the data set' do
+        assert_equal 28, @tp.field_length
+      end
+    end
+
+    context 'when the data value is longer than max_field_length' do
+      setup do
+        @tp = TablePrint::ColumnHelper.new([], "", :max_field_length => 10)
+        @tp._find_data_length(MyNestedClass.setup, "captions.photo_url", Time.now)
+      end
+      should 'ignore max_field_length (initialize_field_length handles that - this method is just about the data)' do
+        assert_equal 26, @tp.field_length
+      end
+    end
   end
 
   # def get_current_method(method_chain)

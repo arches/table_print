@@ -189,17 +189,27 @@ class TablePrint
 
       # top-level objects don't have method chain. Need to check explicitly whether our method is top-level, otherwise
       # if the last method in our chain matches a top-level method we could accidentally print its data in our column.
+      #
+      # The method chain is what we've been building up as we were "recursing" through previous objects. You could think of
+      # it as a prefix for this row.  Eg, we could be looping through the columns with a method_chain of "locker.assets",
+      # indicating that we've recursed down from user to locker and are now interested in printing assets. So
+      #
       unless method_chain == "" and self.method.include? "."
-        if self.method.start_with? method_chain
-          current_method = self.method.split(".").last
-          if data_obj.respond_to? current_method
-            cell_value = self.method.split(".").inject(data_obj) { |obj, m| obj.send(m) unless obj.nil? or not obj.respond_to? m }
+        our_method_chain = self.method.split(".")
+        our_method = our_method_chain.pop
+
+        # check whether the method_chain fully qualifies the path to this particular object. If this is the bottom level
+        # of object in the tree, and the method_chain matches all the way down, then it's finally time to print this cell.
+        if method_chain == our_method_chain.join(".")
+          if data_obj.respond_to? our_method
+            cell_value = data_obj.send(our_method)
           end
         end
       end
       "%-#{self.field_length}s" % truncate(cell_value.to_s)
     end
 
+    # Determine if we need to add some stuff to the stack. If so, put it on top and update the tracking objects.
     def add_stack_objects(stack, data_obj, method_chain, method_hash)
 
       return unless self.add_to_stack?(method_chain, method_hash)
@@ -292,6 +302,7 @@ class TablePrint
       self.field_length = [self.field_length, self.max_field_length].min # never bigger than the max
     end
 
+    # recurse through the data set using the method chain to find the longest field (or until time's up)
     def find_data_length(data, method, start)
       return if (Time.now - start) > 2
       return if method.nil?
@@ -334,6 +345,8 @@ module Kernel
   module_function :tp
 end
 
+## Some nested classes to make development easier! Make sure you don't commit these uncommented.
+#
 #class TestClass
 #  attr_accessor :title, :name, :blogs, :locker
 #
