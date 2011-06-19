@@ -202,7 +202,7 @@ class TablePrint
         # of object in the tree, and the method_chain matches all the way down, then it's finally time to print this cell.
         if method_chain == our_method_chain.join(".")
           if data_obj.respond_to? our_method
-            cell_value = data_obj.send(our_method)
+            cell_value = data_obj.send(our_method).to_s.gsub("\n", " ")
           end
         end
       end
