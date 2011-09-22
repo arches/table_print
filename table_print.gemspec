@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{table_print}
-  s.version = "0.2.1"
+  s.name = "table_print"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
-  s.date = %q{2011-06-23}
-  s.description = %q{TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different).}
-  s.email = %q{archslide@gmail.com}
+  s.date = "2011-09-22"
+  s.description = "TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different)."
+  s.email = "archslide@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -30,11 +30,11 @@ Gem::Specification.new do |s|
     "test/test_column.rb",
     "test/test_table_print.rb"
   ]
-  s.homepage = %q{http://github.com/arches/table_print}
+  s.homepage = "http://github.com/arches/table_print"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.5.2}
-  s.summary = %q{Turn objects into nicely formatted columns for easy reading}
+  s.rubygems_version = "1.8.10"
+  s.summary = "Turn objects into nicely formatted columns for easy reading"
   s.test_files = [
     "test/helper.rb",
     "test/test_column.rb",
