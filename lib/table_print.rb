@@ -1,6 +1,5 @@
 # future work:
 #
-#   handle multi-level includes like 'tp User.all, :include => "blogs.title"' and ActiveRecord associations
 #   allow other output venues besides 'puts'
 #   allow fine-grained formatting
 #   on-the-fly column definitions (pass a proc as an include, eg 'tp User.all, :include => {:column_name => "Zodiac", :display_method => lambda {|u| find_zodiac_sign(u.birthday)}}')
@@ -16,12 +15,12 @@ class TablePrint
 
   # We need this set of built-in types when we determine the default display methods for a given object
   OBJECT_CLASSES = [String, Bignum, Regexp, ThreadError, Numeric, SystemStackError, IndexError,
-                    SecurityError, SizedQueue, IO, Range, Object, Exception, NoMethodError, TypeError, Integer, Dir,
+                    SecurityError, IO, Range, Object, Exception, NoMethodError, TypeError, Integer, Dir,
                     ZeroDivisionError, Kernel, RegexpError, SystemExit, NotImplementedError, Hash,
                     Interrupt, SyntaxError, Enumerable, Struct, Class, Continuation, IOError, Proc,
                     RangeError, Data, Thread, Array, NoMemoryError, Time, MatchData,
-                    ConditionVariable, Method, Mutex, StopIteration, Comparable, ArgumentError, Float,
-                    FloatDomainError, UnboundMethod, ThreadGroup, Precision, RuntimeError, FalseClass, Fixnum, Queue,
+                    Method, StopIteration, Comparable, ArgumentError, Float,
+                    FloatDomainError, UnboundMethod, ThreadGroup, Precision, RuntimeError, FalseClass, Fixnum,
                     StandardError, EOFError, LoadError, NameError, NilClass, TrueClass, MatchingData,
                     LocalJumpError, Binding, SignalException, SystemCallError, File, ScriptError, Module, Symbol]
 
@@ -37,7 +36,7 @@ class TablePrint
 
     self.separator = options[:separator] || " | "
 
-    stack = wrap(data).compact
+    stack = Array(data).compact
 
     if stack.empty?
       return "No data."
@@ -122,12 +121,12 @@ class TablePrint
     #   :cascade - show all methods in child objects
 
     if options.has_key? :only
-      display_methods = wrap(options[:only]).map { |m| m.to_s }
+      display_methods = Array(options[:only]).map { |m| m.to_s }
       return display_methods if display_methods.length > 0
     else
       display_methods = get_default_display_methods(data_obj) # start with what we can deduce
-      display_methods.concat(wrap(options[:include])).map! { |m| m.to_s } # add the includes
-      display_methods = (display_methods - wrap(options[:except]).map! { |m| m.to_s }) # remove the excepts
+      display_methods.concat(Array(options[:include])).map! { |m| m.to_s } # add the includes
+      display_methods = (display_methods - Array(options[:except]).map! { |m| m.to_s }) # remove the excepts
     end
 
     display_methods.uniq.compact
@@ -151,23 +150,9 @@ class TablePrint
     methods
   end
 
-  # borrowed from rails
-  # turn objects into an array
-  # TODO: this method is duped, put it someplace everyone can see it
-  def wrap(object)
-    if object.nil?
-      []
-    elsif object.respond_to?(:to_ary)
-      object.to_ary
-    else
-      [object]
-    end
-  end
-
   class ColumnHelper
     attr_accessor :field_length, :max_field_length, :method, :name, :options
 
-    # method is a string
     def initialize(data, method, options = {})
       self.method = method
       self.options = options || {} # could have been passed an explicit nil
@@ -231,7 +216,7 @@ class TablePrint
 
       # TODO: probably a cool array method to do this
       # finally - update the stack with the object(s) we found
-      wrap(new_stack_objects).reverse_each do |stack_obj|
+      Array(new_stack_objects).reverse_each do |stack_obj|
         stack.unshift [stack_obj, new_method_chain]
       end
     end
@@ -266,18 +251,6 @@ class TablePrint
 
     private
 
-    # borrowed from rails
-    # turn objects into an array
-    def wrap(object)
-      if object.nil?
-        []
-      elsif object.respond_to?(:to_ary)
-        object.to_ary
-      else
-        [object]
-      end
-    end
-
     # cut off field_value based on our previously determined width
     def truncate(field_value)
       copy = String.new(field_value)
@@ -309,7 +282,7 @@ class TablePrint
       return if data.nil?
       return if self.field_length >= self.max_field_length
 
-      wrap(data).each do |data_obj|
+      Array(data).each do |data_obj|
         next_method = method.split(".").first
 
         return unless data_obj.respond_to? next_method
@@ -338,7 +311,7 @@ module Kernel
   def tp(data, options = {})
     start = Time.now
     table_print = TablePrint.new
-    puts table_print.tp(data, options)
+    puts table_print.tp(Array(data), options)
     Time.now - start # we have to return *something*, might as well be execution time.
   end
 
