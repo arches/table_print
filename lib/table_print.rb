@@ -13,17 +13,6 @@
 
 class TablePrint
 
-  # We need this set of built-in types when we determine the default display methods for a given object
-  OBJECT_CLASSES = [String, Bignum, Regexp, ThreadError, Numeric, SystemStackError, IndexError,
-                    SecurityError, IO, Range, Object, Exception, NoMethodError, TypeError, Integer, Dir,
-                    ZeroDivisionError, Kernel, RegexpError, SystemExit, NotImplementedError, Hash,
-                    Interrupt, SyntaxError, Enumerable, Struct, Class, Continuation, IOError, Proc,
-                    RangeError, Data, Thread, Array, NoMemoryError, Time, MatchData,
-                    Method, StopIteration, Comparable, ArgumentError, Float,
-                    FloatDomainError, UnboundMethod, ThreadGroup, Precision, RuntimeError, FalseClass, Fixnum,
-                    StandardError, EOFError, LoadError, NameError, NilClass, TrueClass, MatchingData,
-                    LocalJumpError, Binding, SignalException, SystemCallError, File, ScriptError, Module, Symbol]
-
   attr_accessor :columns, :display_methods, :separator
 
   def initialize(options = {})
@@ -137,15 +126,19 @@ class TablePrint
     # ActiveRecord
     return data_obj.class.columns.collect { |c| c.name } if defined?(ActiveRecord) and data_obj.is_a? ActiveRecord::Base
 
-    # custom class
-    methods = data_obj.class.instance_methods
-    OBJECT_CLASSES.each do |oclass|
-      if data_obj.is_a? oclass
-        methods = methods - oclass.instance_methods # we're only interested in custom methods, not ruby core methods
+    methods = []
+    data_obj.methods.each do |method_name|
+      method = data_obj.method(method_name)
+
+      if method.owner == data_obj.class
+        if method.arity == 0 #
+          methods << method_name.to_s
+        end
       end
     end
 
     methods.delete_if { |m| m[-1].chr == "=" } # don't use assignment methods
+    methods.delete_if { |m| m[-1].chr == "!" } # don't use dangerous methods
     methods.map! { |m| m.to_s } # make any symbols into strings
     methods
   end

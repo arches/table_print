@@ -230,7 +230,7 @@ class TestTablePrint < Test::Unit::TestCase
 
     should 'truncate long strings with ellipses' do
       # have to put long data in the data set to field_length is pushed out to the default max_field_length
-      assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first")._truncate("1234567890123456789012345678901234567890")
+      assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new([["1234567890123456789012345678901234567890"]], "first")._truncate("1234567890123456789012345678901234567890")
     end
 
     context 'with a non-default field length' do
@@ -243,8 +243,8 @@ class TestTablePrint < Test::Unit::TestCase
 
     context 'when the max length is tiny' do
       should 'truncate long strings without ellipses' do
-        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first", :field_length => -10)._truncate("1234567890123456789012345678901234567890")
-        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new(["1234567890123456789012345678901234567890"], "first", :field_length => 0)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new([["1234567890123456789012345678901234567890"]], "first", :field_length => -10)._truncate("1234567890123456789012345678901234567890")
+        assert_equal "123456789012345678901234567...", TablePrint::ColumnHelper.new([["1234567890123456789012345678901234567890"]], "first", :field_length => 0)._truncate("1234567890123456789012345678901234567890")
         assert_equal "1", TablePrint::ColumnHelper.new([], "", :field_length => 1)._truncate("1234567890123456789012345678901234567890")
         assert_equal "12", TablePrint::ColumnHelper.new([], "", :field_length => 2)._truncate("1234567890123456789012345678901234567890")
         assert_equal "123", TablePrint::ColumnHelper.new([], "", :field_length => 3)._truncate("1234567890123456789012345678901234567890")
