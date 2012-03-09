@@ -1,5 +1,8 @@
 = table_print
 
+{<img src="https://secure.travis-ci.org/arches/table_print.png" />}[http://travis-ci.org/arches/table_print]
+
+
 Turn objects into nicely formatted columns for easy reading
 
 TablePrint formats an object or array of objects into columns for easy reading. To do this,
@@ -91,7 +94,7 @@ it contains. The max_field_length option takes precedence over field_length - ie
 
 
 == Contributing to table_print
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
