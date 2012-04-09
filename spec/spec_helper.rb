@@ -1,0 +1,2 @@
+require 'cat'
+gem 'rspec'
