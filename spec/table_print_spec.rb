@@ -7,6 +7,28 @@ describe TablePrint do
     Sandbox.cleanup!
   end
 
+  describe TablePrint::Printer::ColumnConstructor do
+    it "returns the input string as the display method" do
+      cc = TablePrint::Printer::ColumnConstructor.new("title")
+      cc.display_method.should == "title"
+    end
+
+    it "returns an empty hash as the column options for a string" do
+      cc = TablePrint::Printer::ColumnConstructor.new("title")
+      cc.column_options.should == {}
+    end
+
+    it "returns the input hash key as the display method" do
+      cc = TablePrint::Printer::ColumnConstructor.new(author: {name: "Written By"})
+      cc.display_method.should == "author"
+    end
+
+    it "returns the input hash value as the column options" do
+      cc = TablePrint::Printer::ColumnConstructor.new(author: {name: "Written By"})
+      cc.column_options.should == {name: "Written By"}
+    end
+  end
+
   describe TablePrint::Printer do
     it "prints a table" do
       tp = TablePrint::Printer.new
@@ -15,19 +37,84 @@ describe TablePrint do
       Sandbox.add_attributes("Movie", :title, :lead)
       tp.table_print(Sandbox::Movie.new(title: "House Bunny", lead: "Anna Faris")).should == "TITLE       | LEAD      \n------------------------\nHouse Bunny | Anna Faris"
     end
+
+    describe "#options_to_columns" do
+      it "returns an empty array if nothing is passed" do
+        tp = TablePrint::Printer.new
+        columns = tp.send(:options_to_columns, nil)
+        columns.should == []
+
+        columns = tp.send(:options_to_columns, {})
+        columns.should == []
+
+        columns = tp.send(:options_to_columns, [])
+        columns.should == []
+      end
+
+      it "passes the data to be printed into the column constructor" do
+        tp = TablePrint::Printer.new
+
+        data = OpenStruct.new
+        tp.instance_variable_set("@data", data)
+
+        columns = tp.send(:options_to_columns, "title")
+        columns.length.should == 1
+
+        columns.first.data.should == data
+        columns.first.display_method.should == "title"
+        columns.first.name.should == "title"
+      end
+
+      it "turns two methods into two columns" do
+        tp = TablePrint::Printer.new
+        data = OpenStruct.new(title: "Amelie", lead: "Audrey Tautou")
+        tp.instance_variable_set("@data", data)
+
+        columns = tp.send(:options_to_columns, ["title", "lead"])
+        columns.length.should == 2
+
+        columns.first.name.should == "title"
+        columns.last.name.should == "lead"
+      end
+
+      it "turns a hash into a column" do
+        tp = TablePrint::Printer.new
+        columns = tp.send(:options_to_columns, "title" => {name: "calling"})
+        columns.length.should == 1
+
+        column = columns.first
+        column.display_method.should == "title"
+        column.name.should == "calling"
+      end
+
+      it "turns an array of a hash and a string into two columns" do
+        tp = TablePrint::Printer.new
+        data = OpenStruct.new(title: "Amelie", lead: "Audrey Tautou")
+        tp.instance_variable_set("@data", data)
+
+        columns = tp.send(:options_to_columns, ["title", lead: {name: "Headlining Actress"}])
+        columns.length.should == 2
+
+        columns.first.name.should == "title"
+        columns.last.name.should == "Headlining Actress"
+
+        columns.first.display_method.should == "title"
+        columns.last.display_method.should == "lead"
+      end
+    end
   end
 
   describe TablePrint::Column do
     it "knows its name and display method" do
-      c = TablePrint::Column.new(name: "Foo", display_method: "foo")
-      c.name.should == "Foo"
+      c = TablePrint::Column.new(OpenStruct.new, "foo", {name: "Foobar"})
+      c.name.should == "Foobar"
       c.display_method.should == "foo"
     end
 
     describe "#width" do
       it "returns the max width of the display_method's values" do
         data = [OpenStruct.new(foo: "bar"), OpenStruct.new(foo: "babar")]
-        c = TablePrint::Column.new(data: data, display_method: "foo")
+        c = TablePrint::Column.new(data, "foo")
         c.width.should == 5
       end
 
@@ -37,8 +124,22 @@ describe TablePrint do
           bottom_level_objects = values.map { |val| OpenStruct.new(bar: val) }
           top_level_objects = bottom_level_objects.map { |obj| OpenStruct.new(foo: obj) }
 
-          c = TablePrint::Column.new(data: top_level_objects, display_method: "foo.bar")
+          c = TablePrint::Column.new(top_level_objects, "foo.bar")
           c.width.should == 7
+        end
+      end
+
+      context "for a singular nested display method" do
+        it "returns the max width of the display_method's values'" do
+          Sandbox.add_class("Foo::Blog")
+          Sandbox.add_attributes("Foo", "blog")
+          Sandbox.add_attributes("Foo::Blog", "title")
+
+          blog = Sandbox::Foo::Blog.new(title: "pop pop pop pop")
+          foo = Sandbox::Foo.new(blog: blog)
+
+          c = TablePrint::Column.new(foo, "blog.title")
+          c.width.should == 15
         end
       end
     end

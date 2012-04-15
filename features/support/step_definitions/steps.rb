@@ -25,21 +25,28 @@ When /^I instantiate a (.*) with (\{.*\})$/ do |klass, args|
   @objs.send("#{klass.downcase}=", Sandbox.const_get_from_string(klass).new(eval(args)))
 end
 
-When /^I instantiate a (.*) with (\{.*\}) and add it to (.*)$/ do |klass, args, target|
+When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |klass, args, assignment_method, target|
   # the thing we're instantiating
   child = Sandbox.const_get_from_string(klass).new(eval(args))
 
   # the place we're going to add it
-  target_array = target.split(".").inject(@objs) { |target_obj, target_part| target_obj.send(target_part) }
-  target_array << child
+  method_chain = target.split(".")
+  target_method = method_chain.pop
+  target_object = method_chain.inject(@objs) { |obj, method_name| obj.send(method_name) }
+
+  # how we're going to add it
+  operator = "<<" if assignment_method == "add it"
+  operator = "=" if assignment_method == "assign it"
+
+  target_object.send("#{target_method}#{operator}", child)
 end
 
-When /table_print (.*)$/ do |klass|
-  @r, w = IO.pipe
+When /table_print ([\w:]*), (.*)$/ do |klass, options|
+  tp(Array(@objs.send(klass.downcase)), eval(options))
+end
 
-  w.puts TablePrint::Printer.new.table_print(Array(@objs.send(klass.downcase)))
-
-  w.close
+When /table_print ([\w:]*)$/ do |klass|
+  tp(Array(@objs.send(klass.downcase)))
 end
 
 Then /^the output should contain$/ do |string|
@@ -50,4 +57,10 @@ Then /^the output should contain$/ do |string|
   @r.close
 
   output.join.strip.should == string
+end
+
+def tp(data, options=nil)
+  @r, w = IO.pipe
+  w.puts TablePrint::Printer.new.table_print(data, options)
+  w.close
 end

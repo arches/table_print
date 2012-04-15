@@ -20,11 +20,13 @@
 module TablePrint
 
   class Printer
-    def table_print(data)
-      data = Array(data)
-      data_obj = data.first.extend TablePrint::Printable
+    def table_print(data, options=nil)
+      @data = Array(data)
+      data_obj = @data.first.extend TablePrint::Printable
       display_methods = data_obj.default_display_methods
-      columns = display_methods.collect {|m| Column.new(data: data, display_method: m)}
+      columns = display_methods.collect {|m| Column.new(@data, m)}
+
+      columns.concat options_to_columns(options)
 
       output = []
       output << columns.collect{|c| c.header}.join(" | ")
@@ -32,12 +34,47 @@ module TablePrint
       # separator          widths                                   separators
       output << "-" * (columns.collect{|c| c.width}.inject(&:+) + (columns.length - 1) * 3)
 
-      rows = data.collect{|data_obj| Row.new(data_obj, columns)}
+      rows = @data.collect{|data_obj| Row.new(data_obj, columns)}
       rows.each do |row|
         output << row.format
       end
 
       output.join("\n")
+    end
+
+    private
+
+    # Translate strings and hashes into Column initialization args
+    class ColumnConstructor
+      def initialize(input)
+        @input = input
+      end
+
+      def display_method
+        return @input unless @input.respond_to? :keys
+        @input.keys.first.to_s
+      end
+
+      def column_options
+        return {} unless @input.respond_to? :values
+        @input.values.first
+      end
+    end
+
+    # Turns command-line input into Column objects
+    def options_to_columns(options)
+      return [] if options.nil?
+      return [] if options == []
+      return [] if options == {}
+      options = [options] unless options.is_a? Array
+
+      columns = []
+      options.each do |option|
+        cc = ColumnConstructor.new(option)
+        columns << Column.new(@data, cc.display_method, cc.column_options)
+      end
+
+      columns
     end
   end
 
@@ -73,9 +110,15 @@ module TablePrint
   class Column
     attr_accessor :name, :display_method, :data
 
-    def initialize(attrs)
-      attrs.each { |k, v| self.send "#{k}=", v }
-      self.name ||= attrs[:display_method]
+    def initialize(data, display_method, options={})
+      self.data = data
+      self.display_method = display_method
+
+      options.each do |k, v|
+        self.send("#{k}=", v)
+      end
+
+      self.name ||= display_method
     end
 
     def header
@@ -86,20 +129,19 @@ module TablePrint
 
     def width
       # loop over the data set, keeping track of the max width
-      data_width = data.inject(0) do |max, data_obj|
+      data_width = Array(data).inject(0) do |max, data_obj|
         [
             max,
-            display_method.split(".").inject(data_obj){|obj, method_name| obj = obj.send(method_name)}.size # recurse down the method chain to find the actual value
+            display_method.split(".").inject(data_obj){|obj, method_name| obj = obj.send(method_name)}.to_s.size # recurse down the method chain to find the actual value
         ].max
       end
       [data_width, name.length].max
     end
 
     def format(data_obj)
-      value = data_obj.send(display_method)
+      value = display_method.split(".").inject(data_obj){|obj, method_name| obj.send(method_name)}
       value.extend Printable
       "%-#{width}s" % value.truncate(width)
-      final_object = display_method.split(".").inject(data_obj){|obj, method_name| obj.send(method_name)}
     end
   end
 
