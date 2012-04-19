@@ -17,6 +17,10 @@
 # TODO: make the time limit configurable
 # TODO: set a memory limit?
 
+
+
+
+
 module TablePrint
 
   class Printer
@@ -145,30 +149,39 @@ module TablePrint
     end
   end
 
-  class Row
-    attr_accessor :data_obj, :columns
+  #class Row
+  #  attr_accessor :data_obj, :columns
+  #
+  #  def initialize(data_obj, columns)
+  #    self.data_obj = data_obj
+  #    self.columns = columns
+  #  end
+  #
+  #  def format
+  #    columns.collect{|c| c.format(data_obj)}.join(" | ")
+  #  end
+  #end
 
-    def initialize(data_obj, columns)
-      self.data_obj = data_obj
-      self.columns = columns
-    end
 
-    def format
-      columns.collect{|c| c.format(data_obj)}.join(" | ")
-    end
-  end
+  # to format a row:
+  # loop through the columns and apply the formatter, returning a RowGroup object
+  # create a RowGroup for each child type
+  # format the children and attach their Row objects to the one for this Row
+  # define row.absorb(rowGroup)
+  # for each rowGroup in a given row, try to pull it up
 
+  #
   #  def format
   #    #                this object's cols    other cols            more of this obj's cols
-  #    formatted_cells = [asdf, asdf, asdf, , , , , asdf, jklp, asdf]
-  #    formatted_cells = [, , , uiop, uiop, uiop, , , ,]
-  #    formatted_cells = [, , , uiop, uiop, uiop, , , ,]
-  #    formatted_cells = [, , , , , , erty, , ,]
-  #    formatted_cells = [, , , , , , erty, , ,]
-  #    formatted_cells = [, , , , , , erty, , ,]
-  #    formatted_cells = [, , , , , , erty, , ,]
-  #    formatted_cells = [, , , uiop, uiop, uiop, , , ,]
-  #    formatted_cells = [, , , uiop, uiop, uiop, , , ,]
+  #    formatted_cells = [asdf, asdf, asdf,     ,     ,     ,     , asdf, jklp, asdf]
+  #    formatted_cells = [    ,     ,     , uiop, uiop, uiop,     ,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     , uiop, uiop, uiop,     ,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     ,     ,     ,     , erty,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     ,     ,     ,     , erty,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     ,     ,     ,     , erty,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     ,     ,     ,     , erty,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     , uiop, uiop, uiop,     ,     ,     ,     ]
+  #    formatted_cells = [    ,     ,     , uiop, uiop, uiop,     ,     ,     ,     ]
   #
   #    formatted_cells = [asdf, asdf, asdf, uiop, uiop, uiop, , asdf, bloz, asdf]
   #    formatted_cells = [, , , uiop, uiop, uiop, erty, , bloz,]
