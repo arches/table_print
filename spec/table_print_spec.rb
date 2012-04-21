@@ -146,14 +146,6 @@ describe TablePrint do
   end
 
   describe TablePrint::Printable do
-    describe "#truncate" do
-      it "truncates strings" do
-        s = "A very long string"
-        s.extend TablePrint::Printable
-        s.truncate(8).should == "A ver..."
-      end
-    end
-
     describe "#default_display_methods" do
       it "returns attribute getters" do
         Sandbox.add_class("Hat")

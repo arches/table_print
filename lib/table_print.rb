@@ -99,16 +99,6 @@ module TablePrint
       methods.delete_if { |m| m[-1].chr == "!" } # don't use dangerous methods
       methods
     end
-
-    # cut off field_value based on our previously determined width
-    def truncate(width)
-      copy = String.new(self.to_s)
-      if copy.length > width
-        copy = copy[0..width-1]
-        copy[-3..-1] = "..." unless width <= 3 # don't use ellipses when the string is tiny
-      end
-      copy
-    end
   end
 
   class Column
