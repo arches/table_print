@@ -11,6 +11,10 @@ module TablePrint
       @rows << row
     end
 
+    def add_rows(rows)
+      @rows.concat(rows)
+    end
+
     def format(*column_names)
       rows = @rows
       rows = @rows[1..-1] if @skip_first_row
@@ -40,13 +44,13 @@ module TablePrint
 
     def set_cell_values(values_hash)
       values_hash.each do |k, v|
-        @cells[k.to_sym] = v
+        @cells[k.to_s] = v
       end
       self
     end
 
     def format(*column_names)
-      column_names = *column_names.collect(&:to_sym)
+      column_names = *column_names.collect(&:to_s)
 
       @already_absorbed_a_multigroup = false
 
@@ -78,8 +82,8 @@ module TablePrint
     end
 
     def add_formatter(column, formatter)
-      @formatters[column.to_sym] ||= []
-      @formatters[column.to_sym] << formatter
+      @formatters[column.to_s] ||= []
+      @formatters[column.to_s] << formatter
     end
 
     def apply_formatters(column, value)
@@ -92,7 +96,7 @@ module TablePrint
     end
 
     def formatters_for(column)
-      @formatters[column.to_sym]
+      @formatters[column.to_s]
     end
 
     def add_group(group)

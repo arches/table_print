@@ -26,11 +26,11 @@ describe TablePrint::Row do
     context "when the row has a child group with a single row" do
       it "also formats and returns the child group" do
         group = RowGroup.new
-        group.add_row(Row.new.set_cell_values(subtitle: "super wonky", publisher: "harper"))
+        group.add_row(Row.new.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper"))
 
         row.add_group(group)
 
-        row.format(:title, :author, :pub_date, :subtitle, :publisher).should == "wonky | bob jones | 2012 | super wonky | harper"
+        row.format(:title, :author, :pub_date, 'subtitle.foobar', :publisher).should == "wonky | bob jones | 2012 | super wonky | harper"
       end
     end
 
@@ -56,11 +56,11 @@ describe TablePrint::Row do
   describe "#apply_formatters" do
     it "calls the format method on each formatter for that column" do
       Sandbox.add_class("DoubleFormatter")
-      Sandbox.add_method("DoubleFormatter", :format) {|value| value * 2}
-      
+      Sandbox.add_method("DoubleFormatter", :format) { |value| value * 2 }
+
       Sandbox.add_class("ChopFormatter")
-      Sandbox.add_method("ChopFormatter", :format) {|value| value[0..-2] }
-      
+      Sandbox.add_method("ChopFormatter", :format) { |value| value[0..-2] }
+
       f1 = Sandbox::DoubleFormatter.new
       f2 = Sandbox::ChopFormatter.new
       row.add_formatter(:title, f1)
@@ -72,7 +72,9 @@ describe TablePrint::Row do
 
   describe "#add_formatter" do
     it "uses the formatter to format that column" do
-      formatter = FixedWidthFormatter.new(30)
+      Sandbox.add_class("FixedWidthFormatter")
+      Sandbox.add_method("FixedWidthFormatter", "format") { |v| v }
+      formatter = Sandbox::FixedWidthFormatter.new
       formatter.should_receive(:format)
 
       row.add_formatter(:title, formatter)
