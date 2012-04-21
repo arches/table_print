@@ -1,15 +1,4 @@
 module TablePrint
-
-  class FixedWidthFormatter
-    def initialize(width)
-      @width = width
-    end
-
-    def format(value)
-
-    end
-  end
-
   class RowGroup
     attr_reader :rows
 
@@ -67,6 +56,16 @@ module TablePrint
       end
 
       # try to get cell values from groups we can roll up
+      absorb_children(column_names, rollup)
+
+      output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
+      output.concat @groups.collect { |g| g.format(*column_names) }
+      output.compact!
+
+      output.join("\n")
+    end
+
+    def absorb_children(column_names, rollup)
       @groups.each do |group|
         next unless absorbable_group?(group)
         group.skip_first_row!
@@ -76,25 +75,24 @@ module TablePrint
           rollup[name] = value if value
         end
       end
-
-      output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
-      output.concat @groups.collect { |g| g.format(*column_names) }
-      output.compact!
-
-      output.join("\n")
-    end
-
-    def apply_formatters(column, value)
-      return value unless @formatters[column]
-
-      @formatters[column.to_sym].inject(value) do |value, formatter|
-        formatter.format(value)
-      end
     end
 
     def add_formatter(column, formatter)
       @formatters[column.to_sym] ||= []
       @formatters[column.to_sym] << formatter
+    end
+
+    def apply_formatters(column, value)
+      return value unless @formatters[column]
+
+      # successively apply the formatters for a column
+      formatters_for(column).inject(value) do |value, formatter|
+        formatter.format(value)
+      end
+    end
+
+    def formatters_for(column)
+      @formatters[column.to_sym]
     end
 
     def add_group(group)
