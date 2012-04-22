@@ -46,7 +46,7 @@ When /table_print ([\w:]*), (.*)$/ do |klass, options|
 end
 
 When /table_print ([\w:]*)$/ do |klass|
-  tp(Array(@objs.send(klass.downcase)))
+  tp(@objs.send(klass.downcase))
 end
 
 Then /^the output should contain$/ do |string|
@@ -59,8 +59,8 @@ Then /^the output should contain$/ do |string|
   output.join.strip.should == string
 end
 
-def tp(data, options=nil)
+def tp(data)
   @r, w = IO.pipe
-  w.puts TablePrint::Printer.new.table_print(data, options)
+  w.puts TablePrint::Printer.table_print(data)
   w.close
 end

@@ -26,10 +26,45 @@ describe TablePrint::RowGroup do
       group.add_formatter('title', formatter)
     end
   end
+
+  describe "#raw_column_data" do
+    it "returns the column data from its child rows" do
+      group = RowGroup.new
+      group.add_row(Row.new.set_cell_values(title: 'foo'))
+      group.add_row(Row.new.set_cell_values(title: 'bar'))
+      group.raw_column_data(:title).should == ['foo', 'bar']
+    end
+  end
+
+  describe "#column_width" do
+    it "finds the width of a column" do
+      group = RowGroup.new
+      group.add_row(Row.new.set_cell_values(title: 'asdf'))
+      group.add_row(Row.new.set_cell_values(title: 'qwerty'))
+      group.column_width(:title).should == 6
+    end
+  end
+
+  describe "#set_column_widths" do
+    it "applies a fixed width formatter to each column based on its data" do
+      group = RowGroup.new
+      [["foo", "bar"], ["one", "two"], ["asdf", "qwerty"]].each do |title, author|
+        group.add_row(Row.new.set_cell_values(title: title, author: author))
+      end
+      group.set_column_widths([:title, :author])
+
+      row = group.rows.first
+      row.formatters_for(:title).length.should == 1
+      row.formatters_for(:title).first.width.should == 4
+
+      row.formatters_for(:author).length.should == 1
+      row.formatters_for(:author).first.width.should == 6
+    end
+  end
 end
 
 describe TablePrint::Row do
-  let(:row) {Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"})}
+  let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
   describe "#format" do
     it "joins its cell values with a separator" do
@@ -79,6 +114,20 @@ describe TablePrint::Row do
       row.add_formatter(:title, f2)
 
       row.apply_formatters(:title, "foobar").should == "foobarfooba"
+    end
+  end
+
+  describe "#raw_column_data" do
+    it "returns all the values for a given column" do
+      row = Row.new.set_cell_values(title: 'one', author: 'two')
+
+      group = RowGroup.new
+      ['two', 'three', 'four', 'five', 'six', 'seven'].each do |title|
+        group.add_row(Row.new.set_cell_values(title: title))
+      end
+      row.add_group(group)
+
+      row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
     end
   end
 

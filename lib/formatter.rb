@@ -8,6 +8,10 @@ module TablePrint
       "%-#{@width}s" % truncate(value)
     end
 
+    def width
+      @width
+    end
+
     private
     def truncate(value)
       return value unless value.length > @width

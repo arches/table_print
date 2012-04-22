@@ -1,3 +1,5 @@
+require_relative './formatter'
+
 module TablePrint
   class RowGroup
     attr_reader :rows
@@ -13,6 +15,10 @@ module TablePrint
 
     def add_rows(rows)
       @rows.concat(rows)
+    end
+
+    def raw_column_data(column_name)
+      @rows.collect{|r| r.raw_column_data(column_name)}.flatten
     end
 
     def format(column_names)
@@ -34,7 +40,19 @@ module TablePrint
     end
 
     def add_formatter(column, formatter)
-      @rows.each {|r| r.add_formatter(column, formatter)}
+      @rows.each { |r| r.add_formatter(column, formatter) }
+    end
+
+    def column_width(column_name)
+      raw_column_data(column_name).collect(&:to_s).collect(&:length).max
+    end
+
+    def set_column_widths(columns)
+      columns.map!(&:to_s)
+      columns.each do |column_name|
+        formatter = TablePrint::FixedWidthFormatter.new(column_width(column_name))
+        add_formatter(column_name, formatter)
+      end
     end
   end
 
@@ -90,7 +108,13 @@ module TablePrint
       @formatters[column.to_s] ||= []
       @formatters[column.to_s] << formatter
 
-      @groups.each {|g| g.add_formatter(column, formatter)}
+      @groups.each { |g| g.add_formatter(column, formatter) }
+    end
+
+    def raw_column_data(column_name)
+      output = [@cells[column_name.to_s]]
+      output << @groups.collect { |g| g.raw_column_data(column_name) }
+      output.flatten
     end
 
     def apply_formatters(column, value)
