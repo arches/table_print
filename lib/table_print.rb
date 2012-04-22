@@ -1,3 +1,5 @@
+require_relative './fingerprinter'
+
 module TablePrint
 
   class Printer
@@ -5,22 +7,9 @@ module TablePrint
       @data = Array(data)
       data_obj = @data.first.extend TablePrint::Printable
       display_methods = data_obj.default_display_methods
-      columns = display_methods.collect { |m| Column.new(@data, m) }
+      #columns = display_methods.collect { |m| Column.new(@data, m) }
 
-      columns.concat options_to_columns(options)
-
-      output = []
-      output << columns.collect { |c| c.header }.join(" | ")
-
-      # separator          widths                                   separators
-      output << "-" * (columns.collect { |c| c.width }.inject(&:+) + (columns.length - 1) * 3)
-
-      rows = @data.collect { |data_obj| Row.new(data_obj, columns) }
-      rows.each do |row|
-        output << row.format
-      end
-
-      output.join("\n")
+      #columns. options_to_columns(options)
     end
 
     private
@@ -52,7 +41,8 @@ module TablePrint
       columns = []
       options.each do |option|
         cc = ColumnConstructor.new(option)
-        columns << Column.new(@data, cc.display_method, cc.column_options)
+        columns << cc.display_method
+        #columns << Column.new(@data, cc.display_method, cc.column_options)
       end
 
       columns

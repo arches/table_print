@@ -15,10 +15,11 @@ module TablePrint
       @rows.concat(rows)
     end
 
-    def format(*column_names)
+    def format(column_names)
+      column_names = column_names.collect(&:to_s)
       rows = @rows
       rows = @rows[1..-1] if @skip_first_row
-      rows = rows.collect { |row| row.format(*column_names) }.join("\n")
+      rows = rows.collect { |row| row.format(column_names) }.join("\n")
 
       return nil if rows.length == 0
       rows
@@ -49,8 +50,8 @@ module TablePrint
       self
     end
 
-    def format(*column_names)
-      column_names = *column_names.collect(&:to_s)
+    def format(column_names)
+      column_names.map!(&:to_s)
 
       @already_absorbed_a_multigroup = false
 
@@ -63,7 +64,7 @@ module TablePrint
       absorb_children(column_names, rollup)
 
       output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
-      output.concat @groups.collect { |g| g.format(*column_names) }
+      output.concat @groups.collect { |g| g.format(column_names) }
       output.compact!
 
       output.join("\n")
@@ -87,7 +88,8 @@ module TablePrint
     end
 
     def apply_formatters(column, value)
-      return value unless @formatters[column]
+      column = column.to_s
+      return value unless formatters_for(column)
 
       # successively apply the formatters for a column
       formatters_for(column).inject(value) do |value, formatter|

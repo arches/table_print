@@ -16,11 +16,11 @@ describe TablePrint::RowGroup do
 end
 
 describe TablePrint::Row do
-  let (:row) {Row.new.set_cell_values({title: "wonky", author: "bob jones", pub_date: "2012"})}
+  let(:row) {Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"})}
 
   describe "#format" do
     it "joins its cell values with a separator" do
-      row.format(:title, :author, :pub_date).should == "wonky | bob jones | 2012"
+      row.format([:title, :author, :pub_date]).should == "wonky | bob jones | 2012"
     end
 
     context "when the row has a child group with a single row" do
@@ -30,15 +30,15 @@ describe TablePrint::Row do
 
         row.add_group(group)
 
-        row.format(:title, :author, :pub_date, 'subtitle.foobar', :publisher).should == "wonky | bob jones | 2012 | super wonky | harper"
+        row.format([:title, :author, :pub_date, 'subtitle.foobar', :publisher]).should == "wonky | bob jones | 2012 | super wonky | harper"
       end
     end
 
     context "when the row has multiple child groups with multiple rows" do
       it "formats all the rows" do
         pubs = RowGroup.new
-        pubs.add_row(Row.new.set_cell_values(subtitle: "super wonky", publisher: "harper"))
-        pubs.add_row(Row.new.set_cell_values(subtitle: "never wonky", publisher: "price"))
+        pubs.add_row(Row.new.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper"))
+        pubs.add_row(Row.new.set_cell_values('subtitle' => "never wonky", 'publisher' => "price"))
 
         ratings = RowGroup.new
         ratings.add_row(Row.new.set_cell_values(user: "Matt", value: 5))
@@ -47,8 +47,7 @@ describe TablePrint::Row do
         row.add_group(pubs)
         row.add_group(ratings)
 
-
-        row.format(:title, :author, :pub_date, :subtitle, :publisher, :user, :value).should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
+        row.format([:title, :author, :pub_date, :subtitle, :publisher, :user, :value]).should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
       end
     end
   end
@@ -78,7 +77,7 @@ describe TablePrint::Row do
       formatter.should_receive(:format)
 
       row.add_formatter(:title, formatter)
-      row.format(:title)
+      row.format([:title])
     end
   end
 end
