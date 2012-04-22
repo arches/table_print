@@ -32,6 +32,10 @@ module TablePrint
     def row_count
       @rows.length
     end
+
+    def add_formatter(column, formatter)
+      @rows.each {|r| r.add_formatter(column, formatter)}
+    end
   end
 
   class Row
@@ -85,6 +89,8 @@ module TablePrint
     def add_formatter(column, formatter)
       @formatters[column.to_s] ||= []
       @formatters[column.to_s] << formatter
+
+      @groups.each {|g| g.add_formatter(column, formatter)}
     end
 
     def apply_formatters(column, value)

@@ -13,6 +13,19 @@ describe TablePrint::RowGroup do
       rg.row_count.should == 1
     end
   end
+
+  describe "#add_formatter" do
+    it "adds the formatter to its child rows" do
+      row = Row.new
+      group = RowGroup.new
+      group.add_row(row)
+
+      formatter = {}
+
+      row.should_receive(:add_formatter).with('title', formatter)
+      group.add_formatter('title', formatter)
+    end
+  end
 end
 
 describe TablePrint::Row do
@@ -78,6 +91,17 @@ describe TablePrint::Row do
 
       row.add_formatter(:title, formatter)
       row.format([:title])
+    end
+
+    it "passes the formatter down to child groups" do
+      Sandbox.add_class("FixedWidthFormatter")
+      formatter = Sandbox::FixedWidthFormatter.new
+
+      group = RowGroup.new
+      row.add_group(group)
+
+      group.should_receive(:add_formatter).with('title', formatter)
+      row.add_formatter('title', formatter)
     end
   end
 end
