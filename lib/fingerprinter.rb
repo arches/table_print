@@ -4,7 +4,7 @@ require_relative './hash_extensions'
 module TablePrint
   class Fingerprinter
     def lift(columns, object)
-      column_hash = columns_to_nested_hash(columns)
+      column_hash = column_names_to_nested_hash(columns)
 
       hash_to_rows("", column_hash, object)
     end
@@ -13,66 +13,64 @@ module TablePrint
       rows = []
 
       # convert each object into its own row
-      objects.each do |target|
-        row = TablePrint::Row.new()
-
-        # populate a row with the columns we handle
-        cells = {}
-        columns_to_handle(hash).each do |method|
-          cells["#{prefix}#{'.' unless prefix == ''}#{method}"] = target.send(method)
-        end
-
-        row.set_cell_values(cells)
+      Array(objects).each do |target|
+        row = populate_row(prefix, hash, target)
         rows << row
 
         # make a group and recurse for the columns we don't handle
-        columns_to_pass(hash).each do |name|
-          recursing_prefix = "#{prefix}#{'.' unless prefix == ''}#{name}"
-          group = RowGroup.new
-          group.add_rows hash_to_rows(recursing_prefix, hash[name], target.send(name))
-          row.add_group(group)
-        end
+        groups = create_child_group(prefix, hash, target)
+        row.add_groups(groups)
       end
 
       rows
     end
 
-    def columns_to_handle(hash)
+    def populate_row(prefix, hash, target)
+      row = TablePrint::Row.new()
+
+      # populate a row with the columns we handle
+      cells = {}
+      handleable_columns(hash).each do |method|
+        cells["#{prefix}#{'.' unless prefix == ''}#{method}"] = target.send(method)
+      end
+
+      row.set_cell_values(cells)
+    end
+
+    def create_child_group(prefix, hash, target)
+      passable_columns(hash).collect do |name|
+        recursing_prefix = "#{prefix}#{'.' unless prefix == ''}#{name}"
+        group = RowGroup.new
+        group.add_rows hash_to_rows(recursing_prefix, hash[name], target.send(name))
+        group
+      end
+    end
+
+    def handleable_columns(hash)
       # get the keys where the value is an empty hash
       hash.select { |k, v| v == {} }.collect { |k, v| k }
     end
 
-    def columns_to_pass(hash)
+    def passable_columns(hash)
       # get the keys where the value is not an empty hash
       hash.select { |k, v| v != {} }.collect { |k, v| k }
     end
 
-    def columns_to_nested_hash(columns)
+    def column_names_to_nested_hash(columns)
       extended_hash = {}.extend TablePrint::HashExtensions::ConstructiveMerge
 
       # turn each column chain into a nested hash and add it to the output
-      columns.inject(extended_hash) do |hash, name|
-        hash.constructive_merge!(chain_to_nested_hash(name))
+      columns.inject(extended_hash) do |hash, column_name|
+        hash.constructive_merge!(column_to_nested_hash(column_name))
       end
     end
 
-    def chain_to_nested_hash(chain)
+    def column_to_nested_hash(column_name)
       hash = {}
-      chain.split(".").inject(hash) do |hash_level, method|
+      column_name.split(".").inject(hash) do |hash_level, method|
         hash_level[method] ||= {}
       end
       hash
-    end
-
-    def method_chains(columns)
-      columns.collect { |name| split_into_chain_and_method(name)[0] }.uniq
-    end
-
-    def split_into_chain_and_method(column_name)
-      parts = column_name.split(".")
-
-      # have to pop the method_name before we do the join, but need to return the chain first
-      [parts.pop, parts.join(".")].reverse
     end
   end
 end

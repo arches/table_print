@@ -105,6 +105,10 @@ module TablePrint
       @groups << group
     end
 
+    def add_groups(groups)
+      @groups.concat groups
+    end
+
     def absorbable_group?(group)
       return true if group.row_count == 1
 
