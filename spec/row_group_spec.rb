@@ -5,22 +5,39 @@ require_relative "../lib/row_group"
 
 include TablePrint
 
-describe TablePrint::RowGroup do
+describe RowRecursion do
+  let(:parent) { RowGroup.new }
+  let(:child) { Row.new }
+
   describe "#add_child" do
-    it "adds the given row to the count" do
-      rg = RowGroup.new
-      rg.add_child(OpenStruct.new)
-      rg.child_count.should == 1
+    it "adds the child to my children" do
+      parent.add_child(child)
+      parent.child_count.should == 1
     end
 
-    it "gives the row a reference to its parent" do
-      rg = RowGroup.new
-      row = Row.new
-      rg.add_child(row)
-      row.parent.should == rg
+    it "sets me as my child's parent" do
+      parent.add_child(child)
+      child.parent.should == parent
     end
   end
 
+  describe "#add_children" do
+    let (:child2) { Row.new }
+
+    it "adds all the children to myself" do
+      parent.add_children([child, child2])
+      parent.child_count.should == 2
+    end
+
+    it "sets me as their parent" do
+      parent.add_children([child, child2])
+      child.parent.should == parent
+      child2.parent.should == parent
+    end
+  end
+end
+
+describe TablePrint::RowGroup do
   describe "#add_formatter" do
     it "adds the formatter to its child rows" do
       row = Row.new
@@ -72,14 +89,6 @@ end
 
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
-
-  describe "#add_child" do
-    it "gives the group a reference to its parent" do
-      group = RowGroup.new
-      row.add_child(group)
-      group.parent.should == row
-    end
-  end
 
   describe "#format" do
     it "joins its cell values with a separator" do
