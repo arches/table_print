@@ -8,6 +8,7 @@ module TablePrint
 
     def initialize
       @children = []
+      @columns = {}
     end
 
     def add_child(child)
@@ -22,6 +23,29 @@ module TablePrint
 
     def child_count
       @children.length
+    end
+
+    def add_column(name)
+      return parent.add_column(name) if parent
+      return if @columns[name.to_s]
+
+      @columns[name.to_s] = Column.new(name: name.to_s)
+    end
+
+    def columns
+      return parent.columns if parent
+
+      # assign the data sets to the column before we return it
+      # do this as late as possible, since new rows could be added at any time
+      @columns.values.each do |column|
+        column.data = raw_column_data(column.name)
+      end
+
+      @columns.values
+    end
+
+    def column_count
+      @columns.size
     end
   end
 
@@ -81,6 +105,7 @@ module TablePrint
 
     def set_cell_values(values_hash)
       values_hash.each do |k, v|
+        add_column(k)
         @cells[k.to_s] = v
       end
       self

@@ -1,8 +1,8 @@
 module TablePrint
   class Column
-    attr_reader :data, :formatters
+    attr_reader :formatters
     attr_writer :width
-    attr_accessor :name
+    attr_accessor :name, :data
 
     def initialize(attr_hash)
       attr_hash.each do |k, v|

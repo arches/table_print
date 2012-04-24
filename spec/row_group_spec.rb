@@ -35,6 +35,33 @@ describe RowRecursion do
       child2.parent.should == parent
     end
   end
+
+  describe "#add_column" do
+    it "adds the column on the root node" do
+      parent.add_child(child)
+      child.add_column(:title)
+
+      parent.column_count.should == 1
+    end
+  end
+
+  describe "#columns" do
+    it "returns columns populated with names and data" do
+      parent.add_child(child)
+      child.set_cell_values(title: 'foobar')
+
+      parent.columns.length.should == 1
+      parent.columns.first.name.should == 'title'
+      parent.columns.first.data.should == ['foobar']
+    end
+
+    it "gets the columns from the root node" do
+      parent.add_child(child)
+      child.set_cell_values(title: 'foobar')
+
+      child.columns.should == parent.columns
+    end
+  end
 end
 
 describe TablePrint::RowGroup do
