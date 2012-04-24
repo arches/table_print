@@ -80,6 +80,18 @@ describe RowRecursion do
       column.formatters.should == [{}]
     end
   end
+
+  describe "#width" do
+    it "returns the total width of the columns" do
+      parent.add_child(r1 = Row.new)
+      parent.add_child(r2 = Row.new)
+
+      r1.set_cell_values(title: 'foobar')
+      r2.set_cell_values(subtitle: 'element')
+
+      parent.width.should == 16
+    end
+  end
 end
 
 describe TablePrint::RowGroup do

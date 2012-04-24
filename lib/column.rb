@@ -16,7 +16,7 @@ module TablePrint
     end
 
     def data_width
-      data.inject(0) {|sum, datum| sum + datum.length}
+      data.compact.collect(&:to_s).collect(&:length).inject(&:+)
     end
 
     def width

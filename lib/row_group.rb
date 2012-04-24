@@ -1,4 +1,5 @@
 require_relative './formatter'
+require_relative './column'
 
 module TablePrint
 
@@ -35,13 +36,7 @@ module TablePrint
     def columns
       return parent.columns if parent
 
-      # assign the data sets to the column before we return it
-      # do this as late as possible, since new rows could be added at any time
-      @columns.values.each do |column|
-        column.data = raw_column_data(column.name)
-      end
-
-      @columns.values
+      @columns.collect{|k, v| column_for(k)}
     end
 
     def column_count
@@ -49,7 +44,17 @@ module TablePrint
     end
 
     def column_for(name)
-      @columns[name.to_s]
+      column = @columns[name.to_s]
+      return unless column
+
+      # assign the data sets to the column before we return it
+      # do this as late as possible, since new rows could be added at any time
+      column.data = raw_column_data(column.name)
+      column
+    end
+
+    def width
+      columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
     end
 
     def add_formatter(name, formatter)
