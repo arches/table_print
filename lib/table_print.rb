@@ -19,8 +19,6 @@ module TablePrint
 
       group.add_children(Fingerprinter.new.lift(columns, @data))
 
-      group.set_column_widths(columns)
-
       group.format(columns)
     end
 

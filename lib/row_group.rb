@@ -47,6 +47,15 @@ module TablePrint
     def column_count
       @columns.size
     end
+
+    def column_for(name)
+      @columns[name.to_s]
+    end
+
+    def add_formatter(name, formatter)
+      return unless column_for(name)
+      column_for(name).add_formatter(formatter)
+    end
   end
 
   class RowGroup
@@ -75,20 +84,8 @@ module TablePrint
       @skip_first_row = true
     end
 
-    def add_formatter(column, formatter)
-      @children.each { |r| r.add_formatter(column, formatter) }
-    end
-
     def column_width(column_name)
       raw_column_data(column_name).collect(&:to_s).collect(&:length).max
-    end
-
-    def set_column_widths(columns)
-      columns.map!(&:to_s)
-      columns.each do |column_name|
-        formatter = TablePrint::FixedWidthFormatter.new(column_width(column_name))
-        add_formatter(column_name, formatter)
-      end
     end
   end
 
@@ -100,7 +97,6 @@ module TablePrint
     def initialize
       super
       @cells = {}
-      @formatters = {}
     end
 
     def set_cell_values(values_hash)
@@ -143,31 +139,20 @@ module TablePrint
       end
     end
 
-    def add_formatter(column, formatter)
-      @formatters[column.to_s] ||= []
-      @formatters[column.to_s] << formatter
-
-      @children.each { |g| g.add_formatter(column, formatter) }
-    end
-
     def raw_column_data(column_name)
       output = [@cells[column_name.to_s]]
       output << @children.collect { |g| g.raw_column_data(column_name) }
       output.flatten
     end
 
-    def apply_formatters(column, value)
-      column = column.to_s
-      return value unless formatters_for(column)
+    def apply_formatters(column_name, value)
+      column_name = column_name.to_s
+      return value unless column_for(column_name)
 
       # successively apply the formatters for a column
-      formatters_for(column).inject(value) do |value, formatter|
+      column_for(column_name).formatters.inject(value) do |value, formatter|
         formatter.format(value)
       end
-    end
-
-    def formatters_for(column)
-      @formatters[column.to_s]
     end
 
     def absorbable_group?(group)

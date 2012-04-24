@@ -62,22 +62,27 @@ describe RowRecursion do
       child.columns.should == parent.columns
     end
   end
-end
 
-describe TablePrint::RowGroup do
-  describe "#add_formatter" do
-    it "adds the formatter to its child rows" do
-      row = Row.new
-      group = RowGroup.new
-      group.add_child(row)
-
-      formatter = {}
-
-      row.should_receive(:add_formatter).with('title', formatter)
-      group.add_formatter('title', formatter)
+  describe "#column_for" do
+    it "returns the column object for a given column name" do
+      parent.add_column(:title)
+      column = parent.columns.first
+      parent.column_for(:title).should == column
     end
   end
 
+  describe "#add_formatter" do
+    it "adds the formatter to the column object" do
+      parent.add_column(:title)
+      column = parent.columns.first
+      parent.add_formatter(:title, {})
+
+      column.formatters.should == [{}]
+    end
+  end
+end
+
+describe TablePrint::RowGroup do
   describe "#raw_column_data" do
     it "returns the column data from its child rows" do
       group = RowGroup.new
@@ -93,23 +98,6 @@ describe TablePrint::RowGroup do
       group.add_child(Row.new.set_cell_values(title: 'asdf'))
       group.add_child(Row.new.set_cell_values(title: 'qwerty'))
       group.column_width(:title).should == 6
-    end
-  end
-
-  describe "#set_column_widths" do
-    it "applies a fixed width formatter to each column based on its data" do
-      group = RowGroup.new
-      [["foo", "bar"], ["one", "two"], ["asdf", "qwerty"]].each do |title, author|
-        group.add_child(Row.new.set_cell_values(title: title, author: author))
-      end
-      group.set_column_widths([:title, :author])
-
-      row = group.children.first
-      row.formatters_for(:title).length.should == 1
-      row.formatters_for(:title).first.width.should == 4
-
-      row.formatters_for(:author).length.should == 1
-      row.formatters_for(:author).first.width.should == 6
     end
   end
 end
@@ -179,29 +167,6 @@ describe TablePrint::Row do
       row.add_child(group)
 
       row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
-    end
-  end
-
-  describe "#add_formatter" do
-    it "uses the formatter to format that column" do
-      Sandbox.add_class("FixedWidthFormatter")
-      Sandbox.add_method("FixedWidthFormatter", "format") { |v| v }
-      formatter = Sandbox::FixedWidthFormatter.new
-      formatter.should_receive(:format)
-
-      row.add_formatter(:title, formatter)
-      row.format([:title])
-    end
-
-    it "passes the formatter down to child groups" do
-      Sandbox.add_class("FixedWidthFormatter")
-      formatter = Sandbox::FixedWidthFormatter.new
-
-      group = RowGroup.new
-      row.add_child(group)
-
-      group.should_receive(:add_formatter).with('title', formatter)
-      row.add_formatter('title', formatter)
     end
   end
 end
