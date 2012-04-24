@@ -6,18 +6,18 @@ require_relative "../lib/row_group"
 include TablePrint
 
 describe TablePrint::RowGroup do
-  describe "#add_row" do
+  describe "#add_child" do
     it "adds the given row to the count" do
       rg = RowGroup.new
-      rg.add_row(OpenStruct.new)
-      rg.row_count.should == 1
+      rg.add_child(OpenStruct.new)
+      rg.child_count.should == 1
     end
 
     it "gives the row a reference to its parent" do
       rg = RowGroup.new
       row = Row.new
-      rg.add_row(row)
-      row.parent_group.should == rg
+      rg.add_child(row)
+      row.parent.should == rg
     end
   end
 
@@ -25,7 +25,7 @@ describe TablePrint::RowGroup do
     it "adds the formatter to its child rows" do
       row = Row.new
       group = RowGroup.new
-      group.add_row(row)
+      group.add_child(row)
 
       formatter = {}
 
@@ -37,8 +37,8 @@ describe TablePrint::RowGroup do
   describe "#raw_column_data" do
     it "returns the column data from its child rows" do
       group = RowGroup.new
-      group.add_row(Row.new.set_cell_values(title: 'foo'))
-      group.add_row(Row.new.set_cell_values(title: 'bar'))
+      group.add_child(Row.new.set_cell_values(title: 'foo'))
+      group.add_child(Row.new.set_cell_values(title: 'bar'))
       group.raw_column_data(:title).should == ['foo', 'bar']
     end
   end
@@ -46,8 +46,8 @@ describe TablePrint::RowGroup do
   describe "#column_width" do
     it "finds the width of a column" do
       group = RowGroup.new
-      group.add_row(Row.new.set_cell_values(title: 'asdf'))
-      group.add_row(Row.new.set_cell_values(title: 'qwerty'))
+      group.add_child(Row.new.set_cell_values(title: 'asdf'))
+      group.add_child(Row.new.set_cell_values(title: 'qwerty'))
       group.column_width(:title).should == 6
     end
   end
@@ -56,11 +56,11 @@ describe TablePrint::RowGroup do
     it "applies a fixed width formatter to each column based on its data" do
       group = RowGroup.new
       [["foo", "bar"], ["one", "two"], ["asdf", "qwerty"]].each do |title, author|
-        group.add_row(Row.new.set_cell_values(title: title, author: author))
+        group.add_child(Row.new.set_cell_values(title: title, author: author))
       end
       group.set_column_widths([:title, :author])
 
-      row = group.rows.first
+      row = group.children.first
       row.formatters_for(:title).length.should == 1
       row.formatters_for(:title).first.width.should == 4
 
@@ -73,11 +73,11 @@ end
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
-  describe "#add_group" do
+  describe "#add_child" do
     it "gives the group a reference to its parent" do
       group = RowGroup.new
-      row.add_group(group)
-      group.parent_row.should == row
+      row.add_child(group)
+      group.parent.should == row
     end
   end
 
@@ -89,9 +89,9 @@ describe TablePrint::Row do
     context "when the row has a child group with a single row" do
       it "also formats and returns the child group" do
         group = RowGroup.new
-        group.add_row(Row.new.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper"))
+        group.add_child(Row.new.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper"))
 
-        row.add_group(group)
+        row.add_child(group)
 
         row.format([:title, :author, :pub_date, 'subtitle.foobar', :publisher]).should == "wonky | bob jones | 2012 | super wonky | harper"
       end
@@ -100,15 +100,15 @@ describe TablePrint::Row do
     context "when the row has multiple child groups with multiple rows" do
       it "formats all the rows" do
         pubs = RowGroup.new
-        pubs.add_row(Row.new.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper"))
-        pubs.add_row(Row.new.set_cell_values('subtitle' => "never wonky", 'publisher' => "price"))
+        pubs.add_child(Row.new.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper"))
+        pubs.add_child(Row.new.set_cell_values('subtitle' => "never wonky", 'publisher' => "price"))
 
         ratings = RowGroup.new
-        ratings.add_row(Row.new.set_cell_values(user: "Matt", value: 5))
-        ratings.add_row(Row.new.set_cell_values(user: "Sam", value: 3))
+        ratings.add_child(Row.new.set_cell_values(user: "Matt", value: 5))
+        ratings.add_child(Row.new.set_cell_values(user: "Sam", value: 3))
 
-        row.add_group(pubs)
-        row.add_group(ratings)
+        row.add_child(pubs)
+        row.add_child(ratings)
 
         row.format([:title, :author, :pub_date, :subtitle, :publisher, :user, :value]).should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
       end
@@ -138,9 +138,9 @@ describe TablePrint::Row do
 
       group = RowGroup.new
       ['two', 'three', 'four', 'five', 'six', 'seven'].each do |title|
-        group.add_row(Row.new.set_cell_values(title: title))
+        group.add_child(Row.new.set_cell_values(title: title))
       end
-      row.add_group(group)
+      row.add_child(group)
 
       row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
     end
@@ -162,7 +162,7 @@ describe TablePrint::Row do
       formatter = Sandbox::FixedWidthFormatter.new
 
       group = RowGroup.new
-      row.add_group(group)
+      row.add_child(group)
 
       group.should_receive(:add_formatter).with('title', formatter)
       row.add_formatter('title', formatter)

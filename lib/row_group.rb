@@ -2,32 +2,45 @@ require_relative './formatter'
 
 module TablePrint
 
-  class RowGroup
-    attr_reader :rows
-    attr_accessor :parent_row
+  module RowRecursion
+    attr_accessor :parent
+    attr_accessor :children
 
     def initialize
-      @rows = []
-      @skip_first_row
+      @children = []
     end
 
-    def add_row(row)
-      @rows << row
-      row.parent_group = self
+    def add_child(child)
+      @children << child
+      child.parent = self
     end
 
-    def add_rows(rows)
-      @rows.concat(rows)
+    def add_children(children)
+      @children.concat children
+      children.each { |c| c.parent = self }
+    end
+
+    def child_count
+      @children.length
+    end
+  end
+
+  class RowGroup
+    include RowRecursion
+
+    def initialize
+      super
+      @skip_first_row = false
     end
 
     def raw_column_data(column_name)
-      @rows.collect{|r| r.raw_column_data(column_name)}.flatten
+      @children.collect { |r| r.raw_column_data(column_name) }.flatten
     end
 
     def format(column_names)
       column_names = column_names.collect(&:to_s)
-      rows = @rows
-      rows = @rows[1..-1] if @skip_first_row
+      rows = @children
+      rows = @children[1..-1] if @skip_first_row
       rows = rows.collect { |row| row.format(column_names) }.join("\n")
 
       return nil if rows.length == 0
@@ -38,12 +51,8 @@ module TablePrint
       @skip_first_row = true
     end
 
-    def row_count
-      @rows.length
-    end
-
     def add_formatter(column, formatter)
-      @rows.each { |r| r.add_formatter(column, formatter) }
+      @children.each { |r| r.add_formatter(column, formatter) }
     end
 
     def column_width(column_name)
@@ -61,11 +70,12 @@ module TablePrint
 
   class Row
     attr_reader :cells
-    attr_accessor :parent_group
+
+    include RowRecursion
 
     def initialize
+      super
       @cells = {}
-      @groups = []
       @formatters = {}
     end
 
@@ -90,19 +100,19 @@ module TablePrint
       absorb_children(column_names, rollup)
 
       output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
-      output.concat @groups.collect { |g| g.format(column_names) }
+      output.concat @children.collect { |g| g.format(column_names) }
       output.compact!
 
       output.join("\n")
     end
 
     def absorb_children(column_names, rollup)
-      @groups.each do |group|
+      @children.each do |group|
         next unless absorbable_group?(group)
         group.skip_first_row!
 
         column_names.collect do |name|
-          value = group.rows.first.cells[name]
+          value = group.children.first.cells[name]
           rollup[name] = value if value
         end
       end
@@ -112,12 +122,12 @@ module TablePrint
       @formatters[column.to_s] ||= []
       @formatters[column.to_s] << formatter
 
-      @groups.each { |g| g.add_formatter(column, formatter) }
+      @children.each { |g| g.add_formatter(column, formatter) }
     end
 
     def raw_column_data(column_name)
       output = [@cells[column_name.to_s]]
-      output << @groups.collect { |g| g.raw_column_data(column_name) }
+      output << @children.collect { |g| g.raw_column_data(column_name) }
       output.flatten
     end
 
@@ -135,17 +145,8 @@ module TablePrint
       @formatters[column.to_s]
     end
 
-    def add_group(group)
-      @groups << group
-      group.parent_row = self
-    end
-
-    def add_groups(groups)
-      @groups.concat groups
-    end
-
     def absorbable_group?(group)
-      return true if group.row_count == 1
+      return true if group.child_count == 1
 
       return false if @already_absorbed_a_multigroup
       @already_absorbed_a_multigroup = true # only call this method once

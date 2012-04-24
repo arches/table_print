@@ -15,9 +15,9 @@ module TablePrint
 
     def table_print
       group = TablePrint::RowGroup.new
-      group.add_row(header)
+      group.add_child(header)
 
-      group.add_rows(Fingerprinter.new.lift(columns, @data))
+      group.add_children(Fingerprinter.new.lift(columns, @data))
 
       group.set_column_widths(columns)
 

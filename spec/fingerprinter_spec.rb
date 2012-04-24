@@ -19,7 +19,7 @@ describe Fingerprinter do
       rows = Fingerprinter.new.lift(["name"], OpenStruct.new(name: "dale carnegie"))
       rows.length.should == 1
       row = rows.first
-      row.groups.length.should == 0
+      row.children.length.should == 0
       row.cells.should == {'name' => "dale carnegie"}
     end
 
@@ -33,7 +33,7 @@ describe Fingerprinter do
       rows = Fingerprinter.new.hash_to_rows("", {'name' => {}}, OpenStruct.new(name: "dale carnegie"))
       rows.length.should == 1
       row = rows.first
-      row.groups.length.should == 0
+      row.children.length.should == 0
       row.cells.should == {'name' => 'dale carnegie'}
     end
 
@@ -43,10 +43,10 @@ describe Fingerprinter do
 
       top_row = rows.first
       top_row.cells.should == {'name' => 'dale carnegie'}
-      top_row.groups.length.should == 1
-      top_row.groups.first.row_count.should == 1
+      top_row.children.length.should == 1
+      top_row.children.first.child_count.should == 1
 
-      bottom_row = top_row.groups.first.rows.first
+      bottom_row = top_row.children.first.children.first
       bottom_row.cells.should == {'books.title' => 'hallmark'}
     end
   end

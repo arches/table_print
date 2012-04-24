@@ -19,7 +19,7 @@ module TablePrint
 
         # make a group and recurse for the columns we don't handle
         groups = create_child_group(prefix, hash, target)
-        row.add_groups(groups)
+        row.add_children(groups)
       end
 
       rows
@@ -41,7 +41,7 @@ module TablePrint
       passable_columns(hash).collect do |name|
         recursing_prefix = "#{prefix}#{'.' unless prefix == ''}#{name}"
         group = RowGroup.new
-        group.add_rows hash_to_rows(recursing_prefix, hash[name], target.send(name))
+        group.add_children hash_to_rows(recursing_prefix, hash[name], target.send(name))
         group
       end
     end
