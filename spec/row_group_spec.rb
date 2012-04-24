@@ -12,6 +12,13 @@ describe TablePrint::RowGroup do
       rg.add_row(OpenStruct.new)
       rg.row_count.should == 1
     end
+
+    it "gives the row a reference to its parent" do
+      rg = RowGroup.new
+      row = Row.new
+      rg.add_row(row)
+      row.parent_group.should == rg
+    end
   end
 
   describe "#add_formatter" do
@@ -65,6 +72,14 @@ end
 
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
+
+  describe "#add_group" do
+    it "gives the group a reference to its parent" do
+      group = RowGroup.new
+      row.add_group(group)
+      group.parent_row.should == row
+    end
+  end
 
   describe "#format" do
     it "joins its cell values with a separator" do

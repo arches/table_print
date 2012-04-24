@@ -1,8 +1,10 @@
 require_relative './formatter'
 
 module TablePrint
+
   class RowGroup
     attr_reader :rows
+    attr_accessor :parent_row
 
     def initialize
       @rows = []
@@ -11,6 +13,7 @@ module TablePrint
 
     def add_row(row)
       @rows << row
+      row.parent_group = self
     end
 
     def add_rows(rows)
@@ -58,6 +61,7 @@ module TablePrint
 
   class Row
     attr_reader :cells
+    attr_accessor :parent_group
 
     def initialize
       @cells = {}
@@ -133,6 +137,7 @@ module TablePrint
 
     def add_group(group)
       @groups << group
+      group.parent_row = self
     end
 
     def add_groups(groups)
