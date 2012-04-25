@@ -19,7 +19,7 @@ module TablePrint
 
       group.add_children(Fingerprinter.new.lift(columns, @data))
 
-      group.format(columns)
+      [group.header, group.horizontal_separator, group.format(columns)].join("\n")
     end
 
     def header

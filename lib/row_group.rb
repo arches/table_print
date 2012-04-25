@@ -88,11 +88,11 @@ module TablePrint
       @children.collect { |r| r.raw_column_data(column_name) }.flatten
     end
 
-    def format(column_names)
-      column_names = column_names.collect(&:to_s)
+    def format
+      column_names = columns.collect(&:name)
       rows = @children
       rows = @children[1..-1] if @skip_first_row
-      rows = rows.collect { |row| row.format(column_names) }.join("\n")
+      rows = rows.collect { |row| row.format }.join("\n")
 
       return nil if rows.length == 0
       rows
@@ -125,8 +125,8 @@ module TablePrint
       self
     end
 
-    def format(column_names)
-      column_names.map!(&:to_s)
+    def format
+      column_names = columns.collect(&:name)
 
       @already_absorbed_a_multigroup = false
 
@@ -139,7 +139,7 @@ module TablePrint
       absorb_children(column_names, rollup)
 
       output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
-      output.concat @children.collect { |g| g.format(column_names) }
+      output.concat @children.collect { |g| g.format }
       output.compact!
 
       output.join("\n")

@@ -133,34 +133,43 @@ describe TablePrint::Row do
 
   describe "#format" do
     it "joins its cell values with a separator" do
-      row.format([:title, :author, :pub_date]).should == "wonky | bob jones | 2012"
+      row.format.should == "wonky | bob jones | 2012"
     end
 
     context "when the row has a child group with a single row" do
       it "also formats and returns the child group" do
         group = RowGroup.new
-        group.add_child(Row.new.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper"))
-
         row.add_child(group)
 
-        row.format([:title, :author, :pub_date, 'subtitle.foobar', :publisher]).should == "wonky | bob jones | 2012 | super wonky | harper"
+        r2 = Row.new
+        group.add_child(r2)
+        r2.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper")
+
+        row.format.should == "wonky | bob jones | 2012 | super wonky | harper"
       end
     end
 
     context "when the row has multiple child groups with multiple rows" do
       it "formats all the rows" do
         pubs = RowGroup.new
-        pubs.add_child(Row.new.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper"))
-        pubs.add_child(Row.new.set_cell_values('subtitle' => "never wonky", 'publisher' => "price"))
+        row.add_child(pubs)
+        pr1 = Row.new
+        pr2 = Row.new
+        pubs.add_children([pr1, pr2])
+
+        pr1.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper")
+        pr2.set_cell_values('subtitle' => "never wonky", 'publisher' => "price")
 
         ratings = RowGroup.new
-        ratings.add_child(Row.new.set_cell_values(user: "Matt", value: 5))
-        ratings.add_child(Row.new.set_cell_values(user: "Sam", value: 3))
-
-        row.add_child(pubs)
         row.add_child(ratings)
+        rr1 = Row.new
+        rr2 = Row.new
+        ratings.add_children([rr1, rr2])
 
-        row.format([:title, :author, :pub_date, :subtitle, :publisher, :user, :value]).should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
+        rr1.set_cell_values(user: "Matt", value: 5)
+        rr2.set_cell_values(user: "Sam", value: 3)
+
+        row.format.should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
       end
     end
   end
