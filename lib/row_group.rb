@@ -57,6 +57,10 @@ module TablePrint
       columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
     end
 
+    def horizontal_separator
+      '-' * width
+    end
+
     def add_formatter(name, formatter)
       return unless column_for(name)
       column_for(name).add_formatter(formatter)

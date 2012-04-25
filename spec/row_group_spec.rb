@@ -92,6 +92,13 @@ describe RowRecursion do
       parent.width.should == 16
     end
   end
+
+  describe "#horizontal_separator" do
+    it "returns hyphens equal to the table width" do
+      child.set_cell_values(title: 'foobar')
+      child.horizontal_separator.should == '------'
+    end
+  end
 end
 
 describe TablePrint::RowGroup do
