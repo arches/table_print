@@ -24,6 +24,11 @@ describe Column do
     it "reflects the width of the data set" do
       c.data_width.should == 33
     end
+
+    it "includes the title in the calculation" do
+      c.name = "a horse is a horse of course of course"
+      c.data_width.should == 38
+    end
   end
 
   describe "#width" do
