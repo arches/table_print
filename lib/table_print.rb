@@ -15,20 +15,10 @@ module TablePrint
 
     def table_print
       group = TablePrint::RowGroup.new
-      group.add_child(header)
 
       group.add_children(Fingerprinter.new.lift(columns, @data))
 
-      [group.header, group.horizontal_separator, group.format(columns)].join("\n")
-    end
-
-    def header
-      row = TablePrint::Row.new
-
-      cell_hash = {}
-      columns.each { |name| cell_hash[name] = name.upcase }
-
-      row.set_cell_values(cell_hash)
+      [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
     def columns
