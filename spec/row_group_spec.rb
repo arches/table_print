@@ -19,10 +19,6 @@ describe RowRecursion do
       parent.add_child(child)
       child.parent.should == parent
     end
-
-    it "pulls column information from the new child" do
-      pending
-    end
   end
 
   describe "#add_children" do
@@ -40,19 +36,10 @@ describe RowRecursion do
     end
   end
 
-  describe "#add_column" do
-    it "adds the column on the root node" do
-      parent.add_child(child)
-      child.add_column(:title)
-
-      parent.column_count.should == 1
-    end
-  end
-
   describe "#columns" do
     it "returns columns populated with names and data" do
-      parent.add_child(child)
       child.set_cell_values(title: 'foobar')
+      parent.add_child(child)
 
       parent.columns.length.should == 1
       parent.columns.first.name.should == 'title'
@@ -63,13 +50,15 @@ describe RowRecursion do
       parent.add_child(child)
       child.set_cell_values(title: 'foobar')
 
+      parent.columns.length.should == 1
       child.columns.should == parent.columns
     end
   end
 
   describe "#column_for" do
     it "returns the column object for a given column name" do
-      parent.add_column(:title)
+      parent.add_child(child)
+      child.set_cell_values(title: 'foobar')
       column = parent.columns.first
       parent.column_for(:title).should == column
     end
@@ -77,7 +66,8 @@ describe RowRecursion do
 
   describe "#add_formatter" do
     it "adds the formatter to the column object" do
-      parent.add_column(:title)
+      parent.add_child(child)
+      child.set_cell_values(title: 'foobar')
       column = parent.columns.first
       parent.add_formatter(:title, {})
 

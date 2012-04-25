@@ -26,17 +26,10 @@ module TablePrint
       @children.length
     end
 
-    def add_column(name)
-      return parent.add_column(name) if parent
-      return if @columns[name.to_s]
-
-      @columns[name.to_s] = Column.new(name: name.to_s)
-    end
-
     def columns
       return parent.columns if parent
 
-      @columns.collect{|k, v| column_for(k)}
+      raw_column_names.collect{|k, v| column_for(k)}
     end
 
     def column_count
@@ -44,8 +37,7 @@ module TablePrint
     end
 
     def column_for(name)
-      column = @columns[name.to_s]
-      return unless column
+      column = @columns[name.to_s] ||= Column.new(name: name)
 
       # assign the data sets to the column before we return it
       # do this as late as possible, since new rows could be added at any time
@@ -88,6 +80,10 @@ module TablePrint
       @children.collect { |r| r.raw_column_data(column_name) }.flatten
     end
 
+    def raw_column_names
+      @children.collect { |r| r.raw_column_names }.flatten.uniq
+    end
+
     def format
       column_names = columns.collect(&:name)
       rows = @children
@@ -119,7 +115,6 @@ module TablePrint
 
     def set_cell_values(values_hash)
       values_hash.each do |k, v|
-        add_column(k)
         @cells[k.to_s] = v
       end
       self
@@ -161,6 +156,12 @@ module TablePrint
       output = [@cells[column_name.to_s]]
       output << @children.collect { |g| g.raw_column_data(column_name) }
       output.flatten
+    end
+
+    def raw_column_names
+      output = [@cells.keys]
+      output << @children.collect { |g| g.raw_column_names }
+      output.flatten.uniq
     end
 
     def apply_formatters(column_name, value)
