@@ -16,7 +16,7 @@ module TablePrint
     end
 
     def data_width
-      data.compact.collect(&:to_s).collect(&:length).inject(&:+)
+      data.compact.collect(&:to_s).collect(&:length).max
     end
 
     def width

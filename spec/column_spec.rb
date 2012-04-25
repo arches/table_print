@@ -4,14 +4,14 @@ require_relative '../lib/column'
 include TablePrint
 
 describe Column do
-  let(:c) {Column.new(data: ["Once upon a time"], name: "tagline")}
+  let(:c) {Column.new(data: ["Once upon a time", "there was a dark and stormy night"], name: "tagline")}
 
   it "remembers its name" do
     c.name.should == "tagline"
   end
 
   it "exposes the array of data representing the column" do
-    c.data.should == ['Once upon a time']
+    c.data.should == ["Once upon a time", "there was a dark and stormy night"]
   end
 
   it "stores formatters" do
@@ -22,7 +22,7 @@ describe Column do
 
   describe "#data_width" do
     it "reflects the width of the data set" do
-      c.data_width.should == 16
+      c.data_width.should == 33
     end
   end
 
@@ -33,7 +33,7 @@ describe Column do
     end
 
     it "uses the data_width if no width has been set" do
-      c.width.should == 16
+      c.width.should == 33
     end
   end
 end
