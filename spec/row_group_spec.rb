@@ -19,6 +19,10 @@ describe RowRecursion do
       parent.add_child(child)
       child.parent.should == parent
     end
+
+    it "pulls column information from the new child" do
+      pending
+    end
   end
 
   describe "#add_children" do
