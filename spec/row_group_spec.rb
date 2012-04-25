@@ -87,9 +87,9 @@ describe RowRecursion do
       parent.add_child(r2 = Row.new)
 
       r1.set_cell_values(title: 'foobar')
-      r2.set_cell_values(subtitle: 'element')
+      r2.set_cell_values(subtitle: 'elemental')
 
-      parent.width.should == 16
+      parent.width.should == 18
     end
   end
 
@@ -97,6 +97,13 @@ describe RowRecursion do
     it "returns hyphens equal to the table width" do
       child.set_cell_values(title: 'foobar')
       child.horizontal_separator.should == '------'
+    end
+  end
+
+  describe "#header" do
+    it "returns the column names, padded to the proper width, separated by the | character" do
+      child.set_cell_values(title: 'first post', author: 'chris', subtitle: 'first is the worst')
+      child.header.should == 'TITLE      | AUTHOR | SUBTITLE          '
     end
   end
 end

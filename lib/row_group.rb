@@ -61,6 +61,15 @@ module TablePrint
       '-' * width
     end
 
+    def header
+      padded_names = columns.collect do |column|
+        f = FixedWidthFormatter.new(column.width)
+        f.format(column.name)
+      end
+
+      padded_names.join(" | ").upcase
+    end
+
     def add_formatter(name, formatter)
       return unless column_for(name)
       column_for(name).add_formatter(formatter)
