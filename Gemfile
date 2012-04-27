@@ -9,6 +9,6 @@ group :development do
 end
 
 group :test do
-  gem 'cat'
+  gem 'cat', "~> 0.2"
 end
 
