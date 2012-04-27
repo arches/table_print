@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/hash_extensions'
+require 'hash_extensions'
 
 describe "#constructive_merge" do
   it "merges hashes without clobbering" do

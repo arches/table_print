@@ -1,5 +1,5 @@
-require_relative './row_group'
-require_relative './hash_extensions'
+require 'row_group'
+require 'hash_extensions'
 
 module TablePrint
   class Fingerprinter

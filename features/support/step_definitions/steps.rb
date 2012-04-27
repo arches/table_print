@@ -1,6 +1,6 @@
 require 'cat'
 require 'ostruct'
-require_relative '../../../lib/table_print'
+require 'table_print'
 
 Given /^a class named (.*)$/ do |klass|
   Sandbox.add_class(klass)

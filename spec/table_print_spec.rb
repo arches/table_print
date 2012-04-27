@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/table_print'
+require 'table_print'
 
 include TablePrint
 

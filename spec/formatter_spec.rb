@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative "../lib/formatter"
+require "formatter"
 
 include TablePrint
 

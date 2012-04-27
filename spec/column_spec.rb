@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/column'
+require 'column'
 
 include TablePrint
 

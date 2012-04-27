@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'ostruct'
 require 'cat'
-require_relative "../lib/row_group"
+require "row_group"
 
 include TablePrint
 

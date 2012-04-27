@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../lib/printable'
+require 'printable'
 
 describe TablePrint::Printable do
   before(:each) do

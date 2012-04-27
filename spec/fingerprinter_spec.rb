@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'ostruct'
-require_relative '../lib/fingerprinter'
+require 'fingerprinter'
 
 class TablePrint::Row
   attr_accessor :groups, :cells

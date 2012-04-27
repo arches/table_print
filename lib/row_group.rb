@@ -1,5 +1,5 @@
-require_relative './formatter'
-require_relative './column'
+require 'formatter'
+require 'column'
 
 module TablePrint
 

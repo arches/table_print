@@ -1,5 +1,5 @@
-require_relative './fingerprinter'
-require_relative './printable'
+require 'fingerprinter'
+require 'printable'
 
 module TablePrint
   class Printer
