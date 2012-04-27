@@ -27,14 +27,20 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.test_files = Dir.glob("test/**/test_*.rb")
-  test.verbose = true
+require 'rspec/core/rake_task'
+
+desc 'Default: run specs and cucumber features.'
+task :default => [:spec, :cucumber]
+
+desc "Run specs"
+RSpec::Core::RakeTask.new do |t|
 end
 
-task :default => :test
+require "cucumber/rake/task"
+desc 'Run cucumber features'
+Cucumber::Rake::Task.new(:cucumber) do |task|
+  task.cucumber_opts = ["features"]
+end
 
 begin
   require 'rdoc/task'
