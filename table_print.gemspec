@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
-  s.date = "2012-03-20"
+  s.date = "2012-04-27"
   s.description = "TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different)."
   s.email = "archslide@gmail.com"
   s.extra_rdoc_files = [
@@ -26,11 +26,28 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "development/mock_objects.rb",
+    "features/adding_columns.feature",
+    "features/configuring_output.feature",
+    "features/excluding_columns.feature",
+    "features/sensible_defaults.feature",
+    "features/support/step_definitions/before.rb",
+    "features/support/step_definitions/steps.rb",
+    "lib/column.rb",
+    "lib/fingerprinter.rb",
+    "lib/formatter.rb",
+    "lib/hash_extensions.rb",
+    "lib/printable.rb",
+    "lib/row_group.rb",
     "lib/table_print.rb",
-    "table_print.gemspec",
-    "test/helper.rb",
-    "test/test_column.rb",
-    "test/test_table_print.rb"
+    "spec/column_spec.rb",
+    "spec/fingerprinter_spec.rb",
+    "spec/formatter_spec.rb",
+    "spec/hash_extensions_spec.rb",
+    "spec/printable_spec.rb",
+    "spec/row_group_spec.rb",
+    "spec/spec_helper.rb",
+    "spec/table_print_spec.rb",
+    "table_print.gemspec"
   ]
   s.homepage = "http://github.com/arches/table_print"
   s.licenses = ["MIT"]
@@ -49,12 +66,18 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<cucumber>, [">= 0"])
+      s.add_development_dependency(%q<relish>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<cucumber>, [">= 0"])
     else
       s.add_dependency(%q<table_print>, [">= 0"])
       s.add_dependency(%q<bundler>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<cucumber>, [">= 0"])
+      s.add_dependency(%q<relish>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<cucumber>, [">= 0"])
     end
@@ -64,6 +87,9 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<cucumber>, [">= 0"])
+    s.add_dependency(%q<relish>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<cucumber>, [">= 0"])
   end
