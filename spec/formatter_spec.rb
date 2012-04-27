@@ -16,6 +16,14 @@ describe TablePrint::FixedWidthFormatter do
     it "truncates long fields with periods" do
       @f.format("1234567890123456").should == "1234567..."
     end
+
+    it "uses an empty string in place of nils" do
+      @f.format(nil).should == "          "
+    end
+
+    it "turns objects into strings before trying to format them" do
+      @f.format(123).should == "123       "
+    end
   end
 
   describe "#width" do

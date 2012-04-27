@@ -17,13 +17,13 @@ Feature: Sensible defaults
     Given Foo::Blog has a class method named foo with lambda{"just testing!"}
     Given Foo::Blog has a method named two_args with lambda{|a, b| "Called with #{a}, #{b}"}
 
-    When I instantiate a Foo::Blog with {title: "First post!", author: 'Ryan'}
+    When I instantiate a Foo::Blog with {:title => "First post!", :author => 'Ryan'}
     And table_print Foo::Blog
     Then the output should contain
     """
-    TITLE       | AUTHOR
+    AUTHOR | TITLE      
     --------------------
-    First post! | Ryan
+    Ryan   | First post!
     """
 
 #  Scenario: A nested object

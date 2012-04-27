@@ -97,7 +97,7 @@ describe RowRecursion do
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
       child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
-      child.header.should == 'TITLE      | AUTHOR | SUBTITLE          '
+      child.header.should == 'AUTHOR | SUBTITLE           | TITLE     '
     end
   end
 end
@@ -127,7 +127,7 @@ describe TablePrint::Row do
 
   describe "#format" do
     it "joins its cell values with a separator" do
-      row.format.should == "wonky | bob jones | 2012"
+      row.format.should == "bob jones | 2012     | wonky"
     end
 
     context "when the row has a child group with a single row" do
@@ -139,7 +139,7 @@ describe TablePrint::Row do
         group.add_child(r2)
         r2.set_cell_values('subtitle.foobar' => "super wonky", :publisher => "harper")
 
-        row.format.should == "wonky | bob jones | 2012 | super wonky | harper"
+        row.format.should == "bob jones | 2012     | harper    | super wonky     | wonky"
       end
     end
 
@@ -163,7 +163,7 @@ describe TablePrint::Row do
         rr1.set_cell_values(:user => "Matt", :value => 5)
         rr2.set_cell_values(:user => "Sam", :value => 3)
 
-        row.format.should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
+        row.format.should == "bob jones | 2012     | harper    | super wonky | wonky |      |      \n       |          | price     | never wonky |       |      |      \n       |          |           |          |       | Matt | 5    \n       |          |           |          |       | Sam  | 3    "
       end
     end
   end

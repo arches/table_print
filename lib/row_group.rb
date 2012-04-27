@@ -29,7 +29,7 @@ module TablePrint
     def columns
       return parent.columns if parent
 
-      raw_column_names.collect{|k, v| column_for(k)}
+      raw_column_names.sort.collect{|k, v| column_for(k)}
     end
 
     def column_count
@@ -85,7 +85,6 @@ module TablePrint
     end
 
     def format
-      column_names = columns.collect(&:name)
       rows = @children
       rows = @children[1..-1] if @skip_first_row
       rows = rows.collect { |row| row.format }.join("\n")
@@ -133,11 +132,16 @@ module TablePrint
       # try to get cell values from groups we can roll up
       absorb_children(column_names, rollup)
 
-      output = [column_names.collect { |name| apply_formatters(name, rollup[name]) }.join(" | ")]
+      output = [column_names.collect { |name| padded(name, apply_formatters(name, rollup[name])) }.join(" | ")]
       output.concat @children.collect { |g| g.format }
       output.compact!
 
       output.join("\n")
+    end
+
+    def padded(name, value)
+      f = FixedWidthFormatter.new(column_for(name).width)
+      f.format(value)
     end
 
     def absorb_children(column_names, rollup)
