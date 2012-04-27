@@ -38,7 +38,7 @@ describe RowRecursion do
 
   describe "#columns" do
     it "returns columns populated with names and data" do
-      child.set_cell_values(title: 'foobar')
+      child.set_cell_values(:title => 'foobar')
       parent.add_child(child)
 
       parent.columns.length.should == 1
@@ -48,7 +48,7 @@ describe RowRecursion do
 
     it "gets the columns from the root node" do
       parent.add_child(child)
-      child.set_cell_values(title: 'foobar')
+      child.set_cell_values(:title => 'foobar')
 
       parent.columns.length.should == 1
       child.columns.should == parent.columns
@@ -58,7 +58,7 @@ describe RowRecursion do
   describe "#column_for" do
     it "returns the column object for a given column name" do
       parent.add_child(child)
-      child.set_cell_values(title: 'foobar')
+      child.set_cell_values(:title => 'foobar')
       column = parent.columns.first
       parent.column_for(:title).should == column
     end
@@ -67,7 +67,7 @@ describe RowRecursion do
   describe "#add_formatter" do
     it "adds the formatter to the column object" do
       parent.add_child(child)
-      child.set_cell_values(title: 'foobar')
+      child.set_cell_values(:title => 'foobar')
       column = parent.columns.first
       parent.add_formatter(:title, {})
 
@@ -80,8 +80,8 @@ describe RowRecursion do
       parent.add_child(r1 = Row.new)
       parent.add_child(r2 = Row.new)
 
-      r1.set_cell_values(title: 'foobar')
-      r2.set_cell_values(subtitle: 'elemental')
+      r1.set_cell_values(:title => 'foobar')
+      r2.set_cell_values(:subtitle => 'elemental')
 
       parent.width.should == 18
     end
@@ -89,14 +89,14 @@ describe RowRecursion do
 
   describe "#horizontal_separator" do
     it "returns hyphens equal to the table width" do
-      child.set_cell_values(title: 'foobar')
+      child.set_cell_values(:title => 'foobar')
       child.horizontal_separator.should == '------'
     end
   end
 
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
-      child.set_cell_values(title: 'first post', author: 'chris', subtitle: 'first is the worst')
+      child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
       child.header.should == 'TITLE      | AUTHOR | SUBTITLE          '
     end
   end
@@ -106,8 +106,8 @@ describe TablePrint::RowGroup do
   describe "#raw_column_data" do
     it "returns the column data from its child rows" do
       group = RowGroup.new
-      group.add_child(Row.new.set_cell_values(title: 'foo'))
-      group.add_child(Row.new.set_cell_values(title: 'bar'))
+      group.add_child(Row.new.set_cell_values(:title => 'foo'))
+      group.add_child(Row.new.set_cell_values(:title => 'bar'))
       group.raw_column_data(:title).should == ['foo', 'bar']
     end
   end
@@ -115,8 +115,8 @@ describe TablePrint::RowGroup do
   describe "#column_width" do
     it "finds the width of a column" do
       group = RowGroup.new
-      group.add_child(Row.new.set_cell_values(title: 'asdf'))
-      group.add_child(Row.new.set_cell_values(title: 'qwerty'))
+      group.add_child(Row.new.set_cell_values(:title => 'asdf'))
+      group.add_child(Row.new.set_cell_values(:title => 'qwerty'))
       group.column_width(:title).should == 6
     end
   end
@@ -137,7 +137,7 @@ describe TablePrint::Row do
 
         r2 = Row.new
         group.add_child(r2)
-        r2.set_cell_values('subtitle.foobar' => "super wonky", publisher: "harper")
+        r2.set_cell_values('subtitle.foobar' => "super wonky", :publisher => "harper")
 
         row.format.should == "wonky | bob jones | 2012 | super wonky | harper"
       end
@@ -160,8 +160,8 @@ describe TablePrint::Row do
         rr2 = Row.new
         ratings.add_children([rr1, rr2])
 
-        rr1.set_cell_values(user: "Matt", value: 5)
-        rr2.set_cell_values(user: "Sam", value: 3)
+        rr1.set_cell_values(:user => "Matt", :value => 5)
+        rr2.set_cell_values(:user => "Sam", :value => 3)
 
         row.format.should == "wonky | bob jones | 2012 | super wonky | harper |  | \n |  |  | never wonky | price |  | \n |  |  |  |  | Matt | 5\n |  |  |  |  | Sam | 3"
       end
@@ -187,11 +187,11 @@ describe TablePrint::Row do
 
   describe "#raw_column_data" do
     it "returns all the values for a given column" do
-      row = Row.new.set_cell_values(title: 'one', author: 'two')
+      row = Row.new.set_cell_values(:title => 'one', :author => 'two')
 
       group = RowGroup.new
       ['two', 'three', 'four', 'five', 'six', 'seven'].each do |title|
-        group.add_child(Row.new.set_cell_values(title: title))
+        group.add_child(Row.new.set_cell_values(:title => title))
       end
       row.add_child(group)
 

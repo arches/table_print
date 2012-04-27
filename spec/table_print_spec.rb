@@ -13,7 +13,7 @@ describe TablePrint::Printer do
       Sandbox.add_class("Post")
       Sandbox.add_attributes("Post", :title)
 
-      p = Printer.new(Sandbox::Post.new(title: "first post"))
+      p = Printer.new(Sandbox::Post.new(:title => "first post"))
       p.columns.should == ['title']
     end
   end
