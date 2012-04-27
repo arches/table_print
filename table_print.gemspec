@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "table_print"
-  s.version = "0.2.3"
+  s.version = "1.0.0.pre"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
@@ -38,7 +38,8 @@ Gem::Specification.new do |s|
     "lib/hash_extensions.rb",
     "lib/printable.rb",
     "lib/row_group.rb",
-    "lib/table_print.rb",
+    "lib/table_print.rb"]
+  s.test_files = [
     "spec/column_spec.rb",
     "spec/fingerprinter_spec.rb",
     "spec/formatter_spec.rb",
@@ -55,31 +56,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = "1.8.19"
   s.summary = "Turn objects into nicely formatted columns for easy reading"
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 3
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<table_print>, [">= 0"])
-      s.add_runtime_dependency(%q<bundler>, ["~> 1.1"])
-      s.add_development_dependency(%q<jeweler>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
-      s.add_development_dependency(%q<cucumber>, [">= 0"])
-      s.add_development_dependency(%q<relish>, [">= 0"])
-    else
-      s.add_runtime_dependency(%q<table_print>, [">= 0"])
-      s.add_runtime_dependency(%q<bundler>, ["~> 1.1"])
-      s.add_development_dependency(%q<jeweler>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
-      s.add_development_dependency(%q<cucumber>, [">= 0"])
-      s.add_development_dependency(%q<relish>, [">= 0"])
-    end
-  else
-    s.add_runtime_dependency(%q<table_print>, [">= 0"])
-    s.add_runtime_dependency(%q<bundler>, ["~> 1.1"])
-    s.add_development_dependency(%q<jeweler>, [">= 0"])
-    s.add_development_dependency(%q<rspec>, [">= 0"])
-    s.add_development_dependency(%q<cucumber>, [">= 0"])
-    s.add_development_dependency(%q<relish>, [">= 0"])
-  end
+  s.add_development_dependency('bundler', "~> 1.1")
+  s.add_development_dependency('jeweler', ">= 0")
+  s.add_development_dependency('rspec', ">= 0")
+  s.add_development_dependency('cucumber', ">= 0")
+  s.add_development_dependency('relish', ">= 0")
 end
 
