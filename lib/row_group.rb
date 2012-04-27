@@ -37,7 +37,7 @@ module TablePrint
     end
 
     def column_for(name)
-      column = @columns[name.to_s] ||= Column.new(name: name)
+      column = @columns[name.to_s] ||= Column.new(:name => name)
 
       # assign the data sets to the column before we return it
       # do this as late as possible, since new rows could be added at any time
