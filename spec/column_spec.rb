@@ -4,9 +4,9 @@ require 'column'
 include TablePrint
 
 describe Column do
-  let(:c) {Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => "tagline")}
+  let(:c) {Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => :tagline)}
 
-  it "remembers its name" do
+  it "remembers its name as a string" do
     c.name.should == "tagline"
   end
 

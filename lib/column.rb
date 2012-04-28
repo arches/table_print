@@ -6,9 +6,13 @@ module TablePrint
 
     def initialize(attr_hash={})
       attr_hash.each do |k, v|
-        instance_variable_set("@#{k}", v)
+        self.send("#{k}=", v)
       end
       @formatters ||= []
+    end
+
+    def name=(n)
+      @name = n.to_s
     end
 
     def add_formatter(formatter)

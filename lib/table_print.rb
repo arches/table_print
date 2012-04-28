@@ -17,14 +17,14 @@ module TablePrint
     def table_print
       group = TablePrint::RowGroup.new
 
-      group.add_children(Fingerprinter.new.lift(columns, @data))
+      group.add_children(Fingerprinter.new.lift(columns.collect(&:name), @data))
 
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
     def columns
       @data.extend Printable
-      @data.default_display_methods + included_columns - excepted_columns
+      (@data.default_display_methods + included_columns - excepted_columns).sort.collect{|c| Column.new(:name => c)}
     end
 
     def excepted_columns
@@ -33,6 +33,12 @@ module TablePrint
 
     def included_columns
       Array(@options[:include]).collect(&:to_s)
+    end
+
+    def hash_to_columns
+      options = [@options].flatten
+      options.map! { |o| (o.is_a? Hash) ? o : {:name => o} }
+      options.map { |o| Column.new(o) }
     end
   end
 end
