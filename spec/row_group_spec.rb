@@ -9,6 +9,14 @@ describe RowRecursion do
   let(:parent) { RowGroup.new }
   let(:child) { Row.new }
 
+  describe "#set_column" do
+    it "assigns the column object to the column name" do
+      column = Column.new
+      parent.set_column(:foobar, column)
+      parent.column_for(:foobar).should == column
+    end
+  end
+
   describe "#add_child" do
     it "adds the child to my children" do
       parent.add_child(child)

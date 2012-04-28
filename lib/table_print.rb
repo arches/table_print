@@ -4,13 +4,14 @@ require 'printable'
 module TablePrint
   class Printer
 
-    def self.table_print(data)
-      p = new(data)
+    def self.table_print(data, options={})
+      p = new(data, options)
       p.table_print
     end
 
-    def initialize(data)
+    def initialize(data, options={})
       @data = data
+      @options = options
     end
 
     def table_print
@@ -23,7 +24,11 @@ module TablePrint
 
     def columns
       @data.extend Printable
-      @data.default_display_methods
+      @data.default_display_methods + included_columns
+    end
+
+    def included_columns
+      Array(@options[:include])
     end
   end
 end

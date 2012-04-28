@@ -26,6 +26,10 @@ module TablePrint
       @children.length
     end
 
+    def set_column(name, column)
+      @columns[name.to_s] = column
+    end
+
     def columns
       return parent.columns if parent
 

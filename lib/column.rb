@@ -4,7 +4,7 @@ module TablePrint
     attr_writer :width
     attr_accessor :name, :data
 
-    def initialize(attr_hash)
+    def initialize(attr_hash={})
       attr_hash.each do |k, v|
         instance_variable_set("@#{k}", v)
       end

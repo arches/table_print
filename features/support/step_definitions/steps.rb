@@ -42,7 +42,7 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
 end
 
 When /table_print ([\w:]*), (.*)$/ do |klass, options|
-  tp(Array(@objs.send(klass.downcase)), eval(options))
+  tp(@objs.send(klass.downcase), eval(options))
 end
 
 When /table_print ([\w:]*)$/ do |klass|
@@ -59,8 +59,8 @@ Then /^the output should contain$/ do |string|
   output.join.strip.should == string
 end
 
-def tp(data)
+def tp(data, options={})
   @r, w = IO.pipe
-  w.puts TablePrint::Printer.table_print(data)
+  w.puts TablePrint::Printer.table_print(data, options)
   w.close
 end
