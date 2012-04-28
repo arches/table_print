@@ -24,11 +24,15 @@ module TablePrint
 
     def columns
       @data.extend Printable
-      @data.default_display_methods + included_columns
+      @data.default_display_methods + included_columns - excepted_columns
+    end
+
+    def excepted_columns
+      Array(@options[:except]).collect(&:to_s)
     end
 
     def included_columns
-      Array(@options[:include])
+      Array(@options[:include]).collect(&:to_s)
     end
   end
 end
