@@ -1,5 +1,5 @@
 module Kernel
-  def tp(data, options = {})
+  def tp(data, *options)
     start = Time.now
     printer = TablePrint::Printer.new(data, options)
     puts printer.table_print

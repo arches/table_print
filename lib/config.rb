@@ -8,7 +8,7 @@ module TablePrint
       @default_column_names = default_column_names
       @default_columns = @default_column_names.collect{|name| option_to_column(name)}
 
-      @options = options
+      @options = [options].flatten
       @options.delete_if {|o| o == {}}
 
       set_included_columns
