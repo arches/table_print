@@ -1,6 +1,11 @@
-require 'fingerprinter'
-require 'printable'
+require 'column'
 require 'config'
+require 'fingerprinter'
+require 'formatter'
+require 'hash_extensions'
+require 'kernel_extensions'
+require 'printable'
+require 'row_group'
 
 module TablePrint
   class Printer
@@ -11,7 +16,7 @@ module TablePrint
     end
 
     def initialize(data, options={})
-      @data = data
+      @data = [data].flatten
       @options = options
     end
 
@@ -21,13 +26,15 @@ module TablePrint
         group.set_column(c.name, c)
       end
 
-      group.add_children(Fingerprinter.new.lift(columns.collect(&:name), @data))
+      @data.each do |data|
+        group.add_children(Fingerprinter.new.lift(columns.collect(&:name), data))
+      end
 
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
     def columns
-      defaults = TablePrint::Printable.default_display_methods(@data)
+      defaults = TablePrint::Printable.default_display_methods(@data.first)
       c = TablePrint::Config.new(defaults, @options)
       c.columns
     end

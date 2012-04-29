@@ -35,18 +35,22 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
   target_object = method_chain.inject(@objs) { |obj, method_name| obj.send(method_name) }
 
   # how we're going to add it
-  operator = "<<" if assignment_method == "add it"
-  operator = "=" if assignment_method == "assign it"
-
-  target_object.send("#{target_method}#{operator}", child)
+  if assignment_method == "assign it"
+    target_object.send("#{target_method}=", child)
+  else
+    target_object.send("#{target_method}") << child
+  end
 end
 
 When /table_print ([\w:]*), (.*)$/ do |klass, options|
   tp(@objs.send(klass.downcase), eval(options))
 end
 
-When /table_print ([\w:]*)$/ do |klass|
-  tp(@objs.send(klass.downcase))
+When /table_print ([\w\.:]*)$/ do |klass|
+  obj = @objs.send(klass.split(".").first.downcase)
+  obj = obj.send(klass.split(".").last) if klass.include? "."  # hack - we're assuming only two levels. use inject to find the target.
+  
+  tp(obj)
 end
 
 Then /^the output should contain$/ do |string|

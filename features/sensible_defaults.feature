@@ -26,6 +26,29 @@ Feature: Sensible defaults
     Ryan   | First post!
     """
 
+  Scenario: An array of objects
+    Given a class named Post
+    Given Post has attributes title, author
+    Given Post has a class method named foo with lambda{"just testing!"}
+    Given Post has a method named two_args with lambda{|a, b| "Called with #{a}, #{b}"}
+
+    Given a class named Blog
+    Given Blog has attributes posts
+    
+    When I instantiate a Blog with {:posts => []}
+    When I instantiate a Post with {:title => "First post!", :author => 'Ryan'} and add it to blog.posts
+    When I instantiate a Post with {:title => "Second post!", :author => 'Ryan'} and add it to blog.posts
+    When I instantiate a Post with {:title => "Third post!", :author => 'Ryan'} and add it to blog.posts
+    And table_print blog.posts
+    Then the output should contain
+    """
+    AUTHOR | TITLE       
+    ---------------------
+    Ryan   | First post! 
+    Ryan   | Second post!
+    Ryan   | Third post!
+    """
+
 #  Scenario: A nested object
 #    Given a class named Comment
 #    Given Comment has attributes id, username, body
