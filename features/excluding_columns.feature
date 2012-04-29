@@ -13,5 +13,3 @@ Feature: Excluding columns
     Ryan
     """
 
-  Scenario: With the :only option
-

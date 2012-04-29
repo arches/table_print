@@ -27,6 +27,7 @@ module TablePrint
     end
 
     def set_column(name, column)
+      return parent.set_column(name, column) if parent
       @columns[name.to_s] = column
     end
 
@@ -37,10 +38,12 @@ module TablePrint
     end
 
     def column_count
+      return parent.column_count if parent
       @columns.size
     end
 
     def column_for(name)
+      return parent.column_for(name) if parent
       column = @columns[name.to_s] ||= Column.new(:name => name)
 
       # assign the data sets to the column before we return it
@@ -50,6 +53,7 @@ module TablePrint
     end
 
     def width
+      return parent.width if parent
       columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
     end
 
@@ -145,6 +149,7 @@ module TablePrint
 
     def padded(name, value)
       f = FixedWidthFormatter.new(column_for(name).width)
+      #puts "#{name}\t#{value}\t#{column_for(name).width}\t#{f.format(value)}\t#{column_for(name)}"
       f.format(value)
     end
 

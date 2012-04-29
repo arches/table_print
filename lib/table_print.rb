@@ -1,5 +1,6 @@
 require 'fingerprinter'
 require 'printable'
+require 'config'
 
 module TablePrint
   class Printer
@@ -16,6 +17,9 @@ module TablePrint
 
     def table_print
       group = TablePrint::RowGroup.new
+      columns.each do |c|
+        group.set_column(c.name, c)
+      end
 
       group.add_children(Fingerprinter.new.lift(columns.collect(&:name), @data))
 
@@ -24,15 +28,8 @@ module TablePrint
 
     def columns
       @data.extend Printable
-      (@data.default_display_methods + included_columns - excepted_columns).sort.collect{|c| Column.new(:name => c)}
-    end
-
-    def excepted_columns
-      Array(@options[:except]).collect(&:to_s)
-    end
-
-    def included_columns
-      Array(@options[:include]).collect(&:to_s)
+      c = TablePrint::Config.new(@data.default_display_methods, @options)
+      c.columns
     end
   end
 end

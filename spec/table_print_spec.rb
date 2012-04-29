@@ -36,8 +36,8 @@ describe TablePrint::Printer do
       p = Printer.new(Sandbox::Post.new, :include => :author)
       cols = p.columns
       cols.length.should == 2
-      cols.first.name.should == 'author'
-      cols.last.name.should == 'title'
+      cols.first.name.should == 'title'
+      cols.last.name.should == 'author'
     end
   end
 end

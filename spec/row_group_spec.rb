@@ -171,7 +171,7 @@ describe TablePrint::Row do
         rr1.set_cell_values(:user => "Matt", :value => 5)
         rr2.set_cell_values(:user => "Sam", :value => 3)
 
-        row.format.should == "bob jones | 2012     | harper    | super wonky | wonky |      |      \n       |          | price     | never wonky |       |      |      \n       |          |           |          |       | Matt | 5    \n       |          |           |          |       | Sam  | 3    "
+        row.format.should == "bob jones | 2012     | harper    | super wonky | wonky |      |      \n          |          | price     | never wonky |       |      |      \n          |          |           |             |       | Matt | 5    \n          |          |           |             |       | Sam  | 3    "
       end
     end
   end

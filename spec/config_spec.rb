@@ -46,6 +46,17 @@ describe TablePrint::Config do
         c.columns.last.name.should == 'bar'
       end
     end
+    
+    context "with options" do
+      it "adds foo to the list of methods and remembers its options" do
+        c = TablePrint::Config.new([:title], :include => {:foo => {:width => 10}})
+        c.columns.length.should == 2
+        c.columns.first.name.should == 'title'
+
+        c.columns.last.name.should == 'foo'
+        c.columns.last.width.should == 10
+      end
+    end
   end
 
   describe ":except" do
@@ -105,6 +116,31 @@ describe TablePrint::Config do
         c.columns.length.should == 1
         c.columns.first.name.should == 'title'
         c.columns.first.formatters.should == [f1, f2]
+      end
+    end
+  end
+  
+  describe "#option_to_column" do
+    context "with a symbol" do
+      it "returns a column named foo" do
+        c = TablePrint::Config.new([])
+        column = c.option_to_column(:foo)
+        column.name.should == 'foo'
+      end
+    end
+    context "with a string" do
+      it "returns a column named foo" do
+        c = TablePrint::Config.new([])
+        column = c.option_to_column('foo')
+        column.name.should == 'foo'
+      end
+    end
+    context "with a hash" do
+      it "returns a column named foo and the specified options" do
+        c = TablePrint::Config.new([])
+        column = c.option_to_column({:foo => {:width => 10}})
+        column.name.should == 'foo'
+        column.width.should == 10
       end
     end
   end
