@@ -69,3 +69,18 @@ Feature: Sensible defaults
     """
 
   Scenario: An object with column info (like an ActiveRecord object)
+    Given a class named ColumnInfo
+    Given ColumnInfo has attributes name
+    
+    Given a class named Blog
+    Given Blog has attributes title, author
+    Given Blog has a class method named columns with lambda{[Sandbox::ColumnInfo.new(:name => :title)]}
+
+    When I instantiate a Blog with {:title => "First post!", :author => 'Ryan'}
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE      
+    -----------
+    First post!
+    """

@@ -2,6 +2,8 @@ module TablePrint
   module Printable
     # Sniff the data class for non-standard methods to use as a baseline for display
     def self.default_display_methods(target)
+      return target.class.columns.collect(&:name) if target.class.respond_to? :columns
+      
       methods = []
       target.methods.each do |method_name|
         method = target.method(method_name)
