@@ -49,22 +49,23 @@ Feature: Sensible defaults
     Ryan   | Third post!
     """
 
-#  Scenario: A nested object
-#    Given a class named Comment
-#    Given Comment has attributes id, username, body
-#
-#    Given a class named Blog
-#    Given Blog has attributes id, comments
-#
-#    Given I instantiate a Blog with {id: 1, comments: []}
-#    And I instantiate a Comment with {id: 1, username: 'chris', body: 'once upon a time'} and add it to blog.comments
-#    When I table_print
-#    Then the output should contain
-#    """
-#    TODO: review this output string
-#    ID | COMMENTS
-#    -------------
-#    1  | [#<Comment:0x007fb4f38e89d8 @id=1, @username="chris", @body="once upon a time">]
-#    """
-#
-#  Scenario: An object with column info (like an ActiveRecord object)
+  Scenario: Nested objects
+    Given a class named Comment
+    Given Comment has attributes id, username, body
+
+    Given a class named Blog
+    Given Blog has attributes id, comments
+
+    Given I instantiate a Blog with {:id => 1, :comments => []}
+    And I instantiate a Comment with {:id => 1, :username => 'chris', :body => 'once upon a time'} and add it to blog.comments
+    And I instantiate a Comment with {:id => 2, :username => 'joe', :body => 'once upon a time'} and add it to blog.comments
+    When I table_print Blog, [:id, "comments.id", "comments.username"]
+    Then the output should contain
+    """
+    COMMENTS.ID | COMMENTS.USERNAME | ID
+    ------------------------------------
+    1           | chris             | 1 
+    2           | joe               |
+    """
+
+  Scenario: An object with column info (like an ActiveRecord object)
