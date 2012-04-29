@@ -34,11 +34,5 @@ module TablePrint
     def included_columns
       Array(@options[:include]).collect(&:to_s)
     end
-
-    def hash_to_columns
-      options = [@options].flatten
-      options.map! { |o| (o.is_a? Hash) ? o : {:name => o} }
-      options.map { |o| Column.new(o) }
-    end
   end
 end

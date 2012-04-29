@@ -14,10 +14,31 @@ describe Column do
     c.data.should == ["Once upon a time", "there was a dark and stormy night"]
   end
 
-  it "stores formatters" do
-    f = {}
-    c.add_formatter(f)
-    c.formatters.should == [f]
+  describe "#add_formatter" do
+    it "stores the formatter" do
+      f = {}
+      c.add_formatter(f)
+      c.formatters.should == [f]
+    end
+  end
+
+  describe "#formatter=" do
+    it "adds the formatters individually" do
+      c.should_receive(:add_formatter).twice
+      c.formatters = [{}, {}]
+    end
+  end
+
+  describe "#display_method" do
+    it "stores the column's display method as a string" do
+      c = Column.new(:display_method => :boofar)
+      c.display_method.should == "boofar"
+    end
+
+    it "defaults to the column name" do
+      c = Column.new(:name => :boofar)
+      c.display_method.should == "boofar"
+    end
   end
 
   describe "#data_width" do
