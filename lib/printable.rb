@@ -1,12 +1,12 @@
 module TablePrint
   module Printable
     # Sniff the data class for non-standard methods to use as a baseline for display
-    def default_display_methods
+    def self.default_display_methods(target)
       methods = []
-      self.methods.each do |method_name|
-        method = self.method(method_name)
+      target.methods.each do |method_name|
+        method = target.method(method_name)
 
-        if method.owner == self.class
+        if method.owner == target.class
           if method.arity == 0 #
             methods << method_name.to_s
           end

@@ -12,8 +12,7 @@ describe TablePrint::Printable do
       Sandbox.add_attributes("Hat", "brand")
 
       p = Sandbox::Hat.new
-      p.extend TablePrint::Printable
-      p.default_display_methods.should == %W(brand)
+      TablePrint::Printable.default_display_methods(p).should == %W(brand)
     end
 
     it "ignores dangerous methods" do
@@ -21,8 +20,7 @@ describe TablePrint::Printable do
       Sandbox.add_method("Hat", "brand!") {}
 
       p = Sandbox::Hat.new
-      p.extend TablePrint::Printable
-      p.default_display_methods.should == []
+      TablePrint::Printable.default_display_methods(p).should == []
     end
 
     it "ignores methods defined in a superclass" do
@@ -31,8 +29,7 @@ describe TablePrint::Printable do
       Sandbox.add_attributes("Hat::Bowler", "brim_width")
 
       p = Sandbox::Hat::Bowler.new
-      p.extend TablePrint::Printable
-      p.default_display_methods.should == %W(brim_width)
+      TablePrint::Printable.default_display_methods(p).should == %W(brim_width)
     end
 
     it "ignores methods that require arguments" do
@@ -41,8 +38,7 @@ describe TablePrint::Printable do
       Sandbox.add_method("Hat", "tip?") { |person| person.rapscallion? }
 
       p = Sandbox::Hat.new
-      p.extend TablePrint::Printable
-      p.default_display_methods.should == %W(brand)
+      TablePrint::Printable.default_display_methods(p).should == %W(brand)
     end
 
     it "ignores methods from an included module" do

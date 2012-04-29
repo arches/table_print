@@ -27,8 +27,8 @@ module TablePrint
     end
 
     def columns
-      @data.extend Printable
-      c = TablePrint::Config.new(@data.default_display_methods, @options)
+      defaults = TablePrint::Printable.default_display_methods(@data)
+      c = TablePrint::Config.new(defaults, @options)
       c.columns
     end
   end
