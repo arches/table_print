@@ -10,12 +10,12 @@ Feature: Adding columns
 
     When I instantiate a Foo with {:herp => "derp"}
     When I instantiate a Foo::Blog with {:title => "post!", :author => 'Ryan'} and assign it to foo.blog
-    And table_print Foo, {:include => ["blog.title", "blog.author"]}
+    And table_print Foo, {:include => ["blog.author", "blog.title"]}
     Then the output should contain
     """
-    BLOG.AUTHOR | BLOG.TITLE | HERP
+    HERP | BLOG.AUTHOR | BLOG.TITLE
     -------------------------------
-    Ryan        | post!      | derp
+    derp | Ryan        | post!
     """
 
   Scenario: Providing a proc

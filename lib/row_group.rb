@@ -34,7 +34,7 @@ module TablePrint
     def columns
       return parent.columns if parent
 
-      raw_column_names.sort.collect{|k, v| column_for(k)}
+      raw_column_names.collect{|k, v| column_for(k)}
     end
 
     def column_count
@@ -95,6 +95,7 @@ module TablePrint
     def format
       rows = @children
       rows = @children[1..-1] if @skip_first_row
+      rows ||= []
       rows = rows.collect { |row| row.format }.join("\n")
 
       return nil if rows.length == 0
@@ -159,6 +160,7 @@ module TablePrint
         group.skip_first_row!
 
         column_names.collect do |name|
+          next unless group.children and group.children.length > 0
           value = group.children.first.cells[name]
           rollup[name] = value if value
         end

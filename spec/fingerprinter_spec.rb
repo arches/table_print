@@ -23,8 +23,25 @@ describe Fingerprinter do
       row.cells.should == {'name' => "dale carnegie"}
     end
 
-    it "turns a multi-level column set into a single row with groups" do
-      Sandbox.add_class("")
+    it "turns multiple levels of columns into multiple rows" do
+      rows = Fingerprinter.new.lift(["name", "books.title"], OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
+      rows.length.should == 1
+      row = rows.first
+      row.children.length.should == 1
+      row.cells.should == {'name' => "dale carnegie"}
+      row.children.first.children.first.cells.should == {'books.title' => "how to make influences"}
+    end
+    
+    it "doesn't choke if an association doesn't exist" do
+      rows = Fingerprinter.new.lift(["name", "books.title"], OpenStruct.new(:name => "dale carnegie", :books => []))
+
+      rows.length.should == 1
+
+      row = rows.first
+      row.children.length.should == 1
+
+      group = row.children.first
+      group.children.length.should == 0
     end
   end
 

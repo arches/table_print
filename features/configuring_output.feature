@@ -9,9 +9,9 @@ Feature: Configuring output
     And table_print Blog, {:include => {:author => {:width => 10}}}
     Then the output should contain
     """
-    AUTHOR     | TITLE
+    TITLE | AUTHOR    
     ------------------
-    Ryan       | post!
+    post! | Ryan
     """
   Scenario: Specifying configuration on a per-object basis
   Scenario: Setting a default date format
