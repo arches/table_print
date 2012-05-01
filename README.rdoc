@@ -89,5 +89,5 @@ a skinny email column, set the width explicitly:
 
 == Copyright
 
-Copyright (c) 2011 Chris Doyle. See LICENSE.txt for further details.
+Copyright (c) 2012 Chris Doyle. See LICENSE.txt for further details.
 
