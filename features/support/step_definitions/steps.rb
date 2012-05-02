@@ -60,7 +60,9 @@ Then /^the output should contain$/ do |string|
   end
   @r.close
 
-  output.join.strip.should == string
+  output.zip(string.split("\n")).each do |actual, expected|
+    actual.gsub(/\s/m, "").split(//).sort.join.should == expected.gsub(" ", "").split(//).sort.join
+  end
 end
 
 def tp(data, options={})
