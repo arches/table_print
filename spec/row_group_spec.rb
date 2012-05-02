@@ -30,7 +30,7 @@ describe RowRecursion do
   end
 
   describe "#add_children" do
-    let (:child2) { Row.new }
+    let (:child2) {Row.new}
 
     it "adds all the children to myself" do
       parent.add_children([child, child2])
@@ -105,12 +105,7 @@ describe RowRecursion do
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
       child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
-      header = child.header
-      header.count("|").should == 2
-      header.should include "TITLE"
-      header.should include "AUTHOR"
-      header.should include "SUBTITLE"
-      header.length.should == 40
+      compare_rows(child.header, "AUTHOR | SUBTITLE           | TITLE     ")
     end
   end
 end
@@ -135,7 +130,14 @@ describe TablePrint::RowGroup do
   end
 end
 
+def compare_rows(actual_rows, expected_rows)
+  actual_rows.split("\n").zip(expected_rows.split("\n")).each do |actual, expected|
+    actual.split(//).sort.join.should == expected.split(//).sort.join
+  end
+end
+
 describe TablePrint::Row do
+  let(:parent) {RowGroup.new}
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
   describe "#format" do
@@ -148,14 +150,7 @@ describe TablePrint::Row do
         group.add_child(r2)
         r2.set_cell_values('subtitle.foobar' => "super wonky", :publisher => "harper")
 
-        output = row.format
-        output.count("|").should == 4
-        output.should include 'wonky'
-        output.should include 'bob jones'
-        output.should include '2012'
-        output.should include 'super wonky'
-        output.should include 'harper'
-        output.length.should == 58
+        compare_rows(row.format, "wonky | bob jones | 2012     | harper    | super wonky    ")
       end
     end
 
@@ -179,18 +174,10 @@ describe TablePrint::Row do
         rr1.set_cell_values(:user => "Matt", :value => 5)
         rr2.set_cell_values(:user => "Sam", :value => 3)
 
-        output = row.format
-        output.count("|").should == 24
-        output.should include "wonky |"
-        output.should include "bob jones"
-        output.should include "2012"
-        output.should include "super wonky"
-        output.should include "harper"
-        output.should include "Matt"
-        output.should include "Sam"
+        compare_rows(row.format, "wonky | bob jones | 2012     | super wonky | harper    |      |      \n      |           |          | never wonky | price     |      |      \n      |           |          |             |           | Matt | 5    \n      |           |          |             |           | Sam  | 3    ")
       end
     end
-    
+
     context "when a group has no children" do
       it "skips the group" do
         row = Row.new.set_cell_values(:title => "foobar")
