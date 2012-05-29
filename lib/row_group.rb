@@ -48,7 +48,7 @@ module TablePrint
 
       # assign the data sets to the column before we return it
       # do this as late as possible, since new rows could be added at any time
-      column.data = raw_column_data(column.name)
+      column.data ||= raw_column_data(column.name)
       column
     end
 
@@ -89,7 +89,8 @@ module TablePrint
     end
 
     def raw_column_names
-      @children.collect { |r| r.raw_column_names }.flatten.uniq
+      return @raw_column_names if @raw_column_names
+      @raw_column_names = @children.collect { |r| r.raw_column_names }.flatten.uniq
     end
 
     def format
