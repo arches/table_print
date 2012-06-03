@@ -143,7 +143,7 @@ describe TablePrint::Row do
   describe "#padded" do
     it "collapses newlines into spaces" do
       r = Row.new
-      r.stub(:column_for) { OpenStruct.new(width: 10) }
+      r.stub(:column_for) { OpenStruct.new(:width => 10) }
       r.padded(:title, "foo\nbar").should == "foo bar   "
     end
   end
