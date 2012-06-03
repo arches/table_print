@@ -31,7 +31,7 @@ module TablePrint
       end
 
       group.collapse!
-      
+
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 

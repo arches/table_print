@@ -17,6 +17,12 @@ module TablePrint
       child.parent = self
     end
 
+    def insert_children(i, children)
+      @children.insert(i, children).flatten!
+      children.each {|c| c.parent = self }
+      self
+    end
+
     def add_children(children)
       @children.concat children
       children.each { |c| c.parent = self }
@@ -150,8 +156,10 @@ module TablePrint
       to_absorb.each do |absorbable_group|
         absorbable_row = absorbable_group.children.shift
         @cells.merge!(absorbable_row.cells)
+
+        i = children.index(absorbable_group)
         children.delete(absorbable_group) if absorbable_group.children.empty?
-        add_children(absorbable_row.children) if absorbable_row.children.any?
+        insert_children(i, absorbable_row.children) if absorbable_row.children.any?
       end
     end
 

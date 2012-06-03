@@ -408,5 +408,55 @@ describe TablePrint::Row do
         @row.children.last.children.last.cells.should == {"baz" => "bazaar2"}
       end
     end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #       group
+    #         row: bare
+    #         row: bart
+    #     row: baz
+    #       group
+    #         row: bazaar
+    #         row: bizarre
+    # => foo | bar  | bare
+    #        |      | bart
+    #        | baz  | bazaar
+    #        |      | bizarre
+    context "for multiple children with multiple children" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_child(
+            RowGroup.new.add_children([
+                                          Row.new.set_cell_values(:bar => "bar").add_child(
+                                              RowGroup.new.add_children([
+                                                                            Row.new.set_cell_values(:barry => "bare"),
+                                                                            Row.new.set_cell_values(:barry => "bart")
+                                                                        ])
+                                          ),
+                                          Row.new.set_cell_values(:bar => "baz").add_child(
+                                              RowGroup.new.add_children([
+                                                                            Row.new.set_cell_values(:barry => "bazaar"),
+                                                                            Row.new.set_cell_values(:barry => "bizarre")
+                                                                        ])
+                                          )
+                                      ])
+        )
+        @row.collapse!
+      end
+
+      it "pulls the first row from the first child into itself" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar", "barry" => "bare"}
+      end
+
+      it "leaves the second row from the first child in the first group" do
+        @row.children.first.children.first.cells.should == {"barry" => "bart"}
+      end
+
+      it "collapses the second group" do
+        @row.children.last.children.first.cells.should == {"bar" => "baz", "barry" => "bazaar"}
+        @row.children.last.children.first.children.first.children.first.cells.should == {"barry" => "bizarre"}
+      end
+    end
   end
 end
