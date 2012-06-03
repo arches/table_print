@@ -181,6 +181,7 @@ module TablePrint
     end
 
     def padded(name, value)
+      value = value.to_s.gsub(/\n/, " ")
       f = FixedWidthFormatter.new(column_for(name).width)
       f.format(value)
     end

@@ -140,6 +140,14 @@ end
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
+  describe "#padded" do
+    it "collapses newlines into spaces" do
+      r = Row.new
+      r.stub(:column_for) { OpenStruct.new(width: 10) }
+      r.padded(:title, "foo\nbar").should == "foo bar   "
+    end
+  end
+
   describe "#format" do
     it "formats the row with padding" do
       compare_rows(row.format, "wonky | bob jones | 2012    ")
