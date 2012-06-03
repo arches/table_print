@@ -30,6 +30,8 @@ module TablePrint
         group.add_children(Fingerprinter.new.lift(columns.collect(&:name), data))
       end
 
+      group.collapse!
+      
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 

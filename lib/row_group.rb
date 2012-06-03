@@ -20,6 +20,7 @@ module TablePrint
     def add_children(children)
       @children.concat children
       children.each { |c| c.parent = self }
+      self
     end
 
     def child_count
@@ -93,6 +94,15 @@ module TablePrint
       @raw_column_names = @children.collect { |r| r.raw_column_names }.flatten.uniq
     end
 
+    def vis(prefix="")
+      puts "#{prefix}group"
+      children.each{|c| c.vis(prefix + "  ")}
+    end
+
+    def collapse!
+      @children.each(&:collapse!)
+    end
+
     def format
       rows = @children
       rows = @children[1..-1] if @skip_first_row
@@ -122,6 +132,29 @@ module TablePrint
       @cells = {}
     end
 
+    # helpful for debugging
+    def vis(prefix="")
+      puts "#{prefix}row #{cells.inspect.to_s}"
+      children.each{|c| c.vis(prefix + "  ")}
+    end
+
+    def collapse!
+      children.each(&:collapse!)  # depth-first. start collapsing from the bottom and work our way up.
+
+      to_absorb = []
+      children.each do |group|
+        next unless can_absorb?(group)
+        to_absorb << group
+      end
+
+      to_absorb.each do |absorbable_group|
+        absorbable_row = absorbable_group.children.shift
+        @cells.merge!(absorbable_row.cells)
+        children.delete(absorbable_group) if absorbable_group.children.empty?
+        add_children(absorbable_row.children) if absorbable_row.children.any?
+      end
+    end
+
     def set_cell_values(values_hash)
       values_hash.each do |k, v|
         @cells[k.to_s] = v
@@ -132,32 +165,21 @@ module TablePrint
     def format
       column_names = columns.collect(&:name)
 
-      @already_absorbed_a_multigroup = false
-
-      rollup = {}
-      column_names.each do |name|
-        rollup[name] = @cells[name]
-      end
-
-      # try to get cell values from groups we can roll up
-      absorb_children(column_names, rollup)
-
-      output = [column_names.collect { |name| padded(name, apply_formatters(name, rollup[name])) }.join(" | ")]
+      output = [column_names.collect { |name| padded(name, apply_formatters(name, @cells[name])) }.join(" | ")]
       output.concat @children.collect { |g| g.format }
-      output.compact!
+      #output.compact!
 
       output.join("\n")
     end
 
     def padded(name, value)
       f = FixedWidthFormatter.new(column_for(name).width)
-      #puts "#{name}\t#{value}\t#{column_for(name).width}\t#{f.format(value)}\t#{column_for(name)}"
       f.format(value)
     end
 
     def absorb_children(column_names, rollup)
       @children.each do |group|
-        next unless absorbable_group?(group)
+        next unless can_absorb?(group)
         group.skip_first_row!
 
         column_names.collect do |name|
@@ -190,7 +212,7 @@ module TablePrint
       end
     end
 
-    def absorbable_group?(group)
+    def can_absorb?(group)
       return true if group.child_count == 1
 
       return false if @already_absorbed_a_multigroup

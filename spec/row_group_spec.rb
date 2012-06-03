@@ -131,59 +131,23 @@ describe TablePrint::RowGroup do
 end
 
 def compare_rows(actual_rows, expected_rows)
+  actual_rows.split("\n").length.should == expected_rows.split("\n").length
   actual_rows.split("\n").zip(expected_rows.split("\n")).each do |actual, expected|
     actual.split(//).sort.join.should == expected.split(//).sort.join
   end
 end
 
 describe TablePrint::Row do
-  let(:parent) {RowGroup.new}
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
   describe "#format" do
-    context "when the row has a child group with a single row" do
-      it "also formats and returns the child group" do
-        group = RowGroup.new
-        row.add_child(group)
-
-        r2 = Row.new
-        group.add_child(r2)
-        r2.set_cell_values('subtitle.foobar' => "super wonky", :publisher => "harper")
-
-        compare_rows(row.format, "wonky | bob jones | 2012     | harper    | super wonky    ")
-      end
+    it "formats the row with padding" do
+      compare_rows(row.format, "wonky | bob jones | 2012    ")
     end
 
-    context "when the row has multiple child groups with multiple rows" do
-      it "formats all the rows" do
-        pubs = RowGroup.new
-        row.add_child(pubs)
-        pr1 = Row.new
-        pr2 = Row.new
-        pubs.add_children([pr1, pr2])
-
-        pr1.set_cell_values('subtitle' => "super wonky", 'publisher' => "harper")
-        pr2.set_cell_values('subtitle' => "never wonky", 'publisher' => "price")
-
-        ratings = RowGroup.new
-        row.add_child(ratings)
-        rr1 = Row.new
-        rr2 = Row.new
-        ratings.add_children([rr1, rr2])
-
-        rr1.set_cell_values(:user => "Matt", :value => 5)
-        rr2.set_cell_values(:user => "Sam", :value => 3)
-
-        compare_rows(row.format, "wonky | bob jones | 2012     | super wonky | harper    |      |      \n      |           |          | never wonky | price     |      |      \n      |           |          |             |           | Matt | 5    \n      |           |          |             |           | Sam  | 3    ")
-      end
-    end
-
-    context "when a group has no children" do
-      it "skips the group" do
-        row = Row.new.set_cell_values(:title => "foobar")
-        row.add_child(RowGroup.new)
-        row.format.should == "foobar"
-      end
+    it "also formats the children" do
+      row.add_child(RowGroup.new.add_child(Row.new.set_cell_values(:title => "wonky2", :author => "bob jones2", :pub_date => "20122")))
+      compare_rows(row.format, "wonky  | bob jones  | 2012    \nwonky2 | bob jones2 | 20122   ")
     end
   end
 
@@ -215,6 +179,234 @@ describe TablePrint::Row do
       row.add_child(group)
 
       row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
+    end
+  end
+
+  describe "#collapse" do
+
+    # row: foo
+    #   group
+    #     row: bar
+    # => foo | bar
+    context "for a single row in a single child group" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_child(
+            RowGroup.new.add_child(
+                Row.new.set_cell_values(:bar => "bar")
+            )
+        )
+        @row.collapse!
+      end
+
+      it "pulls the cells up into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+      end
+
+      it "dereferences the now-defunct group" do
+        @row.children.length.should == 0
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #     row: baz
+    # => foo | bar
+    #        | baz
+    context "for two rows in a single child group" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_child(
+            RowGroup.new.add_children([
+                                          Row.new.set_cell_values(:bar => "bar"),
+                                          Row.new.set_cell_values(:bar => "baz")
+                                      ])
+        )
+        @row.collapse!
+      end
+
+      it "pulls the cells from the first row up into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+      end
+
+      it "deletes the absorbed row but leaves the second row in the group" do
+        @row.children.length.should == 1
+        @row.children.first.children.length.should == 1
+        @row.children.first.children.first.cells.should == {"bar" => "baz"}
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #   group
+    #     row: baz
+    # => foo | bar | baz
+    context "for two groups with a single row each" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_children([
+                                                             RowGroup.new.add_child(
+                                                                 Row.new.set_cell_values(:bar => "bar")
+                                                             ),
+                                                             RowGroup.new.add_child(
+                                                                 Row.new.set_cell_values(:baz => "baz")
+                                                             )
+                                                         ])
+        @row.collapse!
+      end
+
+      it "pulls the cells from both groups into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+      end
+
+      it "dereferences both now-defunct groups" do
+        @row.children.length.should == 0
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #   group
+    #     row: baz
+    #     row: bazaar
+    # => foo | bar | baz
+    #              | bazaar
+    context "for two groups, one with a single row and one with two rows" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_children([
+                                                             RowGroup.new.add_child(
+                                                                 Row.new.set_cell_values(:bar => "bar")
+                                                             ),
+                                                             RowGroup.new.add_children([
+                                                                                           Row.new.set_cell_values(:baz => "baz"),
+                                                                                           Row.new.set_cell_values(:baz => "bazaar"),
+                                                                                       ]),
+                                                         ])
+        @row.collapse!
+      end
+
+      it "pulls the single row and the first row from the double into itself" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+      end
+
+      it "keeps the second row from the second group in its own group" do
+        @row.children.length.should == 1
+        @row.children.first.children.length.should == 1
+        @row.children.first.children.first.cells.should == {"baz" => "bazaar"}
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #       group
+    #         row: baz
+    # => foo | bar | baz
+    context "for two nested groups, each with one row" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_child(
+            RowGroup.new.add_child(
+                Row.new.set_cell_values(:bar => "bar").add_child(
+                    RowGroup.new.add_child(
+                        Row.new.set_cell_values(:baz => "baz")
+                    )
+                )
+            )
+        )
+        @row.collapse!
+      end
+
+      it "pulls the cells from both groups into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+      end
+
+      it "dereferences both now-defunct groups" do
+        @row.children.length.should == 0
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #       group
+    #         row: baz
+    #         row: bazaar
+    # => foo | bar | baz
+    #              | bazaar
+    context "for a child with one row, which itself has multiple rows" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_child(
+            RowGroup.new.add_child(
+                Row.new.set_cell_values(:bar => "bar").add_child(
+                    RowGroup.new.add_children([
+                                                  Row.new.set_cell_values(:baz => "baz"),
+                                                  Row.new.set_cell_values(:baz => "bazaar")
+                                              ])
+                )
+            )
+        )
+        @row.collapse!
+      end
+
+      it "pulls the first row from each group up into itself" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+      end
+
+      it "deletes only the intermediary group" do
+        @row.children.length.should == 1
+        @row.children.first.children.length.should == 1
+        @row.children.first.children.first.cells.should == {"baz" => "bazaar"}
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #     row: bar2
+    #   group
+    #     row: bazaar
+    #     row: bazaar2
+    # => foo | bar  |
+    #        | bar2 |
+    #        |      | bazaar
+    #        |      | bazaar2
+    context "for multiple children with multiple rows" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_children([
+                                                             RowGroup.new.add_children([
+                                                                                           Row.new.set_cell_values(:bar => "bar"),
+                                                                                           Row.new.set_cell_values(:bar => "bar2"),
+                                                                                       ]),
+                                                             RowGroup.new.add_children([
+                                                                                           Row.new.set_cell_values(:baz => "bazaar"),
+                                                                                           Row.new.set_cell_values(:baz => "bazaar2"),
+                                                                                       ])
+                                                         ])
+        @row.collapse!
+      end
+
+      it "pulls the first row from the first group into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+      end
+
+      it "leaves the second row in the first group" do
+        @row.children.length.should == 2
+        @row.children.first.children.length.should == 1
+        @row.children.first.children.first.cells.should == {"bar" => "bar2"}
+      end
+
+      it "leaves the second group alone" do
+        @row.children.last.children.length.should == 2
+        @row.children.last.children.first.cells.should == {"baz" => "bazaar"}
+        @row.children.last.children.last.cells.should == {"baz" => "bazaar2"}
+      end
     end
   end
 end
