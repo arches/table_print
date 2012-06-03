@@ -8,6 +8,13 @@ describe TablePrint::Printer do
     Sandbox.cleanup!
   end
 
+  describe "printing an empty array" do
+    it "returns the string 'no data'" do
+      p = Printer.new([])
+      p.table_print.should == 'No data.'
+    end
+  end
+
   describe "#columns" do
     it "pulls the column names off the data object" do
       Sandbox.add_class("Post")

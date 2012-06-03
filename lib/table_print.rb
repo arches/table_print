@@ -16,11 +16,12 @@ module TablePrint
     end
 
     def initialize(data, options={})
-      @data = [data].flatten
+      @data = [data].flatten.compact
       @options = options
     end
 
     def table_print
+      return "No data." if @data.empty?
       group = TablePrint::RowGroup.new
       columns.each do |c|
         group.set_column(c.name, c)
