@@ -1,4 +1,10 @@
 module TablePrint
+  class NoNewlineFormatter
+    def format(value)
+      value.to_s.gsub(/\n/, " ")
+    end
+  end
+
   class FixedWidthFormatter
     def initialize(width)
       @width = width

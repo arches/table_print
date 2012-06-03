@@ -3,6 +3,18 @@ require "formatter"
 
 include TablePrint
 
+describe TablePrint::NoNewlineFormatter do
+  before(:each) do
+    @f = TablePrint::NoNewlineFormatter.new
+  end
+
+  describe "#formater" do
+    it "replaces newlines with spaces" do
+      @f.format("foo\nbar").should == "foo bar"
+    end
+  end
+end
+
 describe TablePrint::FixedWidthFormatter do
   before(:each) do
     @f = TablePrint::FixedWidthFormatter.new(10)

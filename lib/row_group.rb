@@ -173,17 +173,10 @@ module TablePrint
     def format
       column_names = columns.collect(&:name)
 
-      output = [column_names.collect { |name| padded(name, apply_formatters(name, @cells[name])) }.join(" | ")]
+      output = [column_names.collect { |name| apply_formatters(name, @cells[name]) }.join(" | ")]
       output.concat @children.collect { |g| g.format }
-      #output.compact!
 
       output.join("\n")
-    end
-
-    def padded(name, value)
-      value = value.to_s.gsub(/\n/, " ")
-      f = FixedWidthFormatter.new(column_for(name).width)
-      f.format(value)
     end
 
     def absorb_children(column_names, rollup)
@@ -215,8 +208,13 @@ module TablePrint
       column_name = column_name.to_s
       return value unless column_for(column_name)
 
+      formatters = column_for(column_name).formatters || []
+
+      formatters << NoNewlineFormatter.new
+      formatters << FixedWidthFormatter.new(column_for(column_name).width)
+
       # successively apply the formatters for a column
-      column_for(column_name).formatters.inject(value) do |value, formatter|
+      formatters.inject(value) do |value, formatter|
         formatter.format(value)
       end
     end

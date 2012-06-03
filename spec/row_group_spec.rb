@@ -140,14 +140,6 @@ end
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
-  describe "#padded" do
-    it "collapses newlines into spaces" do
-      r = Row.new
-      r.stub(:column_for) { OpenStruct.new(:width => 10) }
-      r.padded(:title, "foo\nbar").should == "foo bar   "
-    end
-  end
-
   describe "#format" do
     it "formats the row with padding" do
       compare_rows(row.format, "wonky | bob jones | 2012    ")
@@ -169,8 +161,8 @@ describe TablePrint::Row do
 
       f1 = Sandbox::DoubleFormatter.new
       f2 = Sandbox::ChopFormatter.new
-      row.add_formatter(:title, f1)
-      row.add_formatter(:title, f2)
+
+      row.stub(:column_for) {OpenStruct.new(:width => 11, :formatters => [f1, f2])}
 
       row.apply_formatters(:title, "foobar").should == "foobarfooba"
     end
