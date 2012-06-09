@@ -21,8 +21,9 @@ module TablePrint
       end
     end
 
-    def display_method=(method_name)
-      @display_method = method_name.to_s
+    def display_method=(method)
+      method = method.to_s unless method.is_a? Proc
+      @display_method = method
     end
 
     def display_method

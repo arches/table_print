@@ -35,6 +35,12 @@ describe Column do
       c.display_method.should == "boofar"
     end
 
+    it "doesn't turn a lambda display method into a string" do
+      lam = lambda{}
+      c = Column.new(:display_method => lam)
+      c.display_method.should == lam
+    end
+
     it "defaults to the column name" do
       c = Column.new(:name => :boofar)
       c.display_method.should == "boofar"

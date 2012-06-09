@@ -40,7 +40,7 @@ describe Fingerprinter do
       row.cells.should == {'name' => "dale carnegie"}
       row.children.first.children.first.cells.should == {'books.title' => "how to make influences"}
     end
-    
+
     it "doesn't choke if an association doesn't exist" do
       rows = Fingerprinter.new.lift([Column.new(:name => "name"), Column.new(:name => "books.title")], OpenStruct.new(:name => "dale carnegie", :books => []))
 
@@ -51,6 +51,14 @@ describe Fingerprinter do
 
       group = row.children.first
       group.children.length.should == 0
+    end
+
+    it "allows a lambda as the display_method" do
+      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => lambda { |row| row.name.gsub(/[aeiou]/, "") })], OpenStruct.new(:name => "dale carnegie"))
+      rows.length.should == 1
+      row = rows.first
+      row.children.length.should == 0
+      row.cells.should == {'name' => "dl crng"}
     end
   end
 
@@ -130,15 +138,15 @@ describe Fingerprinter do
 
   describe "#chain_to_nested_hash" do
     it "turns a list of methods into a nested hash" do
-      Fingerprinter.new.column_to_nested_hash("books").should == {'books' => {}}
-      Fingerprinter.new.column_to_nested_hash("reviews.user").should == {'reviews' => {'user' => {}}}
+      Fingerprinter.new.display_method_to_nested_hash("books").should == {'books' => {}}
+      Fingerprinter.new.display_method_to_nested_hash("reviews.user").should == {'reviews' => {'user' => {}}}
     end
   end
 
   describe "#columns_to_nested_hash" do
     it "splits the column names into a nested hash" do
-      Fingerprinter.new.column_names_to_nested_hash(["books.name"]).should == {'books' => {'name' => {}}}
-      Fingerprinter.new.column_names_to_nested_hash(
+      Fingerprinter.new.display_methods_to_nested_hash(["books.name"]).should == {'books' => {'name' => {}}}
+      Fingerprinter.new.display_methods_to_nested_hash(
           ["books.name", "books.publisher", "reviews.rating", "reviews.user.email", "reviews.user.id"]
       ).should == {'books' => {'name' => {}, 'publisher' => {}}, 'reviews' => {'rating' => {}, 'user' => {'email' => {}, 'id' => {}}}}
     end

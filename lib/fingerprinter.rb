@@ -7,7 +7,7 @@ module TablePrint
       @column_names_by_display_method = {}
       columns.each { |c| @column_names_by_display_method[c.display_method] = c.name }
 
-      column_hash = column_names_to_nested_hash(columns.collect(&:display_method))
+      column_hash = display_methods_to_nested_hash(columns.collect(&:display_method))
 
       hash_to_rows("", column_hash, object)
     end
@@ -35,7 +35,9 @@ module TablePrint
       cells = {}
       handleable_columns(hash).each do |method|
         display_method = (prefix == "" ? method : "#{prefix}.#{method}")
-        cells[@column_names_by_display_method[display_method]] = target.send(method)
+        cell_value = method.call(target) if method.is_a? Proc
+        cell_value ||= target.send(method)
+        cells[@column_names_by_display_method[display_method]] = cell_value
       end
 
       row.set_cell_values(cells)
@@ -60,18 +62,21 @@ module TablePrint
       hash.select { |k, v| v != {} }.collect { |k, v| k }
     end
 
-    def column_names_to_nested_hash(columns)
+    def display_methods_to_nested_hash(display_methods)
       extended_hash = {}.extend TablePrint::HashExtensions::ConstructiveMerge
 
       # turn each column chain into a nested hash and add it to the output
-      columns.inject(extended_hash) do |hash, column_name|
-        hash.constructive_merge!(column_to_nested_hash(column_name))
+      display_methods.inject(extended_hash) do |hash, display_method|
+        hash.constructive_merge!(display_method_to_nested_hash(display_method))
       end
     end
 
-    def column_to_nested_hash(column_name)
+    def display_method_to_nested_hash(display_method)
       hash = {}
-      column_name.split(".").inject(hash) do |hash_level, method|
+
+      return {display_method => {}} if display_method.is_a? Proc
+
+      display_method.split(".").inject(hash) do |hash_level, method|
         hash_level[method] ||= {}
       end
       hash

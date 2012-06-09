@@ -20,5 +20,18 @@ Feature: Adding columns
 
   Scenario: Providing a proc
   Scenario: Providing a named proc
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And table_print Blog, {:wombat => {:display_method => lambda{|blog| blog.author.gsub(/[aeiou]/, "").downcase}}}
+    Then the output should contain
+    """
+    WOMBAT
+    ------
+    ryn
+    """
+  Scenario: Providing a named proc without saying 'display_method', eg :foo => lambda{}
   Scenario: Using a proc as a filter (ie, overriding an existing column with a proc)
 

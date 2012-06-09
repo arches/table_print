@@ -97,7 +97,7 @@ describe TablePrint::Config do
         c = TablePrint::Config.new([:title], :title => {:display_method => :boofar})
         c.columns.length.should == 1
         c.columns.first.name.should == 'title'
-        c.columns.first.display_method.should == 'boofar'
+        c.columns.first.display_method.should == "boofar"
       end
     end
     context "width" do
