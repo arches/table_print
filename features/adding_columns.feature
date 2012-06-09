@@ -18,7 +18,6 @@ Feature: Adding columns
     derp | Ryan        | post!
     """
 
-  Scenario: Providing a proc
   Scenario: Providing a named proc
     Given a class named Blog
 
