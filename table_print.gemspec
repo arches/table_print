@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.name = "table_print"
   s.version = "1.0.0.pre"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chris Doyle"]
-  s.date = "2012-04-27"
+  s.date = "2012-06-09"
   s.description = "TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different)."
   s.email = "archslide@gmail.com"
   s.extra_rdoc_files = [
@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    ".rspec",
     ".rvmrc",
     ".travis.yml",
     "Gemfile",
@@ -25,26 +26,32 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
-    "development/mock_objects.rb",
     "features/adding_columns.feature",
     "features/configuring_output.feature",
     "features/excluding_columns.feature",
     "features/sensible_defaults.feature",
     "features/support/step_definitions/before.rb",
     "features/support/step_definitions/steps.rb",
+    "lib/cattr.rb",
     "lib/column.rb",
+    "lib/config.rb",
+    "lib/config_resolver.rb",
     "lib/fingerprinter.rb",
     "lib/formatter.rb",
     "lib/hash_extensions.rb",
+    "lib/kernel_extensions.rb",
     "lib/printable.rb",
+    "lib/returnable.rb",
     "lib/row_group.rb",
-    "lib/table_print.rb"]
-  s.test_files = [
+    "lib/table_print.rb",
     "spec/column_spec.rb",
+    "spec/config_resolver_spec.rb",
+    "spec/config_spec.rb",
     "spec/fingerprinter_spec.rb",
     "spec/formatter_spec.rb",
     "spec/hash_extensions_spec.rb",
     "spec/printable_spec.rb",
+    "spec/returnable_spec.rb",
     "spec/row_group_spec.rb",
     "spec/spec_helper.rb",
     "spec/table_print_spec.rb",
@@ -56,10 +63,32 @@ Gem::Specification.new do |s|
   s.rubygems_version = "1.8.19"
   s.summary = "Turn objects into nicely formatted columns for easy reading"
 
-  s.add_development_dependency('bundler', "~> 1.1")
-  s.add_development_dependency('jeweler', ">= 0")
-  s.add_development_dependency('rspec', ">= 0")
-  s.add_development_dependency('cucumber', ">= 0")
-  s.add_development_dependency('relish', ">= 0")
+  if s.respond_to? :specification_version then
+    s.specification_version = 3
+
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<table_print>, [">= 0"])
+      s.add_runtime_dependency(%q<bundler>, ["~> 1.1"])
+      s.add_development_dependency(%q<bundler>, ["~> 1.1"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<relish>, [">= 0"])
+      s.add_development_dependency(%q<cucumber>, [">= 0"])
+    else
+      s.add_dependency(%q<table_print>, [">= 0"])
+      s.add_dependency(%q<bundler>, ["~> 1.1"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<cucumber>, [">= 0"])
+      s.add_dependency(%q<relish>, [">= 0"])
+    end
+  else
+    s.add_dependency(%q<table_print>, [">= 0"])
+    s.add_dependency(%q<bundler>, ["~> 1.1"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<cucumber>, [">= 0"])
+    s.add_dependency(%q<relish>, [">= 0"])
+  end
 end
 
