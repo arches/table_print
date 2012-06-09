@@ -17,11 +17,19 @@ describe Fingerprinter do
 
   describe "#lift" do
     it "turns a single level of columns into a single row" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => "name")], OpenStruct.new(:name => "dale carnegie"))
+      rows = Fingerprinter.new.lift([Column.new(:name => "name")], OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
       row.cells.should == {'name' => "dale carnegie"}
+    end
+
+    it "uses the display_method to get the data" do
+      rows = Fingerprinter.new.lift([Column.new(:name => "name of work", :display_method => "title")], OpenStruct.new(:title => "of mice and men"))
+      rows.length.should == 1
+      row = rows.first
+      row.children.length.should == 0
+      row.cells.should == {'name of work' => "of mice and men"}
     end
 
     it "turns multiple levels of columns into multiple rows" do
@@ -48,7 +56,9 @@ describe Fingerprinter do
 
   describe "#hash_to_rows" do
     it "uses hashes with empty values as column names" do
-      rows = Fingerprinter.new.hash_to_rows("", {'name' => {}}, OpenStruct.new(:name => "dale carnegie"))
+      f = Fingerprinter.new
+      f.instance_variable_set("@column_names_by_display_method", {"name" => "name"})
+      rows = f.hash_to_rows("", {'name' => {}}, OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
@@ -56,7 +66,9 @@ describe Fingerprinter do
     end
 
     it 'recurses for subsequent levels of hash' do
-      rows = Fingerprinter.new.hash_to_rows("", {'name' => {}, 'books' => {'title' => {}}}, [OpenStruct.new(:name => 'dale carnegie', :books => [OpenStruct.new(:title => "hallmark")])])
+      f = Fingerprinter.new
+      f.instance_variable_set("@column_names_by_display_method", {"name" => "name", "books.title" => "books.title"})
+      rows = f.hash_to_rows("", {'name' => {}, 'books' => {'title' => {}}}, [OpenStruct.new(:name => 'dale carnegie', :books => [OpenStruct.new(:title => "hallmark")])])
       rows.length.should == 1
 
       top_row = rows.first
@@ -71,13 +83,24 @@ describe Fingerprinter do
 
   describe "#populate_row" do
     it "fills a row by calling methods on the target object" do
-      row = Fingerprinter.new.populate_row("", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
+      f = Fingerprinter.new
+      f.instance_variable_set("@column_names_by_display_method", {"title" => "title", "author" => "author"})
+      row = f.populate_row("", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'title' => "foobar", 'author' => 'bobby'}
     end
 
     it "uses the provided prefix to name the cells" do
-      row = Fingerprinter.new.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
+      f = Fingerprinter.new
+      f.instance_variable_set("@column_names_by_display_method", {"bar.title" => "bar.title", "bar.author" => "bar.author"})
+      row = f.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'bar.title' => "foobar", 'bar.author' => 'bobby'}
+    end
+
+    it "uses the column name as the cell name but uses the display method to get the value" do
+      f = Fingerprinter.new
+      f.instance_variable_set("@column_names_by_display_method", {"bar.title" => "title", "bar.author" => "bar.author"})
+      row = f.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
+      row.cells.should == {'title' => "foobar", 'bar.author' => 'bobby'}
     end
   end
 

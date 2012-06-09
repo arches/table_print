@@ -4,7 +4,10 @@ require 'hash_extensions'
 module TablePrint
   class Fingerprinter
     def lift(columns, object)
-      column_hash = column_names_to_nested_hash(columns.collect(&:name))
+      @column_names_by_display_method = {}
+      columns.each { |c| @column_names_by_display_method[c.display_method] = c.name }
+
+      column_hash = column_names_to_nested_hash(columns.collect(&:display_method))
 
       hash_to_rows("", column_hash, object)
     end
@@ -31,7 +34,8 @@ module TablePrint
       # populate a row with the columns we handle
       cells = {}
       handleable_columns(hash).each do |method|
-        cells["#{prefix}#{'.' unless prefix == ''}#{method}"] = target.send(method)
+        display_method = (prefix == "" ? method : "#{prefix}.#{method}")
+        cells[@column_names_by_display_method[display_method]] = target.send(method)
       end
 
       row.set_cell_values(cells)
