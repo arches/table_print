@@ -42,5 +42,12 @@ describe TablePrint::FixedWidthFormatter do
     it "returns the width" do
       @f.width.should == 10
     end
+
+    it "respects the config'd max_width" do
+      max = TablePrint::Config.max_width
+      TablePrint::Config.max_width = 5
+      @f.width.should == 5
+      TablePrint::Config.max_width = max
+    end
   end
 end

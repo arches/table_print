@@ -15,7 +15,7 @@ module TablePrint
     end
 
     def width
-      @width
+      [@width, TablePrint::Config.max_width].min
     end
 
     private
