@@ -11,7 +11,7 @@ module TablePrint
     end
 
     def format(value)
-      "%-#{@width}s" % truncate(value)
+      "%-#{width}s" % truncate(value)
     end
 
     def width
@@ -23,9 +23,9 @@ module TablePrint
       return "" unless value
 
       value = value.to_s
-      return value unless value.length > @width
+      return value unless value.length > width
 
-      "#{value[0..@width-4]}..."
+      "#{value[0..width-4]}..."
     end
   end
 end
