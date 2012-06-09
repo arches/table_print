@@ -1,7 +1,7 @@
 require 'column'
 
 module TablePrint
-  class Config
+  class ConfigResolver
     def initialize(default_column_names, *options)
       @column_hash = {}
 

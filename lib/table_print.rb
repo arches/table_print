@@ -1,5 +1,5 @@
 require 'column'
-require 'config'
+require 'config_resolver'
 require 'fingerprinter'
 require 'formatter'
 require 'hash_extensions'
@@ -38,7 +38,7 @@ module TablePrint
 
     def columns
       defaults = TablePrint::Printable.default_display_methods(@data.first)
-      c = TablePrint::Config.new(defaults, @options)
+      c = TablePrint::ConfigResolver.new(defaults, @options)
       c.columns
     end
   end
