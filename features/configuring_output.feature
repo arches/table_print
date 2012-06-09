@@ -14,7 +14,19 @@ Feature: Configuring output
     post! | Ryan
     """
   Scenario: Specifying configuration on a per-object basis
-  Scenario: Setting a default date format
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And configure Blog with :title
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE
+    -----
+    post!
+    """
   Scenario: Applying a formatter
   Scenario: Setting a column name
     Given a class named Blog

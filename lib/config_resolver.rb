@@ -1,21 +1,50 @@
 require 'column'
+require 'config'
 
 module TablePrint
   class ConfigResolver
-    def initialize(default_column_names, *options)
+    def initialize(klass, default_column_names, *options)
       @column_hash = {}
 
-      @default_columns = default_column_names.collect{|name| option_to_column(name)}
+      @default_columns = default_column_names.collect { |name| option_to_column(name) }
 
-      @options = [options].flatten
-      @options.delete_if {|o| o == {}}
+      @included_columns = []
+      @excepted_columns = []
+      @only_columns = []
+
+      process_option_set(TablePrint::Config.for(klass))
+      process_option_set(options)
+    end
+
+    def process_option_set(options)
+
+      options = [options].flatten
+      options.delete_if { |o| o == {} }
 
       # process special symbols
-      set_included_columns
-      set_excepted_columns
+
+      @included_columns.concat [get_and_remove(options, :include)].flatten
+      @included_columns.map!{|option| option_to_column(option)}
+
+      @included_columns.each do |c|
+        @column_hash[c.name] = c
+      end
+
+      @excepted_columns.concat [get_and_remove(options, :except)].flatten
 
       # anything that isn't recognized as a special option is assumed to be a column name
-      @only_columns = @options.collect{|name| option_to_column(name)}
+      options.compact!
+      @only_columns = options.collect { |name| option_to_column(name) } unless options.empty?
+    end
+
+    def get_and_remove(arr, key)
+      except = arr.select do |o|
+        o.is_a? Hash and o.keys.include? key
+      end
+
+      return [] if except.empty?
+      arr.delete(except.first)
+      except.first.fetch(key)
     end
 
     def option_to_column(option)
@@ -34,30 +63,10 @@ module TablePrint
       c
     end
     
-    def set_included_columns
-      include, @options = @options.partition do |o|
-        o.is_a? Hash and o.keys.include? :include
-      end
-
-      @included_columns = [(include.first || {}).fetch(:include) {[]}].flatten
-      @included_columns.map!{|option| option_to_column(option)}
-      
-      @included_columns.each do |c|
-        @column_hash[c.name] = c
-      end
-    end
-
-    def set_excepted_columns
-      except, @options = @options.partition do |o|
-        o.is_a? Hash and o.keys.include? :except
-      end
-
-      @excepted_columns = (except.first || {}).fetch(:except) {[]}
-    end
-
     def usable_column_names
-      return @only_columns.collect(&:name) if @only_columns.length > 0
-      Array(@default_columns).collect(&:name) + Array(@included_columns).collect(&:name) - Array(@excepted_columns).collect(&:to_s)
+      base = @default_columns
+      base = @only_columns unless @only_columns.empty?
+      Array(base).collect(&:name) + Array(@included_columns).collect(&:name) - Array(@excepted_columns).collect(&:to_s)
     end
 
     def columns

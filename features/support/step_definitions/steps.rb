@@ -42,6 +42,11 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
   end
 end
 
+When /^configure (.*) with (.*)$/ do |klass, config|
+  klass = Sandbox.const_get_from_string(klass)
+  TablePrint::Config.set(klass, eval(config))
+end
+
 When /table_print ([\w:]*), (.*)$/ do |klass, options|
   tp(@objs.send(klass.downcase), eval(options))
 end

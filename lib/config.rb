@@ -14,7 +14,7 @@ module TablePrint
     end
 
     def self.for(klass)
-      @@klasses[klass]
+      @@klasses.fetch(klass) {}
     end
 
     def self.clear(klass)
