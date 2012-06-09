@@ -4,7 +4,7 @@ require 'hash_extensions'
 module TablePrint
   class Fingerprinter
     def lift(columns, object)
-      column_hash = column_names_to_nested_hash(columns)
+      column_hash = column_names_to_nested_hash(columns.collect(&:name))
 
       hash_to_rows("", column_hash, object)
     end

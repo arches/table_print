@@ -28,7 +28,7 @@ module TablePrint
       end
 
       @data.each do |data|
-        group.add_children(Fingerprinter.new.lift(columns.collect(&:name), data))
+        group.add_children(Fingerprinter.new.lift(columns, data))
       end
 
       group.collapse!

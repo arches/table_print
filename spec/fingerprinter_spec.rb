@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'ostruct'
 require 'fingerprinter'
+require 'column'
 
 class TablePrint::Row
   attr_accessor :groups, :cells
@@ -16,7 +17,7 @@ describe Fingerprinter do
 
   describe "#lift" do
     it "turns a single level of columns into a single row" do
-      rows = Fingerprinter.new.lift(["name"], OpenStruct.new(:name => "dale carnegie"))
+      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => "name")], OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
@@ -24,7 +25,7 @@ describe Fingerprinter do
     end
 
     it "turns multiple levels of columns into multiple rows" do
-      rows = Fingerprinter.new.lift(["name", "books.title"], OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
+      rows = Fingerprinter.new.lift([Column.new(:name => "name"), Column.new(:name => "books.title")], OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 1
@@ -33,7 +34,7 @@ describe Fingerprinter do
     end
     
     it "doesn't choke if an association doesn't exist" do
-      rows = Fingerprinter.new.lift(["name", "books.title"], OpenStruct.new(:name => "dale carnegie", :books => []))
+      rows = Fingerprinter.new.lift([Column.new(:name => "name"), Column.new(:name => "books.title")], OpenStruct.new(:name => "dale carnegie", :books => []))
 
       rows.length.should == 1
 
