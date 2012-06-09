@@ -4,16 +4,17 @@ module TablePrint
   class Config
     def initialize(default_column_names, *options)
       @column_hash = {}
-      
-      @default_column_names = default_column_names
-      @default_columns = @default_column_names.collect{|name| option_to_column(name)}
+
+      @default_columns = default_column_names.collect{|name| option_to_column(name)}
 
       @options = [options].flatten
       @options.delete_if {|o| o == {}}
 
+      # process special symbols
       set_included_columns
       set_excepted_columns
 
+      # anything that isn't recognized as a special option is assumed to be a column name
       @only_columns = @options.collect{|name| option_to_column(name)}
     end
 
