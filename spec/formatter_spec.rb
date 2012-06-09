@@ -9,6 +9,10 @@ describe TablePrint::NoNewlineFormatter do
   end
 
   describe "#formater" do
+    it "replaces carriage returns with spaces" do
+      @f.format("foo\r\nbar").should == "foo bar"
+    end
+
     it "replaces newlines with spaces" do
       @f.format("foo\nbar").should == "foo bar"
     end

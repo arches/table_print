@@ -1,7 +1,9 @@
+require 'config'
+
 module TablePrint
   class NoNewlineFormatter
     def format(value)
-      value.to_s.gsub(/\n/, " ")
+      value.to_s.gsub(/\r\n/, "\n").gsub(/\n/, " ")
     end
   end
 
