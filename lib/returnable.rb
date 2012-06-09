@@ -4,7 +4,7 @@ module TablePrint
       @string_value = string_value
     end
 
-    def set(klass, config)
+    def set(klass, *config)
       TablePrint::Config.set(klass, config)
       "Set table_print config for #{klass}"
     end
