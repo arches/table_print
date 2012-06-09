@@ -21,7 +21,11 @@ module TablePrint
     def option_to_column(option)
       if option.is_a? Hash
         name = option.keys.first
-        option = option[name].merge(:name => name)
+        if option[name].is_a? Proc
+          option = {:name => name, :display_method => option[name]}
+        else
+          option = option[name].merge(:name => name)
+        end
       else
         option = {:name => option}
       end

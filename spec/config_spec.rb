@@ -46,7 +46,7 @@ describe TablePrint::Config do
         c.columns.last.name.should == 'bar'
       end
     end
-    
+
     context "with options" do
       it "adds foo to the list of methods and remembers its options" do
         c = TablePrint::Config.new([:title], :include => {:foo => {:width => 10}})
@@ -77,16 +77,21 @@ describe TablePrint::Config do
   end
 
   describe "lambdas" do
-    context "alone" do
-      it "" do
-        pending
-        #:foo => lambda { |mo| mo.foo * mo.bar }
-      end
+    it "uses the key as the name and the lambda as the display method" do
+      lam = lambda {}
+      c = TablePrint::Config.new([:title], :foo => {:display_method => lam})
+      c.columns.length.should == 1
+      c.columns.first.name.should == 'foo'
+      c.columns.first.display_method.should == lam
     end
-    context "alone" do
-      it "" do
-        pending
-        #:foo => {:display_method => lambda { |mo| mo.foo * mo.bar }}
+
+    context "without the display_method keyword" do
+      it "uses the key as the name and the lambda as the display method" do
+        lam = lambda {}
+        c = TablePrint::Config.new([:title], :foo => lam)
+        c.columns.length.should == 1
+        c.columns.first.name.should == 'foo'
+        c.columns.first.display_method.should == lam
       end
     end
   end
@@ -119,7 +124,7 @@ describe TablePrint::Config do
       end
     end
   end
-  
+
   describe "#option_to_column" do
     context "with a symbol" do
       it "returns a column named foo" do

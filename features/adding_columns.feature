@@ -33,5 +33,17 @@ Feature: Adding columns
     ryn
     """
   Scenario: Providing a named proc without saying 'display_method', eg :foo => lambda{}
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And table_print Blog, {:wombat => lambda{|blog| blog.author.gsub(/[aeiou]/, "").downcase}}
+    Then the output should contain
+    """
+    WOMBAT
+    ------
+    ryn
+    """
   Scenario: Using a proc as a filter (ie, overriding an existing column with a proc)
 
