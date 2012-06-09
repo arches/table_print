@@ -6,8 +6,8 @@ describe TablePrint::Config do
     TablePrint::Config.max_width.should == 30
   end
 
-  it "defaults date_format to year-month-day-hour-minute-second" do
-    TablePrint::Config.date_format.should == "%Y-%m-%d %H:%M:%S"
+  it "defaults time_format to year-month-day-hour-minute-second" do
+    TablePrint::Config.time_format.should == "%Y-%m-%d %H:%M:%S"
   end
 
   describe "class-based column config" do

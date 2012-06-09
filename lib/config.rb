@@ -2,10 +2,10 @@ require 'cattr'
 
 module TablePrint
   class Config
-    cattr_accessor :max_width, :date_format
+    cattr_accessor :max_width, :time_format
 
     @@max_width = 30
-    @@date_format = "%Y-%m-%d %H:%M:%S"
+    @@time_format = "%Y-%m-%d %H:%M:%S"
 
     @@klasses = {}
 

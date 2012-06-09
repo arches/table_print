@@ -210,6 +210,8 @@ module TablePrint
 
       formatters = column_for(column_name).formatters || []
 
+      value = value.strftime(TablePrint::Config.time_format) if value.is_a? Time
+
       formatters << NoNewlineFormatter.new
       formatters << FixedWidthFormatter.new(column_for(column_name).width)
 
