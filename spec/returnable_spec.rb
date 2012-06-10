@@ -9,7 +9,7 @@ describe TablePrint::Returnable do
   end
 
   it "passes #set through to TablePrint::Config" do
-    TablePrint::Config.should_receive(:set).with(Object, :foo)
+    TablePrint::Config.should_receive(:set).with(Object, [:foo])
     r = TablePrint::Returnable.new
     r.set(Object, :foo)
   end
