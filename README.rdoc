@@ -54,7 +54,7 @@ You can reference nested objects with the method chain required to reach them. S
 books had photos.
 
   > tp Author.limit(3), "name", "books.title", "books.photos.caption"
-  NAME              | BOOKS > TITLE     | BOOKS > PHOTOS > CAPTION
+  NAME              | BOOKS.TITLE       | BOOKS.PHOTOS.CAPTION
   -------------------------------------------------------------------------
   Michael Connelly  | The Fifth Witness | Susan was running, fast, away...
                     |                   | Along came a spider.
