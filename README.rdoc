@@ -90,7 +90,7 @@ You can pass a proc as the display_method for a column:
 
 Or if you want to pass other options along with the lambda:
 
-  tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}}
+  tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :width => 10}
 
 ==== Column formatters
 
