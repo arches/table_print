@@ -110,8 +110,27 @@ can be used to filter a column. This could also be used for coloring output.
 
 Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
 
-    tp.set User, :id, :email # now whenever you print users, the only columns shown will be id and email
-    tp.clear User # back to square one - print all the columns we can find
+  tp.set User, :id, :email # now whenever you print users, the only columns shown will be id and email
+  
+  > tp User.first
+  ID | EMAIL
+  ----------------
+  1  | foo@bar.com
+
+  # the config sets a 'baseline' for each print. You can still include/except columns:
+  > tp User.first, :except => :email
+  ID
+  --
+  17
+
+  # you can still provide a specific set of columns:
+  > tp User.first, :first_name
+  FIRST_NAME
+  ----------
+  Phooey
+
+  tp.clear User # back to square one - print all the columns we can find
+
 
 == Contributing to table_print
 
