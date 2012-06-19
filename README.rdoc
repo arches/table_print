@@ -76,6 +76,13 @@ a skinny email column, set the width explicitly:
 
   tp User.all, :email => {:width => 12}
 
+Available column options:
+
+* *display_method* - string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
+* *formatters* - array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
+* *time_format* - string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
+* *width* - integer - how wide you want your column. Currently cannot exceed max_width.
+
 ==== Display method
 
 Columns are named after hash keys. To rename a column, use the name you want as the key, and pass the method as an option.
@@ -131,6 +138,10 @@ Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
 
   tp.clear User # back to square one - print all the columns we can find
 
+You can also set individual options:
+
+  tp.set :max_width, 10 # columns won't exceed 10 characters
+  tp.set :time_format, "%Y" # date columns will only show the year
 
 == Contributing to table_print
 
