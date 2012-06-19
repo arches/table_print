@@ -1,6 +1,17 @@
 require 'config'
 
 module TablePrint
+  class TimeFormatter
+    def initialize(time_format=TablePrint::Config.time_format)
+      @format = time_format
+    end
+
+    def format(value)
+      return value unless value.is_a? Time
+      value.strftime @format
+    end
+  end
+
   class NoNewlineFormatter
     def format(value)
       value.to_s.gsub(/\r\n/, "\n").gsub(/\n/, " ")

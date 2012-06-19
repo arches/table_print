@@ -3,12 +3,33 @@ require "formatter"
 
 include TablePrint
 
+describe TablePrint::TimeFormatter, :focus => true do
+  describe "#format" do
+    it "only operates on Time objects" do
+      f = TablePrint::TimeFormatter.new
+      f.format(12).should == 12
+    end
+
+    it "uses the config'd time_format" do
+      f = TablePrint::TimeFormatter.new
+      time = Time.local(2012, 01, 11, 1, 23, 45)
+      f.format(time).should == "2012-01-11 01:23:45" # default time format is set in config.rb
+    end
+
+    it "overrides the config'd time format with one it was passed" do
+      f = TablePrint::TimeFormatter.new("%Y")
+      time = Time.local(2012, 01, 11, 1, 23, 45)
+      f.format(time).should == "2012" # default time format is set in config.rb
+    end
+  end
+end
+
 describe TablePrint::NoNewlineFormatter do
   before(:each) do
     @f = TablePrint::NoNewlineFormatter.new
   end
 
-  describe "#formater" do
+  describe "#format" do
     it "replaces carriage returns with spaces" do
       @f.format("foo\r\nbar").should == "foo bar"
     end
