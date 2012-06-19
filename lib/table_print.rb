@@ -33,6 +33,7 @@ module TablePrint
       end
 
       group.collapse!
+      return "No data." if group.columns.empty?
 
       [group.header, group.horizontal_separator, group.format].join("\n")
     end

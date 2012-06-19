@@ -15,6 +15,15 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "printing an object where there are only association columns with no data" do
+    it "returns the string 'no data'" do
+      Sandbox.add_class("Blog")
+      Sandbox.add_attributes("Blog", :author)
+      p = Printer.new(Sandbox::Blog.new, "author.name")
+      p.table_print.should == 'No data.'
+    end
+  end
+
   describe "#columns" do
     it "pulls the column names off the data object" do
       Sandbox.add_class("Post")
