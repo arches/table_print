@@ -22,7 +22,7 @@ module TablePrint
 
         # make a group and recurse for the columns we don't handle
         groups = create_child_group(prefix, hash, target)
-        row.add_children(groups)
+        row.add_children(groups) unless groups.all? {|g| g.children.empty?}
       end
 
       rows

@@ -47,10 +47,7 @@ describe Fingerprinter do
       rows.length.should == 1
 
       row = rows.first
-      row.children.length.should == 1
-
-      group = row.children.first
-      group.children.length.should == 0
+      row.children.length.should == 0
     end
 
     it "allows a lambda as the display_method" do
