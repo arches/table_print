@@ -13,15 +13,15 @@ describe TablePrint::Config do
   describe "individual config options" do
     describe "storing and retrieving" do
       it "sets the variable" do
-        TablePrint::Config.set(:max_width, 10)
+        TablePrint::Config.set(:max_width, [10])
         TablePrint::Config.max_width.should == 10
-        TablePrint::Config.set(:max_width, 30)
+        TablePrint::Config.set(:max_width, [30])
       end
     end
 
     describe "clearing" do
       it "resets the variable to its initial value" do
-        TablePrint::Config.set(:max_width, 10)
+        TablePrint::Config.set(:max_width, [10])
         TablePrint::Config.clear(:max_width)
         TablePrint::Config.max_width.should == 30
       end

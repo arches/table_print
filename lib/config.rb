@@ -16,7 +16,7 @@ module TablePrint
       if klass.is_a? Class
         @@klasses[klass] = val  # val is a hash of column options
       else
-        TablePrint::Config.send("#{klass}=", val)
+        TablePrint::Config.send("#{klass}=", val.first)
       end
     end
 
