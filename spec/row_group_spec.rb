@@ -170,7 +170,7 @@ describe TablePrint::Row do
     it "uses the config'd time_format to format times" do
       row.stub(:column_for) {OpenStruct.new(:width => 20, :formatters => [], :time_format => "%Y %m %d")}
 
-      time_formatter = OpenStruct.new(:format => "")
+      time_formatter = TablePrint::TimeFormatter.new
       TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
       row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20))
     end
