@@ -4,13 +4,20 @@ module TablePrint
   class Config
     cattr_accessor :max_width, :time_format
 
-    @@max_width = 30
-    @@time_format = "%Y-%m-%d %H:%M:%S"
+    DEFAULT_MAX_WIDTH = 30
+    DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+    @@max_width = DEFAULT_MAX_WIDTH
+    @@time_format = DEFAULT_TIME_FORMAT
 
     @@klasses = {}
 
-    def self.set(klass, hash)
-      @@klasses[klass] = hash
+    def self.set(klass, val)
+      if klass.is_a? Class
+        @@klasses[klass] = val  # val is a hash of column options
+      else
+        TablePrint::Config.send("#{klass}=", val)
+      end
     end
 
     def self.for(klass)
@@ -18,7 +25,12 @@ module TablePrint
     end
 
     def self.clear(klass)
-      @@klasses.delete(klass)
+      if klass.is_a? Class
+        @@klasses.delete(klass)
+      else
+        original_value = TablePrint::Config.const_get("DEFAULT_#{klass.to_s.upcase}")
+        TablePrint::Config.send("#{klass}=", original_value)
+      end
     end
   end
 end
