@@ -168,9 +168,11 @@ describe TablePrint::Row do
     end
 
     it "uses the config'd time_format to format times" do
-      row.stub(:column_for) {OpenStruct.new(:width => 20, :formatters => [])}
+      row.stub(:column_for) {OpenStruct.new(:width => 20, :formatters => [], :time_format => "%Y %m %d")}
 
-      row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20)).should == "2012-06-01 14:20:20 "
+      time_formatter = OpenStruct.new(:format => "")
+      TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
+      row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20))
     end
   end
 

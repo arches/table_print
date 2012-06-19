@@ -208,10 +208,10 @@ module TablePrint
       column_name = column_name.to_s
       return value unless column_for(column_name)
 
-      formatters = column_for(column_name).formatters || []
+      column = column_for(column_name)
+      formatters = column.formatters || []
 
-      value = value.strftime(TablePrint::Config.time_format) if value.is_a? Time
-
+      formatters << TimeFormatter.new(column.time_format)
       formatters << NoNewlineFormatter.new
       formatters << FixedWidthFormatter.new(column_for(column_name).width)
 

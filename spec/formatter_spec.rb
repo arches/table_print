@@ -3,7 +3,7 @@ require "formatter"
 
 include TablePrint
 
-describe TablePrint::TimeFormatter, :focus => true do
+describe TablePrint::TimeFormatter do
   describe "#format" do
     it "only operates on Time objects" do
       f = TablePrint::TimeFormatter.new

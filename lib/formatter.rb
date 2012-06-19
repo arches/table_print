@@ -2,8 +2,9 @@ require 'config'
 
 module TablePrint
   class TimeFormatter
-    def initialize(time_format=TablePrint::Config.time_format)
+    def initialize(time_format=nil)
       @format = time_format
+      @format ||= TablePrint::Config.time_format
     end
 
     def format(value)

@@ -2,7 +2,7 @@ module TablePrint
   class Column
     attr_reader :formatters
     attr_writer :width
-    attr_accessor :name, :data
+    attr_accessor :name, :data, :time_format
 
     def initialize(attr_hash={})
       @formatters = []
