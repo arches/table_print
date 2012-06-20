@@ -65,7 +65,7 @@ module TablePrint
     end
 
     def horizontal_separator
-      '-' * width
+      '-' * header.length # columns don't know how to respect max_width (formatter does that) so just match the header
     end
 
     def header

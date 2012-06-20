@@ -100,6 +100,11 @@ describe RowRecursion do
       child.set_cell_values(:title => 'foobar')
       child.horizontal_separator.should == '------'
     end
+
+    it "matches the header width" do
+      child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
+      child.horizontal_separator.should == '------------------------------' # 30 hyphens
+    end
   end
 
   describe "#header" do
