@@ -122,10 +122,6 @@ module TablePrint
     def skip_first_row!
       @skip_first_row = true
     end
-
-    def column_width(column_name)
-      raw_column_data(column_name).collect(&:to_s).collect(&:length).max
-    end
   end
 
   class Row

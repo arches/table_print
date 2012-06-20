@@ -119,15 +119,6 @@ describe TablePrint::RowGroup do
       group.raw_column_data(:title).should == ['foo', 'bar']
     end
   end
-
-  describe "#column_width" do
-    it "finds the width of a column" do
-      group = RowGroup.new
-      group.add_child(Row.new.set_cell_values(:title => 'asdf'))
-      group.add_child(Row.new.set_cell_values(:title => 'qwerty'))
-      group.column_width(:title).should == 6
-    end
-  end
 end
 
 def compare_rows(actual_rows, expected_rows)
