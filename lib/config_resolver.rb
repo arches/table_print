@@ -24,7 +24,13 @@ module TablePrint
       # process special symbols
 
       @included_columns.concat [get_and_remove(options, :include)].flatten
-      @included_columns.map!{|option| option_to_column(option)}
+      @included_columns.map! do |option|
+        if option.is_a? Column
+          option if option.is_a? Column
+        else
+          option_to_column(option)
+        end
+      end
 
       @included_columns.each do |c|
         @column_hash[c.name] = c

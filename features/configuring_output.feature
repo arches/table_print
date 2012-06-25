@@ -27,6 +27,20 @@ Feature: Configuring output
     -----
     post!
     """
+  Scenario: Specifying configuration on a per-object basis with an included column
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And configure Blog with {:include => {:foobar => lambda{|b| b.title}}}
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE | AUTHOR | FOOBAR
+    -----------------------
+    post! | Ryan   | post!
+    """
   Scenario: Applying a formatter
   Scenario: Setting a column name
     Given a class named Blog
