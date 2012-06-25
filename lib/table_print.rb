@@ -19,6 +19,7 @@ module TablePrint
     def initialize(data, options={})
       @data = [data].flatten.compact
       @options = options
+      @columns = nil
     end
 
     def table_print
@@ -39,9 +40,10 @@ module TablePrint
     end
 
     def columns
+      return @columns if @columns
       defaults = TablePrint::Printable.default_display_methods(@data.first)
       c = TablePrint::ConfigResolver.new(@data.first.class, defaults, @options)
-      c.columns
+      @columns = c.columns
     end
   end
 end

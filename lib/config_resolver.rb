@@ -30,6 +30,7 @@ module TablePrint
         @column_hash[c.name] = c
       end
 
+      # excepted columns don't need column objects since we're just going to throw them out anyway
       @excepted_columns.concat [get_and_remove(options, :except)].flatten
 
       # anything that isn't recognized as a special option is assumed to be a column name
@@ -37,14 +38,20 @@ module TablePrint
       @only_columns = options.collect { |name| option_to_column(name) } unless options.empty?
     end
 
-    def get_and_remove(arr, key)
-      except = arr.select do |o|
-        o.is_a? Hash and o.keys.include? key
+    def get_and_remove(options_array, key)
+      except = options_array.select do |option|
+        option.is_a? Hash and option.keys.include? key
       end
 
       return [] if except.empty?
-      arr.delete(except.first)
-      except.first.fetch(key)
+      except = except.first
+
+      option_of_interest = except.fetch(key)
+      except.delete(key)
+
+      options_array.delete(except) if except.keys.empty?  # if we've taken all the info from this option, get rid of it
+
+      option_of_interest
     end
 
     def option_to_column(option)

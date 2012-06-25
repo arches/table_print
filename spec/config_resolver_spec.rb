@@ -20,6 +20,28 @@ describe TablePrint::ConfigResolver do
       options.should == [:title, :author]
     end
 
+    it "deletes and returns the :except key from an array with an :include key" do
+      c = TablePrint::ConfigResolver.new(Object, [])
+      options = [:title, {:except => [:title]}, {:include => [:author]}]
+      c.get_and_remove(options, :except).should == [:title]
+      options.should == [:title, {:include => [:author]}]
+    end
+
+    it "deletes and returns the :except key from a hash with an :include key" do
+      c = TablePrint::ConfigResolver.new(Object, [])
+      options = [:title, {:except => [:title], :include => [:author]}]
+      c.get_and_remove(options, :except).should == [:title]
+      options.should == [:title, {:include => [:author]}]
+    end
+
+    it "deletes and returns both the :include and :except keys" do
+      c = TablePrint::ConfigResolver.new(Object, [])
+      options = [:title, {:except => [:title]}, {:include => [:author]}]
+      c.get_and_remove(options, :include).should == [:author]
+      c.get_and_remove(options, :except).should == [:title]
+      options.should == [:title]
+    end
+
     it "works even if the array doesn't have an exception hash" do
       c = TablePrint::ConfigResolver.new(Object, [])
       options = [:title, :author]
@@ -150,6 +172,11 @@ describe TablePrint::ConfigResolver do
     it "applies excepts on top of specified columns" do
       c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:pub_date, :length, {:except => :length}])
       c.usable_column_names.should == ['pub_date']
+    end
+
+    it "applies both includes and excepts on top of specified columns" do
+      c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:pub_date, :length, {:except => :length, :include => :foobar}])
+      c.usable_column_names.should == ['pub_date', 'foobar']
     end
   end
 
