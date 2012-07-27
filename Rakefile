@@ -9,24 +9,6 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "table_print"
-  gem.homepage = "http://github.com/arches/table_print"
-  gem.license = "MIT"
-  gem.summary = %Q{Turn objects into nicely formatted columns for easy reading}
-  gem.description = %Q{TablePrint formats an object or array of objects into columns for easy reading. To do this, it assumes the objects in your array all respond to the same methods (vs pretty_print or awesome_print, who can't create columns because your objects could be entirely different).}
-  gem.email = "archslide@gmail.com"
-  gem.authors = ["Chris Doyle"]
-  # Include your dependencies below. Runtime dependencies are required when using your gem,
-  # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
-  #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'cucumber'
-end
-Jeweler::RubygemsDotOrgTasks.new
-
 require 'rspec/core/rake_task'
 
 desc 'Default: run specs and cucumber features.'

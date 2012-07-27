@@ -1,5 +1,3 @@
-require 'returnable'
-
 module Kernel
   def tp(data=[], *options)
     start = Time.now

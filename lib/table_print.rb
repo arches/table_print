@@ -1,12 +1,14 @@
-require 'column'
-require 'config_resolver'
-require 'config'
-require 'fingerprinter'
-require 'formatter'
-require 'hash_extensions'
-require 'kernel_extensions'
-require 'printable'
-require 'row_group'
+require 'table_print/cattr'
+require 'table_print/column'
+require 'table_print/config_resolver'
+require 'table_print/config'
+require 'table_print/fingerprinter'
+require 'table_print/formatter'
+require 'table_print/hash_extensions'
+require 'table_print/kernel_extensions'
+require 'table_print/printable'
+require 'table_print/row_group'
+require 'table_print/returnable'
 
 module TablePrint
   class Printer

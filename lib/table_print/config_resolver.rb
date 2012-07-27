@@ -1,6 +1,3 @@
-require 'column'
-require 'config'
-
 module TablePrint
   class ConfigResolver
     def initialize(klass, default_column_names, *options)

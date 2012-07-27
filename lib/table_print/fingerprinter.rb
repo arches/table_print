@@ -1,6 +1,3 @@
-require 'row_group'
-require 'hash_extensions'
-
 module TablePrint
   class Fingerprinter
     def lift(columns, object)

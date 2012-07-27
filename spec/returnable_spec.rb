@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'returnable'
-require 'config'
 
 describe TablePrint::Returnable do
   it "returns its initialized value from its to_s method" do

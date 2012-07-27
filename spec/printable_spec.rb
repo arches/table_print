@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'printable'
 
 describe TablePrint::Printable do
   before(:each) do

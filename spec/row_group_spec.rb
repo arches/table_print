@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'ostruct'
-require 'cat'
-require "row_group"
 
 include TablePrint
 

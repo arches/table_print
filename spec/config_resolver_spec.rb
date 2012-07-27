@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'config_resolver'
 
 describe TablePrint::ConfigResolver do
 

@@ -1,5 +1,3 @@
-require 'config'
-
 module TablePrint
   class TimeFormatter
     def initialize(time_format=nil)

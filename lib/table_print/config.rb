@@ -1,5 +1,3 @@
-require 'cattr'
-
 module TablePrint
   class Config
     cattr_accessor :max_width, :time_format

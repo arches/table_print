@@ -1,6 +1,3 @@
-require 'formatter'
-require 'column'
-
 module TablePrint
 
   module RowRecursion

@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'ostruct'
-require 'fingerprinter'
-require 'column'
 
 class TablePrint::Row
   attr_accessor :groups, :cells

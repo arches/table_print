@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'config'
 
 describe TablePrint::Config do
   it "defaults max_width to 30" do
