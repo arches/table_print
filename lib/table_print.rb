@@ -5,7 +5,6 @@ require 'table_print/config'
 require 'table_print/fingerprinter'
 require 'table_print/formatter'
 require 'table_print/hash_extensions'
-require 'table_print/kernel_extensions'
 require 'table_print/printable'
 require 'table_print/row_group'
 require 'table_print/returnable'
@@ -48,4 +47,11 @@ module TablePrint
       @columns = c.columns
     end
   end
+end
+
+def tp(data=[], *options)
+  start = Time.now
+  printer = TablePrint::Printer.new(data, options)
+  puts printer.table_print unless data.is_a? Class
+  TablePrint::Returnable.new(Time.now - start) # we have to return *something*, might as well be execution time.
 end
