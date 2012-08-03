@@ -271,6 +271,32 @@ describe TablePrint::Row do
     #   group
     #     row: bar
     #   group
+    # => foo | bar |
+    context "for two groups, one of which has no rows (aka, we hit an empty association)" do
+      before(:each) do
+        @row = Row.new
+        @row.set_cell_values(:foo => "foo").add_children([
+                                                             RowGroup.new.add_child(
+                                                                 Row.new.set_cell_values(:bar => "bar")
+                                                             ),
+                                                             RowGroup.new
+                                                         ])
+        @row.collapse!
+      end
+
+      it "pulls the cells from both groups into the parent" do
+        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+      end
+
+      it "dereferences both now-defunct groups" do
+        @row.children.length.should == 0
+      end
+    end
+
+    # row: foo
+    #   group
+    #     row: bar
+    #   group
     #     row: baz
     #     row: bazaar
     # => foo | bar | baz

@@ -148,6 +148,10 @@ module TablePrint
 
       to_absorb.each do |absorbable_group|
         absorbable_row = absorbable_group.children.shift
+
+        # missing associations create groups with no rows
+        children.delete(absorbable_group) and next unless absorbable_row
+
         @cells.merge!(absorbable_row.cells)
 
         i = children.index(absorbable_group)
