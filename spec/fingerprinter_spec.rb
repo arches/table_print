@@ -54,6 +54,14 @@ describe Fingerprinter do
       row.children.length.should == 0
       row.cells.should == {'name' => "dl crng"}
     end
+
+    it "doesn't puke if a lambda returns nil" do
+      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => lambda { |row| nil })], OpenStruct.new(:name => "dale carnegie"))
+      rows.length.should == 1
+      row = rows.first
+      row.children.length.should == 0
+      row.cells.should == {'name' => nil}
+    end
   end
 
   describe "#hash_to_rows" do

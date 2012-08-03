@@ -32,8 +32,11 @@ module TablePrint
       cells = {}
       handleable_columns(hash).each do |method|
         display_method = (prefix == "" ? method : "#{prefix}.#{method}")
-        cell_value = method.call(target) if method.is_a? Proc
-        cell_value ||= target.send(method)
+        if method.is_a? Proc
+          cell_value = method.call(target)
+        else
+          cell_value ||= target.send(method)
+        end
         cells[@column_names_by_display_method[display_method]] = cell_value
       end
 
