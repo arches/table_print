@@ -11,10 +11,10 @@ it assumes the objects in your array all respond to the same methods.
 == Installation
 
   # Install as a standalone gem
-  $ gem install table_print --pre
+  $ gem install table_print
 
   # Install within rails
-  In your Gemfile: gem "table_print", "~> 1.0.0.rc3
+  In your Gemfile: gem "table_print", "~> 1.0.0"
   $ bundle install
 
 == Usage
