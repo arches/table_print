@@ -130,7 +130,7 @@ Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
   --
   17
 
-  # you can still provide a specific set of columns:
+  # a specific set of columns will entirely override the baseline config:
   > tp User.first, :first_name
   FIRST_NAME
   ----------
@@ -138,7 +138,13 @@ Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
 
   tp.clear User # back to square one - print all the columns we can find
 
-You can also set individual options:
+To see the config for a given object, use `tp.config_for`.
+
+  > tp.set User, :id, :email
+  > tp.config_for User
+  [:id, :email]
+
+You can also set global options:
 
   tp.set :max_width, 10 # columns won't exceed 10 characters
   tp.set :time_format, "%Y" # date columns will only show the year
