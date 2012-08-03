@@ -1,4 +1,4 @@
-= table_print - 1.0.0.rc3
+= table_print
 
 {<img src="https://secure.travis-ci.org/arches/table_print.png" />}[http://travis-ci.org/arches/table_print]
 
