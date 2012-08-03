@@ -115,7 +115,7 @@ can be used to filter a column. This could also be used for coloring output.
 
 === Config
 
-Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
+Use tp.set and tp.clear to set options on a class-by-class basis.
 
   tp.set User, :id, :email # now whenever you print users, the only columns shown will be id and email
   
@@ -138,7 +138,7 @@ Use `tp.set` and `tp.clear` to set options on a class-by-class basis.
 
   tp.clear User # back to square one - print all the columns we can find
 
-To see the config for a given object, use `tp.config_for`.
+To see the config for a given object, use tp.config_for.
 
   > tp.set User, :id, :email
   > tp.config_for User
