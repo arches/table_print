@@ -14,6 +14,10 @@ module TablePrint
       "Cleared table_print config for #{klass}"
     end
 
+    def config_for(klass)
+      TablePrint::Config.for(klass)
+    end
+
     def to_s
       @string_value
     end

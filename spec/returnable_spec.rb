@@ -17,5 +17,11 @@ describe TablePrint::Returnable do
     r = TablePrint::Returnable.new
     r.clear(Object)
   end
+
+  it "passes #config_for through to TablePrint::Config.for" do
+    TablePrint::Config.should_receive(:for).with(Object)
+    r = TablePrint::Returnable.new
+    r.config_for(Object)
+  end
 end
 
