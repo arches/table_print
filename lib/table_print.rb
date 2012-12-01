@@ -49,7 +49,7 @@ module TablePrint
   end
 end
 
-def tp(data=[], *options)
+def tp(data=Class, *options)
   start = Time.now
   printer = TablePrint::Printer.new(data, options)
   puts printer.table_print unless data.is_a? Class
