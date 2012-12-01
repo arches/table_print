@@ -6,6 +6,12 @@ describe TablePrint::Returnable do
     r.to_s.should == "foobar"
   end
 
+  it "returns its initialized value from its inspect method" do
+    # 1.8.7 calls inspect on return values
+    r = TablePrint::Returnable.new("foobar")
+    r.inspect.should == "foobar"
+  end
+
   it "passes #set through to TablePrint::Config" do
     TablePrint::Config.should_receive(:set).with(Object, [:foo])
     r = TablePrint::Returnable.new

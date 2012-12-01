@@ -21,5 +21,9 @@ module TablePrint
     def to_s
       @string_value
     end
+
+    def inspect
+      to_s
+     end
   end
 end
