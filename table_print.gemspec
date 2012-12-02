@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.summary             = "Turn objects into nicely formatted columns for easy reading"
   gem.homepage            = "http://tableprintgem.com"
   gem.version             = TablePrint::VERSION
+  gem.license             = 'MIT'
 
   gem.files               = `git ls-files`.split($\)
   gem.test_files          = gem.files.grep(%r{^(test|spec|features)/})
