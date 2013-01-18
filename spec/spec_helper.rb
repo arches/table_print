@@ -2,6 +2,7 @@ require 'cat'
 gem 'rspec'
 require 'table_print'
 require 'ostruct'
+require 'pry'
 
 RSpec.configure do |c|
   c.filter_run :focus => true

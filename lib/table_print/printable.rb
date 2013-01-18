@@ -4,6 +4,8 @@ module TablePrint
     def self.default_display_methods(target)
       return target.class.columns.collect(&:name) if target.class.respond_to? :columns
       
+      return target.keys if target.is_a? Hash
+
       methods = []
       target.methods.each do |method_name|
         method = target.method(method_name)
