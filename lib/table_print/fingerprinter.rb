@@ -12,6 +12,8 @@ module TablePrint
     def hash_to_rows(prefix, hash, objects)
       rows = []
 
+
+
       # convert each object into its own row
       Array(objects).each do |target|
         row = populate_row(prefix, hash, target)
@@ -32,7 +34,9 @@ module TablePrint
       cells = {}
       handleable_columns(hash).each do |method|
         display_method = (prefix == "" ? method : "#{prefix}.#{method}")
-        if method.is_a? Proc
+        if target.is_a? Hash
+          cell_value = target[method.to_sym]
+        elsif method.is_a? Proc
           cell_value = method.call(target)
         else
           cell_value ||= target.send(method)
