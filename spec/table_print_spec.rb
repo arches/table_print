@@ -35,6 +35,19 @@ describe TablePrint::Printer do
       cols.first.name.should == 'title'
     end
 
+    it "pulls the column names off the array of hashes" do
+      data = [{:name => "User 1",
+               :surname => "Familyname 1"
+              },
+              {:name => "User 2",
+               :surname => "Familyname 2"}]
+
+      p = Printer.new(data)
+      cols = p.columns
+      cols.length.should == 2
+      cols.collect(&:name).sort.should == ['name', 'surname']
+    end
+
     it "pulls out excepted columns" do
       Sandbox.add_class("Post")
       Sandbox.add_attributes("Post", :title, :author)

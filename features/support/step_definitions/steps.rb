@@ -20,6 +20,11 @@ Given /^(.*) has a method named (\w*) with (.*)$/ do |klass, method_name, blk|
   Sandbox.add_method(klass, method_name, &eval(blk))
 end
 
+Given /^a variable named (.*) with$/ do |variable, table|
+  @objs ||= OpenStruct.new
+  @objs.send("#{variable.downcase}=", table.hashes)
+end
+
 When /^I instantiate a (.*) with (\{.*\})$/ do |klass, args|
   @objs ||= OpenStruct.new
   @objs.send("#{klass.downcase}=", Sandbox.const_get_from_string(klass).new(eval(args)))

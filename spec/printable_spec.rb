@@ -47,23 +47,5 @@ describe TablePrint::Printable do
     it "uses column information when available (eg, from ActiveRecord objects)"
   end
 
-  describe "printing a Hash" do
-    it "prints an array of hashes" do
-
-      data = [{:name => "User 1",
-               :surname => "Familyname 1"
-              },
-              {:name => "User 2",
-               :surname => "Familyname 2"}]
-
-      p = Printer.new(data)
-      cols = p.columns
-      cols.length.should == 2
-      cols.sort! {|x,y| x.name <=> y.name} # To fix Travis bug
-      cols.first.name.should == 'name'
-      cols[1].name.should == 'surname'
-      # puts p.table_print
-    end
-  end
 end
 
