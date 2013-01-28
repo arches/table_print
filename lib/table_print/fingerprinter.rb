@@ -34,10 +34,10 @@ module TablePrint
       cells = {}
       handleable_columns(hash).each do |method|
         display_method = (prefix == "" ? method : "#{prefix}.#{method}")
-        if target.is_a? Hash
-          cell_value = target[method.to_sym]
-        elsif method.is_a? Proc
+        if method.is_a? Proc
           cell_value = method.call(target)
+        elsif target.is_a? Hash
+          cell_value = target[method.to_sym]
         else
           cell_value ||= target.send(method)
         end
