@@ -97,6 +97,7 @@ module TablePrint
       @raw_column_names = @children.collect { |r| r.raw_column_names }.flatten.uniq
     end
 
+    # this is a development tool, to show the structure of the row/row_group tree
     def vis(prefix="")
       puts "#{prefix}group"
       children.each{|c| c.vis(prefix + "  ")}
@@ -106,6 +107,7 @@ module TablePrint
       @children.each(&:collapse!)
     end
 
+    # TODO: rename this to_s
     def format
       rows = @children
       rows = @children[1..-1] if @skip_first_row
@@ -131,7 +133,7 @@ module TablePrint
       @cells = {}
     end
 
-    # helpful for debugging
+    # this is a development tool, to show the structure of the row/row_group tree
     def vis(prefix="")
       puts "#{prefix}row #{cells.inspect.to_s}"
       children.each{|c| c.vis(prefix + "  ")}

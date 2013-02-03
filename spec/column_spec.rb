@@ -29,7 +29,7 @@ describe Column do
   end
 
   describe "#display_method" do
-    it "stores the column's display method as a string" do
+    it "returns the column's display method as a string" do
       c = Column.new(:display_method => :boofar)
       c.display_method.should == "boofar"
     end
