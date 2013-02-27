@@ -208,7 +208,8 @@ module TablePrint
       return value unless column_for(column_name)
 
       column = column_for(column_name)
-      formatters = column.formatters || []
+      formatters = []
+      formatters.concat(Array(column.formatters))
 
       formatters << TimeFormatter.new(column.time_format)
       formatters << NoNewlineFormatter.new
