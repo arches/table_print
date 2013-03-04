@@ -18,16 +18,14 @@ module TablePrint
   end
 
   class FixedWidthFormatter
+    attr_accessor :width
+
     def initialize(width)
-      @width = width
+      self.width = width
     end
 
     def format(value)
       "%-#{width}s" % truncate(value)
-    end
-
-    def width
-      [@width, TablePrint::Config.max_width].min
     end
 
     private
