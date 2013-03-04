@@ -61,15 +61,15 @@ describe Column do
     context "when default width is specified" do
       it "uses the default width" do
         c.default_width = 10
-        c.stub(data_width: 15)
-        c.stub(max_width: 20)
+        c.stub(:data_width => 15)
+        c.stub(:max_width => 20)
         c.width.should == 10
       end
 
       it "isn't limited by the config width" do
         c.default_width = 40
-        c.stub(data_width: 50)
-        c.stub(max_width: 20)
+        c.stub(:data_width => 50)
+        c.stub(:max_width => 20)
         c.width.should == 40
       end
     end
@@ -77,15 +77,15 @@ describe Column do
     context "When default width is not specified" do
       it "uses the data width" do
         c.default_width = nil
-        c.stub(data_width: 10)
-        c.stub(max_width: 20)
+        c.stub(:data_width => 10)
+        c.stub(:max_width => 20)
         c.width.should == 10
       end
 
       it "is limited by the config width" do
         c.default_width = nil
-        c.stub(data_width: 30)
-        c.stub(max_width: 20)
+        c.stub(:data_width => 30)
+        c.stub(:max_width => 20)
         c.width.should == 20
       end
     end
