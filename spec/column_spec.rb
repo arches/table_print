@@ -58,13 +58,36 @@ describe Column do
   end
 
   describe "#width" do
-    it "returns the specified width" do
-      c.width = 14
-      c.width.should == 14
+    context "when default width is specified" do
+      it "uses the default width" do
+        c.default_width = 10
+        c.stub(data_width: 15)
+        c.stub(max_width: 20)
+        c.width.should == 10
+      end
+
+      it "isn't limited by the config width" do
+        c.default_width = 40
+        c.stub(data_width: 50)
+        c.stub(max_width: 20)
+        c.width.should == 40
+      end
     end
 
-    it "uses the data_width if no width has been set" do
-      c.width.should == 33
+    context "When default width is not specified" do
+      it "uses the data width" do
+        c.default_width = nil
+        c.stub(data_width: 10)
+        c.stub(max_width: 20)
+        c.width.should == 10
+      end
+
+      it "is limited by the config width" do
+        c.default_width = nil
+        c.stub(data_width: 30)
+        c.stub(max_width: 20)
+        c.width.should == 20
+      end
     end
   end
 end

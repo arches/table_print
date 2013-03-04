@@ -100,7 +100,7 @@ describe TablePrint::ConfigResolver do
         c.columns.first.name.should == 'title'
 
         c.columns.last.name.should == 'foo'
-        c.columns.last.width.should == 10
+        c.columns.last.default_width.should == 10
       end
     end
   end
@@ -189,11 +189,11 @@ describe TablePrint::ConfigResolver do
       end
     end
     context "width" do
-      it "sets the width" do
+      it "sets the default width" do
         c = TablePrint::ConfigResolver.new(Object, [:title], :title => {:width => 100})
         c.columns.length.should == 1
         c.columns.first.name.should == 'title'
-        c.columns.first.width.should == 100
+        c.columns.first.default_width.should == 100
       end
     end
     context "formatters" do
@@ -226,9 +226,9 @@ describe TablePrint::ConfigResolver do
     context "with a hash" do
       it "returns a column named foo and the specified options" do
         c = TablePrint::ConfigResolver.new(Object, [])
-        column = c.option_to_column({:foo => {:width => 10}})
+        column = c.option_to_column({:foo => {:default_width => 10}})
         column.name.should == 'foo'
-        column.width.should == 10
+        column.default_width.should == 10
       end
     end
   end

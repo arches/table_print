@@ -68,11 +68,16 @@ module TablePrint
       else
         option = {:name => option}
       end
+
+      if option.has_key? :width
+        option[:default_width] = option.delete(:width)
+      end
+
       c = Column.new(option)
       @column_hash[c.name] = c
       c
     end
-    
+
     def usable_column_names
       base = @default_columns
       base = @only_columns unless @only_columns.empty?

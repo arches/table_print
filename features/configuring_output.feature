@@ -5,13 +5,13 @@ Feature: Configuring output
 
     Given Blog has attributes title, author
 
-    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
-    And table_print Blog, {:include => {:author => {:width => 10}}}
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan'}
+    And table_print Blog, {:include => {:author => {:width => 13}}}
     Then the output should contain
     """
-    TITLE | AUTHOR    
-    ------------------
-    post! | Ryan
+    TITLE | AUTHOR       
+    ---------------------
+    post! | Ryan Ryan...
     """
   Scenario: Specifying configuration on a per-object basis
     Given a class named Blog
