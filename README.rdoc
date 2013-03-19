@@ -78,6 +78,7 @@ Pass options to individual columns through the options hash by using the display
 a skinny email column, set the width explicitly:
 
   tp User.all, :email => {:width => 12}
+  tp User.all, :id, {:email => {:width => 12}}, :age
 
 Available column options:
 
