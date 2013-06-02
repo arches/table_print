@@ -71,7 +71,7 @@ module TablePrint
         f.format(column.name)
       end
 
-      padded_names.join(" | ").upcase
+      ["| ", padded_names.join(" | "), " |"].join.upcase
     end
 
     def add_formatter(name, formatter)
@@ -108,11 +108,11 @@ module TablePrint
     end
 
     # TODO: rename this to_s
-    def format
+    def format(append_bars=true)
       rows = @children
       rows = @children[1..-1] if @skip_first_row
       rows ||= []
-      rows = rows.collect { |row| row.format }.join("\n")
+      rows = rows.collect { |row| row.format(append_bars) }.join("\n")
 
       return nil if rows.length == 0
       rows
@@ -169,13 +169,14 @@ module TablePrint
       self
     end
 
-    def format
+    def format(append_bars=true)
       column_names = columns.collect(&:name)
 
       output = [column_names.collect { |name| apply_formatters(name, @cells[name]) }.join(" | ")]
-      output.concat @children.collect { |g| g.format }
+      output.concat @children.collect { |g| g.format(false)}
 
-      output.join("\n")
+      output = output.collect {|o| append_bars ? "| #{o} |" : o }
+      output = output.join("\n")
     end
 
     def absorb_children(column_names, rollup)

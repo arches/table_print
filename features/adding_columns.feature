@@ -13,9 +13,9 @@ Feature: Adding columns
     And table_print Foo, {:include => ["blog.author", "blog.title"]}
     Then the output should contain
     """
-    HERP | BLOG.AUTHOR | BLOG.TITLE
-    -------------------------------
-    derp | Ryan        | post!
+    | HERP | BLOG.AUTHOR | BLOG.TITLE |
+    -----------------------------------
+    | derp | Ryan        | post!      |
     """
 
   Scenario: Providing a named proc
@@ -27,9 +27,9 @@ Feature: Adding columns
     And table_print Blog, {:wombat => {:display_method => lambda{|blog| blog.author.gsub(/[aeiou]/, "").downcase}}}
     Then the output should contain
     """
-    WOMBAT
-    ------
-    ryn
+    | WOMBAT |
+    ----------
+    | ryn    |
     """
   Scenario: Providing a named proc without saying 'display_method', eg :foo => lambda{}
     Given a class named Blog
@@ -40,9 +40,9 @@ Feature: Adding columns
     And table_print Blog, {:wombat => lambda{|blog| blog.author.gsub(/[aeiou]/, "").downcase}}
     Then the output should contain
     """
-    WOMBAT
-    ------
-    ryn
+    | WOMBAT |
+    ----------
+    | ryn    |
     """
   Scenario: Using a proc as a filter (ie, overriding an existing column with a proc)
 

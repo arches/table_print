@@ -9,9 +9,9 @@ Feature: Configuring output
     And table_print Blog, {:include => {:author => {:width => 40}}}
     Then the output should contain
     """
-    TITLE | AUTHOR                                  
-    ------------------------------------------------
-    post! | Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ry... 
+    | TITLE | AUTHOR                                   |
+    ----------------------------------------------------
+    | post! | Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ry... |
     """
   Scenario: Specifying configuration on a per-object basis
     Given a class named Blog
@@ -23,9 +23,9 @@ Feature: Configuring output
     And table_print Blog
     Then the output should contain
     """
-    TITLE
-    -----
-    post!
+    | TITLE |
+    ---------
+    | post! |
     """
   Scenario: Specifying configuration on a per-object basis with an included column
     Given a class named Blog
@@ -37,9 +37,9 @@ Feature: Configuring output
     And table_print Blog
     Then the output should contain
     """
-    TITLE | AUTHOR | FOOBAR
-    -----------------------
-    post! | Ryan   | post!
+    | TITLE | AUTHOR | FOOBAR |
+    ---------------------------
+    | post! | Ryan   | post!  |
     """
   Scenario: Applying a formatter
   Scenario: Setting a column name
@@ -51,7 +51,7 @@ Feature: Configuring output
     And table_print Blog, {:wombat => {:display_method => :author}}
     Then the output should contain
     """
-    WOMBAT
-    ------
-    Ryan
+    | WOMBAT |
+    ----------
+    | Ryan   |
     """

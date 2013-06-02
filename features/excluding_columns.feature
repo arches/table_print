@@ -8,9 +8,9 @@ Feature: Excluding columns
     And table_print Blog, {:except => :title}
     Then the output should contain
     """
-    AUTHOR
-    ------
-    Ryan
+    | AUTHOR |
+    ----------
+    | Ryan   |
     """
 
   Scenario: By specifying columns
@@ -22,7 +22,7 @@ Feature: Excluding columns
     And table_print Blog, [:author, :url]
     Then the output should contain
     """
-    AUTHOR | URL              
-    --------------------------
-    Ryan   | http://google.com
+    | AUTHOR | URL               |
+    ------------------------------
+    | Ryan   | http://google.com |
     """

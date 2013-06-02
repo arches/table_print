@@ -1,5 +1,10 @@
+
+# A class that incorporates various configs/options from the user into the final output given the data
+
 module TablePrint
   class ConfigResolver
+
+    # Initialize with the class of data we are process, default columns and user options
     def initialize(klass, default_column_names, *options)
       @column_hash = {}
 
