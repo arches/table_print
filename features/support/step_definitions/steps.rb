@@ -69,6 +69,7 @@ Then /^the output should contain$/ do |string|
     output << line
   end
   @r.close
+  puts output
 
   output.zip(string.split("\n")).each do |actual, expected|
     actual.gsub(/\s/m, "").split(//).sort.join.should == expected.gsub(" ", "").split(//).sort.join

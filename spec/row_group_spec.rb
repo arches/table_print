@@ -95,19 +95,19 @@ describe RowRecursion do
   describe "#horizontal_separator" do
     it "returns hyphens equal to the table width" do
       child.set_cell_values(:title => 'foobar')
-      child.horizontal_separator.should == '------'
+      child.horizontal_separator.should == '----------'
     end
 
     it "matches the header width" do
       child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
-      child.horizontal_separator.should == '------------------------------' # 30 hyphens
+      child.horizontal_separator.should == '----------------------------------' # 34 hyphens
     end
   end
 
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
       child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
-      compare_rows(child.header, "AUTHOR | SUBTITLE           | TITLE     ")
+      compare_rows(child.header, "| AUTHOR | SUBTITLE           | TITLE      |")
     end
   end
 end
@@ -131,16 +131,16 @@ def compare_rows(actual_rows, expected_rows)
 end
 
 describe TablePrint::Row do
-  let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
+  let(:row) { Row.new.set_cell_values({'title' => " wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
   describe "#format" do
     it "formats the row with padding" do
-      compare_rows(row.format, "wonky | bob jones | 2012    ")
+      compare_rows(row.format, "| wonky | bob jones | 2012      |")
     end
 
     it "also formats the children" do
       row.add_child(RowGroup.new.add_child(Row.new.set_cell_values(:title => "wonky2", :author => "bob jones2", :pub_date => "20122")))
-      compare_rows(row.format, "wonky  | bob jones  | 2012    \nwonky2 | bob jones2 | 20122   ")
+      compare_rows(row.format, "| wonky  | bob jones  | 2012     |\n|  wonky2 | bob jones2 | 20122   |")
     end
   end
 

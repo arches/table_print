@@ -9,11 +9,11 @@ Feature: Printing hash
     When I table_print data
     Then the output should contain
     """
-    TITLE        | AUTHOR
-    ---------------------
-    First post!  | Ryan  
-    Second post! | John  
-    Third post!  | Peter
+    | TITLE        | AUTHOR |
+    -------------------------
+    | First post!  | Ryan   |
+    | Second post! | John   |
+    | Third post!  | Peter  |
     """
 
   Scenario: A lambda column
@@ -25,11 +25,11 @@ Feature: Printing hash
     When I table_print data, [:include => {:two => lambda{|hash| hash[:author]*2}}]
     Then the output should contain
     """
-    TITLE        | AUTHOR | TWO       
-    ----------------------------------
-    First post!  | Ryan   | RyanRyan  
-    Second post! | John   | JohnJohn  
-    Third post!  | Peter  | PeterPeter
+    | TITLE        | AUTHOR | TWO        |
+    --------------------------------------
+    | First post!  | Ryan   | RyanRyan   |
+    | Second post! | John   | JohnJohn   |
+    | Third post!  | Peter  | PeterPeter |
     """
 
   Scenario: A method on the object
@@ -41,11 +41,11 @@ Feature: Printing hash
     When I table_print data, [:include => :size]
     Then the output should contain
     """
-    TITLE        | AUTHOR | SIZE
-    ----------------------------
-    First post!  | Ryan   | 2   
-    Second post! | John   | 2   
-    Third post!  | Peter  | 2   
+    | TITLE        | AUTHOR | SIZE |
+    --------------------------------
+    | First post!  | Ryan   | 2    |
+    | Second post! | John   | 2    |
+    | Third post!  | Peter  | 2    |
     """
 
 

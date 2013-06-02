@@ -10,6 +10,8 @@ module TablePrint
 
     @@klasses = {}
 
+    # This method either sets a config for a given class (klass, config)
+    # OR if klass is not a Class, then assume that we call a method on this class and pass in the value
     def self.set(klass, val)
       if klass.is_a? Class
         @@klasses[klass] = val  # val is a hash of column options
@@ -18,6 +20,7 @@ module TablePrint
       end
     end
 
+    # Returns the config for this class from the collection of stored configs for classes
     def self.for(klass)
       @@klasses.fetch(klass) {}
     end

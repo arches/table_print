@@ -21,9 +21,9 @@ Feature: Sensible defaults
     And table_print Foo::Blog
     Then the output should contain
     """
-    TITLE       | AUTHOR
-    --------------------
-    First post! | Ryan
+    | TITLE       | AUTHOR |
+    ------------------------
+    | First post! | Ryan   |
     """
 
   Scenario: An array of objects
@@ -42,11 +42,11 @@ Feature: Sensible defaults
     And table_print blog.posts
     Then the output should contain
     """
-    TITLE        | AUTHOR
-    ---------------------
-    First post!  | Ryan  
-    Second post! | Ryan  
-    Third post!  | Ryan
+    | TITLE        | AUTHOR |
+    -------------------------
+    | First post!  | Ryan   |
+    | Second post! | Ryan   |
+    | Third post!  | Ryan   |
     """
 
   Scenario: Nested objects
@@ -62,10 +62,10 @@ Feature: Sensible defaults
     When I table_print Blog, [:id, "comments.id", "comments.username"]
     Then the output should contain
     """
-    ID | COMMENTS.ID | COMMENTS.USERNAME
-    ------------------------------------
-    1  | 1           | chris            
-       | 2           | joe
+    | ID | COMMENTS.ID | COMMENTS.USERNAME |
+    ----------------------------------------
+    | 1  | 1           | chris             |
+    |    | 2           | joe               |
     """
 
   Scenario: An object with column info (like an ActiveRecord object)
@@ -80,7 +80,7 @@ Feature: Sensible defaults
     And table_print Blog
     Then the output should contain
     """
-    TITLE      
-    -----------
-    First post!
+    | TITLE       |
+    ---------------
+    | First post! |
     """

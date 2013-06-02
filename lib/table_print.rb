@@ -12,6 +12,7 @@ require 'table_print/returnable'
 module TablePrint
   class Printer
 
+    # Convenience method to call table_print() method (which is an instance method) on the class
     def self.table_print(data, options={})
       p = new(data, options)
       p.table_print
@@ -23,6 +24,7 @@ module TablePrint
       @columns = nil
     end
 
+    # Constructs string output in a tabular form which can be printed
     def table_print
       return "No data." if @data.empty?
       group = TablePrint::RowGroup.new
@@ -41,18 +43,24 @@ module TablePrint
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
+    # Returns the columns for the stored data
     def columns
       return @columns if @columns
-      defaults = TablePrint::Printable.default_display_methods(@data.first)
-      c = TablePrint::ConfigResolver.new(@data.first.class, defaults, @options)
+      default_columns = TablePrint::Printable.default_display_methods(@data.first)
+      c = TablePrint::ConfigResolver.new(@data.first.class, default_columns, @options)
       @columns = c.columns
     end
+
   end
 end
+
 
 def tp(data=Class, *options)
   start = Time.now
   printer = TablePrint::Printer.new(data, options)
+
+  puts "\n"
   puts printer.table_print unless data.is_a? Class
+  puts "\n"
   TablePrint::Returnable.new(Time.now - start) # we have to return *something*, might as well be execution time.
 end
