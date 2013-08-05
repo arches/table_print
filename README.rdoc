@@ -165,5 +165,5 @@ You can also set global options:
 
 == Copyright
 
-Copyright (c) 2012 Chris Doyle. See LICENSE.txt for further details.
+Copyright (c) 2013 Chris Doyle. See LICENSE.txt for further details.
 
