@@ -1,6 +1,6 @@
 = table_print
 
-{<img src="https://secure.travis-ci.org/arches/table_print.png" />}[http://travis-ci.org/arches/table_print]
+{<img src="https://travis-ci.org/arches/table_print.png?branch=master" />}[http://travis-ci.org/arches/table_print]
 
 TablePrint shows objects in nicely formatted columns for easy reading. It even lets you nest other tables
 of related objects, contextualizing data across tables. It's incredibly flexible, yet simple, making it easy to
