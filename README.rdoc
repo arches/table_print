@@ -2,13 +2,12 @@
 
 {<img src="https://secure.travis-ci.org/arches/table_print.png" />}[http://travis-ci.org/arches/table_print]
 
-
 Turn objects into nicely formatted columns for easy reading
 
 TablePrint formats an object or array of objects into columns for easy reading. To do this,
 it assumes the objects in your array all respond to the same methods.
 
-This {ten minute lightning talk}[http://vimeo.com/61158847] will give you a quick overview of table_print's most
+This {three minute screencast}[http://tableprintgem.com] will give you a quick overview of table_print's most
 powerful features and how to use them.
 
 == Installation
