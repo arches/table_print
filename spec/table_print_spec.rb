@@ -25,6 +25,10 @@ describe TablePrint::Printer do
   end
 
   describe "#columns" do
+    let(:printed_output) do
+      "NAME   | SURNAME     \n---------------------\nUser 1 | Familyname 1\nUser 2 | Familyname 2"
+    end
+
     it "pulls the column names off the data object" do
       Sandbox.add_class("Post")
       Sandbox.add_attributes("Post", :title)
@@ -35,17 +39,38 @@ describe TablePrint::Printer do
       cols.first.name.should == 'title'
     end
 
-    it "pulls the column names off the array of hashes" do
-      data = [{:name => "User 1",
-               :surname => "Familyname 1"
-              },
-              {:name => "User 2",
-               :surname => "Familyname 2"}]
+    context 'when keys are symbols' do
+      it "pulls the column names off the array of hashes" do
+        data = [{:name => "User 1",
+                  :surname => "Familyname 1"
+                },
+                {:name => "User 2",
+                  :surname => "Familyname 2"}]
 
-      p = Printer.new(data)
-      cols = p.columns
-      cols.length.should == 2
-      cols.collect(&:name).sort.should == ['name', 'surname']
+        p = Printer.new(data)
+        cols = p.columns
+        cols.length.should == 2
+        cols.collect(&:name).sort.should == ['name', 'surname']
+
+        p.table_print.should eq printed_output
+      end
+    end
+
+    context 'when keys are strings' do
+      it "pulls the column names off the array of hashes" do
+        data = [{'name' => "User 1",
+                  'surname' => "Familyname 1"
+                },
+                {'name' => "User 2",
+                  'surname' => "Familyname 2"}]
+
+        p = Printer.new(data)
+        cols = p.columns
+        cols.length.should == 2
+        cols.collect(&:name).sort.should == ['name', 'surname']
+
+        p.table_print.should eq printed_output
+      end
     end
 
     it "pulls out excepted columns" do

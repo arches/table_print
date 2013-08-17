@@ -36,8 +36,10 @@ module TablePrint
         display_method = (prefix == "" ? method : "#{prefix}.#{method}")
         if method.is_a? Proc
           cell_value = method.call(target)
-        elsif target.is_a? Hash and target.keys.include? method
+        elsif target.is_a? Hash and target.keys.include? method.to_sym
           cell_value = target[method.to_sym]
+        elsif target.is_a? Hash and target.keys.include? method
+          cell_value = target[method]
         else
           cell_value ||= target.send(method)
         end
