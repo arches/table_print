@@ -30,7 +30,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title)
 
       p = Printer.new(Sandbox::Post.new)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 1
       cols.first.name.should == 'title'
     end
@@ -43,7 +43,7 @@ describe TablePrint::Printer do
                :surname => "Familyname 2"}]
 
       p = Printer.new(data)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 2
       cols.collect(&:name).sort.should == ['name', 'surname']
     end
@@ -53,7 +53,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title, :author)
 
       p = Printer.new(Sandbox::Post.new, :except => :title)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 1
       cols.first.name.should == 'author'
     end
@@ -63,7 +63,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title)
 
       p = Printer.new(Sandbox::Post.new, :include => :author)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 2
       cols.first.name.should == 'title'
       cols.last.name.should == 'author'

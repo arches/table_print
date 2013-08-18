@@ -41,6 +41,7 @@ module TablePrint
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
+    private
     def columns
       return @columns if @columns
       defaults = TablePrint::Printable.default_display_methods(@data.first)
