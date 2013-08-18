@@ -21,6 +21,7 @@ module TablePrint
       @data = [data].flatten.compact
       @options = options
       @columns = nil
+      @start_time = Time.now
     end
 
     def table_print
@@ -41,7 +42,16 @@ module TablePrint
       [group.header, group.horizontal_separator, group.format].join("\n")
     end
 
+    def message
+      return "Printed with config" if configged?
+      Time.now - @start_time
+    end
+
     private
+    def configged?
+      !!Config.for(@data.first.class)
+    end
+
     def columns
       return @columns if @columns
       defaults = TablePrint::Printable.default_display_methods(@data.first)
@@ -52,8 +62,7 @@ module TablePrint
 end
 
 def tp(data=Class, *options)
-  start = Time.now
   printer = TablePrint::Printer.new(data, options)
   puts printer.table_print unless data.is_a? Class
-  TablePrint::Returnable.new(Time.now - start) # we have to return *something*, might as well be execution time.
+  TablePrint::Returnable.new(printer.message) # we have to return *something*, might as well be execution time.
 end

@@ -24,6 +24,21 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "message" do
+    it "defaults to the time the print took" do
+      Printer.new([]).message.should < 0.1
+      Printer.new([]).message.should > 0
+    end
+
+    it "shows a warning if the printed objects have config" do
+      Sandbox.add_class("User")
+
+      tp.set Sandbox::User, :id, :email
+      p = Printer.new(Sandbox::User.new)
+      p.message.should == "Printed with config"
+    end
+  end
+
   describe "#columns" do
     it "pulls the column names off the data object" do
       Sandbox.add_class("Post")
