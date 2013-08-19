@@ -26,8 +26,7 @@ describe TablePrint::Printer do
 
   describe "message" do
     it "defaults to the time the print took" do
-      Printer.new([]).message.should < 0.1
-      Printer.new([]).message.should > 0
+      Printer.new([]).message.should be_a Numeric
     end
 
     it "shows a warning if the printed objects have config" do
