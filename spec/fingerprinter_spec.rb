@@ -112,6 +112,24 @@ describe Fingerprinter do
       row = f.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'title' => "foobar", 'bar.author' => 'bobby'}
     end
+
+    context 'using a hash as input_data' do
+      it "fills a row by calling methods on the target object" do
+        f = Fingerprinter.new
+        f.instance_variable_set('@column_names_by_display_method', {'title' => 'title', 'author' => 'author'})
+        input_data = {:title => 'foobar', :author => 'bobby'}
+        row = f.populate_row('', {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, input_data)
+        row.cells.should == {'title' => 'foobar', 'author' => 'bobby'}
+      end
+
+      it "fills a row by calling methods on the target object" do
+        f = Fingerprinter.new
+        f.instance_variable_set('@column_names_by_display_method', {'title' => 'title', 'author' => 'author'})
+        input_data = {'title' => 'foobar', 'author' => 'bobby'}
+        row = f.populate_row('', {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, input_data)
+        row.cells.should == {'title' => 'foobar', 'author' => 'bobby'}
+      end
+    end
   end
 
   describe "#create_child_group" do
