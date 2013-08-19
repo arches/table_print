@@ -24,6 +24,20 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "message" do
+    it "defaults to the time the print took" do
+      Printer.new([]).message.should be_a Numeric
+    end
+
+    it "shows a warning if the printed objects have config" do
+      Sandbox.add_class("User")
+
+      tp.set Sandbox::User, :id, :email
+      p = Printer.new(Sandbox::User.new)
+      p.message.should == "Printed with config"
+    end
+  end
+
   describe "#columns" do
 
     it "pulls the column names off the data object" do
@@ -31,7 +45,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title)
 
       p = Printer.new(Sandbox::Post.new)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 1
       cols.first.name.should == 'title'
     end
@@ -45,7 +59,7 @@ describe TablePrint::Printer do
                   :surname => "Familyname 2"}]
 
         p = Printer.new(data)
-        cols = p.columns
+        cols = p.send(:columns)
         cols.length.should == 2
         cols.collect(&:name).sort.should == ['name', 'surname']
       end
@@ -60,7 +74,7 @@ describe TablePrint::Printer do
                   'surname' => "Familyname 2"}]
 
         p = Printer.new(data)
-        cols = p.columns
+        cols = p.send(:columns)
         cols.length.should == 2
         cols.collect(&:name).sort.should == ['name', 'surname']
       end
@@ -71,7 +85,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title, :author)
 
       p = Printer.new(Sandbox::Post.new, :except => :title)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 1
       cols.first.name.should == 'author'
     end
@@ -81,7 +95,7 @@ describe TablePrint::Printer do
       Sandbox.add_attributes("Post", :title)
 
       p = Printer.new(Sandbox::Post.new, :include => :author)
-      cols = p.columns
+      cols = p.send(:columns)
       cols.length.should == 2
       cols.first.name.should == 'title'
       cols.last.name.should == 'author'
