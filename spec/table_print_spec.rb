@@ -25,9 +25,6 @@ describe TablePrint::Printer do
   end
 
   describe "#columns" do
-    let(:printed_output) do
-      "NAME   | SURNAME     \n---------------------\nUser 1 | Familyname 1\nUser 2 | Familyname 2"
-    end
 
     it "pulls the column names off the data object" do
       Sandbox.add_class("Post")
@@ -51,8 +48,6 @@ describe TablePrint::Printer do
         cols = p.columns
         cols.length.should == 2
         cols.collect(&:name).sort.should == ['name', 'surname']
-
-        p.table_print.should eq printed_output
       end
     end
 
@@ -68,8 +63,6 @@ describe TablePrint::Printer do
         cols = p.columns
         cols.length.should == 2
         cols.collect(&:name).sort.should == ['name', 'surname']
-
-        p.table_print.should eq printed_output
       end
     end
 
