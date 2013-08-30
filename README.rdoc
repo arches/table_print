@@ -34,7 +34,7 @@ You should see something like this:
 
   > tp Book.all
   AUTHOR            | SUMMARY                         | TITLE
-  -----------------------------------------------------------------------
+  ------------------|---------------------------------|------------------
   Michael Connelly  | Another book by Michael Con...  | The Fifth Witness
   Manning Mardale   | From acclaimed historian Ma...  | Malcolm X
   Tina Fey          | Worth it. -Trees                | Bossypants
@@ -57,7 +57,7 @@ books had photos.
 
   > tp Author.limit(3), "name", "books.title", "books.photos.caption"
   NAME              | BOOKS.TITLE       | BOOKS.PHOTOS.CAPTION
-  -------------------------------------------------------------------------
+  ------------------|-------------------|----------------------------------
   Michael Connelly  | The Fifth Witness | Susan was running, fast, away...
                     |                   | Along came a spider.
                     | Malcolm X         |
@@ -124,7 +124,7 @@ Use tp.set and tp.clear to set options on a class-by-class basis.
   
   > tp User.first
   ID | EMAIL
-  ----------------
+  ---|------------
   1  | foo@bar.com
 
   # the config sets a 'baseline' for each print. You can still include/except columns:
