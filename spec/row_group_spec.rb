@@ -100,7 +100,7 @@ describe RowRecursion do
       r1.set_cell_values(:title => 'a' * 5, :discription => 'b' * 3, :category => 'c' * 10)
       r2.set_cell_values(:title => 'a' * 6, :discription => 'b' * 4, :category => 'c' * 9)
       parent.header.size.should == parent.horizontal_separator.size
-      parent.horizontal_separator.should == '-' * 6 + '-|-' + '-' * 'discription'.length + '-|-' + '-' * 10
+      parent.horizontal_separator.should == '-' * 6 + '-|-' + '-' * 'discription'.size + '-|-' + '-' * 10
     end
 
     it "matches the header width" do
