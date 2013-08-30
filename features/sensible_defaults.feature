@@ -22,7 +22,7 @@ Feature: Sensible defaults
     Then the output should contain
     """
     TITLE       | AUTHOR
-    --------------------
+    ------------|-------
     First post! | Ryan
     """
 
@@ -43,7 +43,7 @@ Feature: Sensible defaults
     Then the output should contain
     """
     TITLE        | AUTHOR
-    ---------------------
+    -------------|-------
     First post!  | Ryan  
     Second post! | Ryan  
     Third post!  | Ryan
@@ -63,7 +63,7 @@ Feature: Sensible defaults
     Then the output should contain
     """
     ID | COMMENTS.ID | COMMENTS.USERNAME
-    ------------------------------------
+    ---|-------------|------------------
     1  | 1           | chris            
        | 2           | joe
     """
