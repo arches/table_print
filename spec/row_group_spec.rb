@@ -94,8 +94,13 @@ describe RowRecursion do
 
   describe "#horizontal_separator" do
     it "returns hyphens equal to the table width" do
-      child.set_cell_values(:title => 'foobar')
-      child.horizontal_separator.should == '------'
+      parent.add_child(r1 = Row.new)
+      parent.add_child(r2 = Row.new)
+
+      r1.set_cell_values(:title => 'a' * 5, :description => 'b' * 3, :category => 'c' * 10)
+      r2.set_cell_values(:title => 'a' * 6, :description => 'b' * 4, :category => 'c' * 9)
+      parent.header.size.should == parent.horizontal_separator.size
+      compare_rows(parent.horizontal_separator, '-' * 6 + '-|-' + '-' * 'description'.size + '-|-' + '-' * 10)
     end
 
     it "matches the header width" do

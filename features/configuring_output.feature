@@ -10,7 +10,7 @@ Feature: Configuring output
     Then the output should contain
     """
     TITLE | AUTHOR                                  
-    ------------------------------------------------
+    ------|-----------------------------------------
     post! | Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ry... 
     """
   Scenario: Specifying configuration on a per-object basis
@@ -38,7 +38,7 @@ Feature: Configuring output
     Then the output should contain
     """
     TITLE | AUTHOR | FOOBAR
-    -----------------------
+    ------|--------|-------
     post! | Ryan   | post!
     """
   Scenario: Applying a formatter

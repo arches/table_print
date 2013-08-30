@@ -62,7 +62,9 @@ module TablePrint
     end
 
     def horizontal_separator
-      '-' * header.length # columns don't know how to respect max_width (formatter does that) so just match the header
+      columns.collect do |column|
+        '-' * column.width
+      end.join('-|-')
     end
 
     def header

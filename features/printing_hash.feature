@@ -10,7 +10,7 @@ Feature: Printing hash
     Then the output should contain
     """
     TITLE        | AUTHOR
-    ---------------------
+    -------------|-------
     First post!  | Ryan  
     Second post! | John  
     Third post!  | Peter
@@ -26,7 +26,7 @@ Feature: Printing hash
     Then the output should contain
     """
     TITLE        | AUTHOR | TWO       
-    ----------------------------------
+    -------------|--------|-----------
     First post!  | Ryan   | RyanRyan  
     Second post! | John   | JohnJohn  
     Third post!  | Peter  | PeterPeter
@@ -42,7 +42,7 @@ Feature: Printing hash
     Then the output should contain
     """
     TITLE        | AUTHOR | SIZE
-    ----------------------------
+    -------------|--------|-----
     First post!  | Ryan   | 2   
     Second post! | John   | 2   
     Third post!  | Peter  | 2   
