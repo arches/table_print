@@ -23,6 +23,6 @@ Feature: Excluding columns
     Then the output should contain
     """
     AUTHOR | URL              
-    --------------------------
+    -------|------------------
     Ryan   | http://google.com
     """

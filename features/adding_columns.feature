@@ -14,7 +14,7 @@ Feature: Adding columns
     Then the output should contain
     """
     HERP | BLOG.AUTHOR | BLOG.TITLE
-    -------------------------------
+    -----|-------------|-----------
     derp | Ryan        | post!
     """
 
