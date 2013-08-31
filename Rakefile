@@ -12,7 +12,11 @@ require 'rake'
 require 'rspec/core/rake_task'
 
 desc 'Default: run specs and cucumber features.'
-task :default => [:spec, :cucumber]
+if RUBY_VERSION < '1.9'
+  task :default => [:spec, :cucumber_187]
+else
+  task :default => [:spec, :cucumber]
+end
 
 desc "Run specs"
 RSpec::Core::RakeTask.new do |t|
@@ -22,6 +26,11 @@ require "cucumber/rake/task"
 desc 'Run cucumber features'
 Cucumber::Rake::Task.new(:cucumber) do |task|
   task.cucumber_opts = ["features"]
+end
+
+desc 'Run cucumber features for ruby 1.8.7'
+Cucumber::Rake::Task.new(:cucumber_187) do |task|
+  task.cucumber_opts = ["-t", "~@ruby19", "features"]
 end
 
 begin

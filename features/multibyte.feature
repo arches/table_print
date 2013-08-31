@@ -1,5 +1,6 @@
 # coding: utf-8
 
+@ruby19
 Feature: Fix the column width for multibyte character
   Scenario: A simple array of hashes
     Given a variable named data with
