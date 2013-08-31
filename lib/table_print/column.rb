@@ -34,7 +34,10 @@ module TablePrint
     end
 
     def data_width
-      [name.length].concat(Array(data).compact.collect(&:to_s).collect(&:length)).max
+      [
+        name.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+),
+        Array(data).compact.collect(&:to_s).collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
+      ].max
     end
 
     def width
