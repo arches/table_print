@@ -25,7 +25,8 @@ module TablePrint
     end
 
     def format(value)
-      "%-#{width}s" % truncate(value)
+      padding = width - value.to_s.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+)
+      truncate(value) + (padding < 0 ? '' : " " * padding)
     end
 
     private
