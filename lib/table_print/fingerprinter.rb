@@ -40,8 +40,10 @@ module TablePrint
           cell_value = target[method.to_sym]
         elsif target.is_a? Hash and target.keys.include? method
           cell_value = target[method]
-        else
+        elsif target.respond_to? method
           cell_value ||= target.send(method)
+        else
+          cell_value = "Method Missing"
         end
         cells[@column_names_by_display_method[display_method]] = cell_value
       end

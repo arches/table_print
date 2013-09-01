@@ -130,6 +130,15 @@ describe Fingerprinter do
         row.cells.should == {'title' => 'foobar', 'author' => 'bobby'}
       end
     end
+
+    context "when the method isn't found" do
+      it "sets the cell value to an error string" do
+        f = Fingerprinter.new
+        f.instance_variable_set('@column_names_by_display_method', {'foo' => 'foo'})
+        row = f.populate_row('', {'foo' => {}}, Hash.new)
+        row.cells.should == {'foo' => 'Method Missing'}
+      end
+    end
   end
 
   describe "#create_child_group" do
