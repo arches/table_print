@@ -37,7 +37,7 @@ module TablePrint
       [
         name.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+),
         Array(data).compact.collect(&:to_s).collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
-      ].max
+      ].compact.max || 0
     end
 
     def width
