@@ -1,6 +1,5 @@
 module TablePrint
   class Config
-    cattr_accessor :max_width, :time_format
 
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -29,6 +28,22 @@ module TablePrint
         original_value = TablePrint::Config.const_get("DEFAULT_#{klass.to_s.upcase}")
         TablePrint::Config.send("#{klass}=", original_value)
       end
+    end
+
+    def self.max_width
+      @@max_width
+    end
+
+    def self.max_width=(width)
+      @@max_width = width
+    end
+
+    def self.time_format
+      @@time_format
+    end
+
+    def self.time_format=(format)
+      @@time_format = format
     end
   end
 end

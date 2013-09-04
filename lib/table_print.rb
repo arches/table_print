@@ -1,4 +1,3 @@
-require 'table_print/cattr'
 require 'table_print/column'
 require 'table_print/config_resolver'
 require 'table_print/config'
