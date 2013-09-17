@@ -45,6 +45,16 @@ describe TablePrint::Printable do
     end
 
     it "uses column information when available (eg, from ActiveRecord objects)"
+    
+    it "uses the members method when passed a Struct" do
+      test_struct = Struct.new(:foo, :bar)
+      obj = test_struct.new
+      obj.foo = 1
+      obj.bar = 2
+      TablePrint::Printable.default_display_methods(obj).should == [:foo, :bar]
+    end
+      
+      
   end
 
 end

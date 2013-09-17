@@ -50,6 +50,15 @@ describe TablePrint::Printer do
       cols.first.name.should == 'title'
     end
 
+    it 'pull the column names off of the array of Structs' do
+      struct = Struct.new(:name, :surname)
+      data = [struct.new("User 1", "Familyname 1"), struct.new("User 2", "Familyname 2")]
+      p = Printer.new(data)
+      cols = p.send(:columns)
+      cols.length.should == 2
+      cols.collect(&:name).sort.should == ['name', 'surname']
+    end
+    
     context 'when keys are symbols' do
       it "pulls the column names off the array of hashes" do
         data = [{:name => "User 1",

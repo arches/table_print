@@ -25,6 +25,17 @@ Given /^a variable named (.*) with$/ do |variable, table|
   @objs.send("#{variable.downcase}=", table.hashes)
 end
 
+Given /^an array of structs named (.*) with$/ do |variable, table|
+  @objs ||= OpenStruct.new
+  struct = Struct.new(*(table.column_names.collect(&:to_sym)))
+  data = table.hashes.collect do |hsh|
+    obj = struct.new
+    hsh.each {|k,v| obj.send "#{k}=", v}
+    obj
+  end
+  @objs.send("#{variable.downcase}=", data)
+end
+
 When /^I instantiate a (.*) with (\{.*\})$/ do |klass, args|
   @objs ||= OpenStruct.new
   @objs.send("#{klass.downcase}=", Sandbox.const_get_from_string(klass).new(eval(args)))
