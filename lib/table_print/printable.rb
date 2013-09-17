@@ -5,7 +5,8 @@ module TablePrint
       return target.class.columns.collect(&:name) if target.class.respond_to? :columns
       
       return target.keys if target.is_a? Hash
-
+      return target.members if target.is_a? Struct
+      
       methods = []
       target.methods.each do |method_name|
         method = target.method(method_name)

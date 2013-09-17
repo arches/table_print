@@ -30,7 +30,7 @@ module TablePrint
         group.set_column(c.name, c)
       end
 
-      group_data = (@data.first.is_a? Hash) ? [@data] : @data
+      group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
       group_data.each do |data|
         group.add_children(Fingerprinter.new.lift(columns, data))
       end
