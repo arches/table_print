@@ -1,4 +1,4 @@
-Feature: Printing hash
+Feature: Printing structs
 
   Scenario: A simple array of structs
     Given an array of structs named data with
