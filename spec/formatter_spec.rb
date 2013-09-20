@@ -53,6 +53,10 @@ describe TablePrint::FixedWidthFormatter do
       @f.format("1234567890123456").should == "1234567..."
     end
 
+    it "truncate colorized values correctly" do 
+      @f.format("\e[0;31;49masdf\e[0m").should == "\e[0;31;49masdf\e[0m      "
+    end
+
     it "uses an empty string in place of nils" do
       @f.format(nil).should == "          "
     end
