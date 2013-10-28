@@ -70,16 +70,12 @@ end
 When /table_print ([\w\.:]*)$/ do |klass|
   obj = @objs.send(klass.split(".").first.downcase)
   obj = obj.send(klass.split(".").last) if klass.include? "."  # hack - we're assuming only two levels. use inject to find the target.
-  
+
   tp(obj)
 end
 
 Then /^the output should contain$/ do |string|
-  output = []
-  while line = @r.gets
-    output << line
-  end
-  @r.close
+  output = @r.lines.to_a
 
   output.zip(string.split("\n")).each do |actual, expected|
     actual.gsub(/\s/m, "").split(//).sort.join.should == expected.gsub(" ", "").split(//).sort.join
