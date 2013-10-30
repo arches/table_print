@@ -58,6 +58,10 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
   end
 end
 
+When /^I configure multibyte with (.*)$/ do |value|
+  TablePrint::Config.set(:multibyte, [value == "true"])
+end
+
 When /^configure (.*) with (.*)$/ do |klass, config|
   klass = Sandbox.const_get_from_string(klass)
   TablePrint::Config.set(klass, eval(config))

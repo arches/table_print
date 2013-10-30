@@ -34,10 +34,17 @@ module TablePrint
     end
 
     def data_width
-      [
-        name.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+),
-        Array(data).compact.collect(&:to_s).collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
-      ].compact.max || 0
+      if multibyte_count
+        [
+          name.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+),
+          Array(data).compact.collect(&:to_s).collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
+        ].compact.max || 0
+      else
+        [
+          name.length,
+          Array(data).compact.collect(&:to_s).collect(&:length).max
+        ].compact.max || 0
+      end
     end
 
     def width
@@ -47,6 +54,10 @@ module TablePrint
     private
     def max_width
       TablePrint::Config.max_width
+    end
+
+    def multibyte_count
+      TablePrint::Config.multibyte
     end
   end
 end

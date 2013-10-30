@@ -6,6 +6,7 @@ module TablePrint
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
+    @@multibyte = false
 
     @@klasses = {}
 
@@ -36,6 +37,14 @@ module TablePrint
 
     def self.max_width=(width)
       @@max_width = width
+    end
+
+    def self.multibyte
+      @@multibyte
+    end
+
+    def self.multibyte=(width)
+      @@multibyte = width
     end
 
     def self.time_format

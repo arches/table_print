@@ -25,7 +25,7 @@ module TablePrint
     end
 
     def format(value)
-      padding = width - value.to_s.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+)
+      padding = width - length(value.to_s)
       truncate(value) + (padding < 0 ? '' : " " * padding)
     end
 
@@ -37,6 +37,14 @@ module TablePrint
       return value unless value.length > width
 
       "#{value[0..width-4]}..."
+    end
+
+    def length(str)
+      if TablePrint::Config.multibyte
+        str.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+)
+      else
+        str.length
+      end
     end
   end
 end
