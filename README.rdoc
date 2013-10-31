@@ -151,6 +151,14 @@ You can also set global options:
 
   tp.set :max_width, 10 # columns won't exceed 10 characters
   tp.set :time_format, "%Y" # date columns will only show the year
+  
+=== Multibyte
+
+Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be
+working with a lot of multibyte characters, set the multibyte option first to enable the slower yet more precise
+width calculation:
+
+  > tp.set :multibyte, true
 
 == Contributing to table_print
 
