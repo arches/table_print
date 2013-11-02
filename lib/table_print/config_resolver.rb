@@ -23,7 +23,7 @@ module TablePrint
       @included_columns.concat [get_and_remove(options, :include)].flatten
       @included_columns.map! do |option|
         if option.is_a? Column
-          option if option.is_a? Column
+          option
         else
           option_to_column(option)
         end

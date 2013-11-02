@@ -30,9 +30,9 @@ module TablePrint
       @children.length
     end
 
-    def set_column(name, column)
-      return parent.set_column(name, column) if parent
-      @columns[name.to_s] = column
+    def set_column(column)
+      return parent.set_column(column) if parent
+      @columns[column.name.to_s] = column
     end
 
     def columns
