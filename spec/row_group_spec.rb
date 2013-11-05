@@ -8,7 +8,7 @@ describe RowRecursion do
 
   describe "#set_column" do
     it "assigns the column object to the column name" do
-      column = Column.new(name: "foobar")
+      column = Column.new(:name => "foobar")
       parent.set_column(column)
       parent.column_for(:foobar).should == column
     end
