@@ -84,3 +84,19 @@ Feature: Sensible defaults
     -----------
     First post!
     """
+
+  Scenario: An object with field info (like a Mongoid object)
+    Given a class named Mongoid
+
+    Given a class named Blog
+    Given Blog has attributes title, author
+    Given Blog has a method named fields with lambda{{"title" => Sandbox::Mongoid.new}}
+
+    When I instantiate a Blog with {:title => "First post!", :author => 'Ryan'}
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE      
+    -----------
+    First post!
+    """

@@ -3,10 +3,13 @@ module TablePrint
     # Sniff the data class for non-standard methods to use as a baseline for display
     def self.default_display_methods(target)
       return target.class.columns.collect(&:name) if target.class.respond_to? :columns
-      
+
+      # eg mongoid
+      return target.fields.keys if target.respond_to? :fields and target.fields.is_a? Hash
+
       return target.keys if target.is_a? Hash
       return target.members.collect(&:to_sym) if target.is_a? Struct
-      
+
       methods = []
       target.methods.each do |method_name|
         method = target.method(method_name)
