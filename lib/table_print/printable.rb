@@ -2,8 +2,18 @@ module TablePrint
   module Printable
     # Sniff the data class for non-standard methods to use as a baseline for display
     def self.default_display_methods(target)
-      # Sequel columns are just symbols
-      return target.class.columns.collect{|c| c.respond_to?(:name) ? c.name : c } if target.class.respond_to? :columns
+      if target.class.respond_to? :columns
+        if target.class.columns.first.respond_to? :name
+
+          # eg ActiveRecord
+          return target.class.columns.collect(&:name)
+        else
+
+          # eg Sequel
+          return target.class.columns
+        end
+      end
+
       # eg mongoid
       return target.fields.keys if target.respond_to? :fields and target.fields.is_a? Hash
 
