@@ -17,7 +17,7 @@ module TablePrint
     end
 
     def initialize(data, options={})
-      @data = [data].flatten.compact
+      @data = Array(data).compact
       @options = options
       @columns = nil
       @start_time = Time.now
