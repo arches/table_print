@@ -152,6 +152,14 @@ You can also set global options:
   tp.set :max_width, 10 # columns won't exceed 10 characters
   tp.set :time_format, "%Y" # date columns will only show the year
   
+You can redirect output:
+
+  f = File.open("users.txt", "w")
+  tp.set :io, f
+  tp User.all # written to users.txt instead of STDOUT
+  tp.clear :io
+  tp User.all # writing to STDOUT again
+  
 === Multibyte
 
 Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be
