@@ -70,6 +70,6 @@ end
 
 def tp(data=Class, *options)
   printer = TablePrint::Printer.new(data, options)
-  puts printer.table_print unless data.is_a? Class
+  TablePrint::Config.io.puts printer.table_print unless data.is_a? Class
   TablePrint::Returnable.new(printer.message) # we have to return *something*, might as well be execution time.
 end

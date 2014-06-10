@@ -3,10 +3,12 @@ module TablePrint
 
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    DEFAULT_IO = STDOUT
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
     @@multibyte = false
+    @@io = STDOUT
 
     @@klasses = {}
 
@@ -53,6 +55,15 @@ module TablePrint
 
     def self.time_format=(format)
       @@time_format = format
+    end
+
+    def self.io
+      @@io
+    end
+
+    def self.io=(io)
+      raise StandardError.new("IO object must respond to :puts") unless io.respond_to? :puts
+      @@io = io
     end
   end
 end

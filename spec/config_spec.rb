@@ -47,5 +47,31 @@ describe TablePrint::Config do
       end
     end
   end
+
+  describe "io" do
+    before :all do
+      Sandbox.add_class("MyIO")
+      Sandbox.add_method("MyIO", :puts) {}
+    end
+
+    it "accepts object that respond to puts" do
+      myIO = Sandbox::MyIO.new
+      TablePrint::Config.set(:io, [myIO])
+      TablePrint::Config.io.should == myIO
+    end
+
+    it "doesn't accept objects unless they respond to puts" do
+      lambda {
+        TablePrint::Config.set(:io, [""])
+      }.should raise_error StandardError
+    end
+
+    it "defaults to STDOUT" do
+      myIO = Sandbox::MyIO.new
+      TablePrint::Config.set(:io, [myIO])
+      TablePrint::Config.clear(:io)
+      TablePrint::Config.io.should == STDOUT
+    end
+  end
 end
 
