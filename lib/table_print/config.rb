@@ -4,11 +4,13 @@ module TablePrint
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     DEFAULT_IO = STDOUT
+    DEFAULT_CAPITALIZE_HEADERS = true
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
     @@multibyte = false
     @@io = STDOUT
+    @@capitalize_headers = true
 
     @@klasses = {}
 
@@ -55,6 +57,14 @@ module TablePrint
 
     def self.time_format=(format)
       @@time_format = format
+    end
+
+    def self.capitalize_headers
+      @@capitalize_headers
+    end
+
+    def self.capitalize_headers=(caps)
+      @@capitalize_headers = caps
     end
 
     def self.io

@@ -55,3 +55,18 @@ Feature: Configuring output
     ------
     Ryan
     """
+
+  Scenario: Setting a lowecase column name
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And I configure capitalize_headers with false
+    And table_print Blog, {:author => {:display_name => "Wom Bat"}}
+    Then the output should contain
+    """
+    Wom Bat
+    -------
+    Ryan
+    """

@@ -73,7 +73,10 @@ module TablePrint
         f.format(column.name)
       end
 
-      padded_names.join(" | ").upcase
+      header_string = padded_names.join(" | ")
+      header_string.upcase! if TablePrint::Config.capitalize_headers
+
+      header_string
     end
 
     def add_formatter(name, formatter)
