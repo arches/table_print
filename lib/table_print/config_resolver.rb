@@ -73,6 +73,11 @@ module TablePrint
         option[:default_width] = option.delete(:width)
       end
 
+      if option.has_key? :display_name
+        option[:display_method] = option[:name]
+        option[:name] = option.delete(:display_name)
+      end
+
       c = Column.new(option)
       @column_hash[c.name] = c
       c

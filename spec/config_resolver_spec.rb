@@ -206,6 +206,14 @@ describe TablePrint::ConfigResolver do
         c.columns.first.formatters.should == [f1, f2]
       end
     end
+    context "display_name" do
+      it "sets the display name on the column" do
+        c = TablePrint::ConfigResolver.new(Object, [], :title => {:display_name => "Ti Tle"})
+        c.columns.length.should == 1
+        c.columns.first.name.should == 'Ti Tle'
+        c.columns.first.display_method.should == "title"
+      end
+    end
   end
 
   describe "#option_to_column" do
