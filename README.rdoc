@@ -85,6 +85,7 @@ Available column options:
 * *formatters* - array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
 * *time_format* - string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
 * *width* - integer - how wide you want your column.
+* *display_name* - string - useful if you want spaces in your column name
 
 ==== Display method
 
@@ -151,6 +152,7 @@ You can also set global options:
 
   tp.set :max_width, 10 # columns won't exceed 10 characters
   tp.set :time_format, "%Y" # date columns will only show the year
+  tp.set :capitalize_headers, false # don't capitalize column headers
   
 You can redirect output:
 
