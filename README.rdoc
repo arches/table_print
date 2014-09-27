@@ -36,7 +36,7 @@ You should see something like this:
   AUTHOR            | SUMMARY                         | TITLE
   ------------------|---------------------------------|------------------
   Michael Connelly  | Another book by Michael Con...  | The Fifth Witness
-  Manning Mardale   | From acclaimed historian Ma...  | Malcolm X
+  Manning Marable   | From acclaimed historian Ma...  | Malcolm X
   Tina Fey          | Worth it. -Trees                | Bossypants
 
 TablePrint tries to use sensible defaults to choose the columns to show. If you're inspecting ActiveRecord objects, it
