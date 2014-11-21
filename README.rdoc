@@ -116,6 +116,14 @@ can be used to filter a column. This could also be used for coloring output.
 
   tp User.all, :bio => {:formatters => [NoNewlineFormatter.new]} # strip newlines from user bios
 
+=== HTML Output
+
+Currently the best way to show table_print output on an HTML page is using a <pre> tag. You can create a helper
+method to send table_print output directly into your <pre> tag:
+
+  def tp_pre data, options={}
+    content_tag :pre, TablePrint::Printer.new(data, options).table_print
+  end
 
 === Config
 
