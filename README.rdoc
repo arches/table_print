@@ -15,7 +15,7 @@ powerful features and how to use them.
   # Install as a standalone gem
   $ gem install table_print
 
-  # Or install within rails (check {rubygems.org}[http://rubygems.org/gems/table_print] for the latest version number)
+  # Or install within rails (check rubygems.org for the latest version number)
   In your Gemfile: gem "table_print"
   $ bundle install
 
