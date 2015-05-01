@@ -1,10 +1,11 @@
 module TablePrint
   class Column
     attr_reader :formatters
-    attr_accessor :name, :data, :time_format, :default_width
+    attr_accessor :name, :data, :time_format, :default_width, :align
 
     def initialize(attr_hash={})
       @formatters = []
+      @align ||= :left
       attr_hash.each do |k, v|
         self.send("#{k}=", v)
       end

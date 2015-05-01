@@ -79,6 +79,7 @@ a skinny email column, set the width explicitly:
   tp User.all, :email => {:width => 12}
   tp User.all, :id, {:email => {:width => 12}}, :age
 
+
 Available column options:
 
 * *display_method* - string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
@@ -86,6 +87,7 @@ Available column options:
 * *time_format* - string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
 * *width* - integer - how wide you want your column.
 * *display_name* - string - useful if you want spaces in your column name
+* *align* - symbol or string - indicate column alignment: `:left`, `:center`, `:right`.  Default is `:left`.
 
 ==== Display method
 
@@ -107,16 +109,37 @@ Make sure to add curly braces if you have more than one column with a lambda or 
 
   tp User.all, :email, { daily_payment: lambda { |u| u.monthly_payment / 30} }, :monthly_payment, { yearly_payment: lambda { |u| u.monthly_payment * 12} }
 
+==== Column Helper Methods
+
+There are helper methods to build the column option hashes:
+
+* `COLUMN.as(LABEL)` - use LABEL for the COLUMN header
+* `COLUMN.width(W)`  - set the COLUMN width to W
+* `COLUMN.right`     - set the COLUMN.align to :right
+* `COLUMN.left`      - set the COLUMN.align to :left
+* `COLUMN.center`    - set the COLUMN.align to :center
+
+These helper methods can be chained, and can be in any order.
+
+Example:
+
+  tp User.all :id.as('Id').right, :email.as('Email Address').width(12), :age.right
+
 ==== Column formatters
 
-Similar to a lambda column, you can use a column formatter to reuse code across prints. Any object with a 'format' method
-can be used to filter a column. This could also be used for coloring output.
+Similar to a lambda column, you can use a column formatter to reuse code across
+prints. Any object with a 'format' method can be used to filter a column. This
+could also be used for coloring output.
+
+For example:
 
   class NoNewlineFormatter
     def format(value)
       value.to_s.gsub(/\r\n/, " ")
     end
   end
+
+This example is actually one of the formatters applied to all columns.
 
   tp User.all, :bio => {:formatters => [NoNewlineFormatter.new]} # strip newlines from user bios
 
@@ -134,7 +157,7 @@ method to send table_print output directly into your <pre> tag:
 Use tp.set and tp.clear to set options on a class-by-class basis.
 
   tp.set User, :id, :email # now whenever you print users, the only columns shown will be id and email
-  
+
   > tp User.first
   ID | EMAIL
   ---|------------
@@ -165,7 +188,7 @@ You can also set global options:
   tp.set :max_width, 10 # columns won't exceed 10 characters
   tp.set :time_format, "%Y" # date columns will only show the year
   tp.set :capitalize_headers, false # don't capitalize column headers
-  
+
 You can redirect output:
 
   f = File.open("users.txt", "w")
@@ -173,7 +196,7 @@ You can redirect output:
   tp User.all # written to users.txt instead of STDOUT
   tp.clear :io
   tp User.all # writing to STDOUT again
-  
+
 === Multibyte
 
 Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be

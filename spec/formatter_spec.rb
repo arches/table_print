@@ -62,3 +62,71 @@ describe TablePrint::FixedWidthFormatter do
     end
   end
 end
+
+describe TablePrint::FixedWidthFormatter do
+  before(:each) do
+    @f = TablePrint::FixedWidthFormatter.new(10, :right)
+  end
+
+  describe "#format" do
+    it "pads a short field to the specified width on the right" do
+      @f.format("asdf").should == "      asdf"
+    end
+
+    it "truncates long fields with periods" do
+      @f.format("1234567890123456").should == "1234567..."
+    end
+
+    it "uses an empty string in place of nils" do
+      @f.format(nil).should == "          "
+    end
+
+    it "turns objects into strings before trying to format them" do
+      @f.format(123).should == "       123"
+    end
+  end
+end
+
+describe TablePrint::NumFormatter do
+  before(:each) do
+    @f = TablePrint::NumFormatter.new(8)
+  end
+
+  describe "#format" do
+    it "pads a number to the right" do
+      @f.format(123).should ==  "     123"
+      @f.format(1234).should == "    1234"
+    end
+    it "sets the width of the column" do
+      @f.width.should == 8
+    end
+    it "allows the width to be set" do
+      @f.width = 10
+      @f.width.should == 10
+      @f.format(1234).should == "      1234"
+    end
+  end
+end
+
+describe TablePrint::MoneyFormatter do
+  before(:each) do
+    @f = TablePrint::MoneyFormatter.new(8)
+  end
+
+  describe "#format" do
+    it "pads a decimal to the right" do
+      @f.format(123).should     == "$ 123.00"
+      @f.format(1234).should    == "$1234.00"
+      @f.format(1234.56).should == "$1234.56"
+    end
+    it "sets the width of the column" do
+      @f.width.should == 8
+    end
+    it "allows the width to be set" do
+      @f.width = 10
+      @f.width.should == 10
+      @f.format(1234).should == "$  1234.00"
+    end
+  end
+
+end

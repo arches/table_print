@@ -69,7 +69,7 @@ module TablePrint
 
     def header
       padded_names = columns.collect do |column|
-        f = FixedWidthFormatter.new(column.width)
+        f = FixedWidthFormatter.new(column.width, :center)
         f.format(column.name)
       end
 
@@ -218,7 +218,7 @@ module TablePrint
 
       formatters << TimeFormatter.new(column.time_format)
       formatters << NoNewlineFormatter.new
-      formatters << FixedWidthFormatter.new(column_for(column_name).width)
+      formatters << FixedWidthFormatter.new(column.width, column.align)
 
       # successively apply the formatters for a column
       formatters.inject(value) do |value, formatter|

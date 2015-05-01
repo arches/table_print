@@ -7,6 +7,7 @@ require 'table_print/hash_extensions'
 require 'table_print/printable'
 require 'table_print/row_group'
 require 'table_print/returnable'
+require 'table_print/column_helpers'
 
 module TablePrint
   class Printer
