@@ -5,7 +5,6 @@ include TablePrint
 using TablePrint::ColumnHelpers
 
 describe TablePrint::ColumnHelpers do
-  # let(:c) { Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => :tagline) }
 
   context "when using the .as helper" do
     it "works on symbol names, and returns the hash with :display_name" do

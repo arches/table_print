@@ -82,18 +82,25 @@ a skinny email column, set the width explicitly:
 
 Available column options:
 
-* *display_method* - string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
-* *formatters* - array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
-* *time_format* - string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
-* *width* - integer - how wide you want your column.
-* *display_name* - string - useful if you want spaces in your column name
-* *align* - symbol or string - indicate column alignment: `:left`, `:center`, `:right`.  Default is `:left`.
++display_method+:: string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
++formatters+::     array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
++time_format+::    string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
++width+::          integer - how wide you want your column.
++display_name+::   string - useful if you want spaces in your column name
++align+::          symbol or string - indicate column alignment: +:left+, +:center+, +:right+.  Default is +:left+.
 
 ==== Display method
 
-Columns are named after hash keys. To rename a column, use the name you want as the key, and pass the method as an option.
+Columns are named after hash keys. To rename a column, use the name you want as
+the key, and pass the method as an option.
 
-  tp User.all, :active => {:display_method => :active_in_the_past_six_months} # the User class defines active_in_the_past_six_months method
+  tp User.all, :active => {:display_method => :active_in_the_past_six_months} 
+  # the User class defines active_in_the_past_six_months method
+
+or
+
+  tp User.all, :active.from(:active_in_the_past_six_months)
+  # the .from helper method generates :display_method keys
 
 ==== Lambdas
 
@@ -105,25 +112,34 @@ Or if you want to pass other options along with the lambda:
 
   tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :width => 10}
 
-Make sure to add curly braces if you have more than one column with a lambda or if this column isn't the last one.
+Make sure to add curly braces if you have more than one column with a lambda or
+if this column isn't the last one.
 
-  tp User.all, :email, { daily_payment: lambda { |u| u.monthly_payment / 30} }, :monthly_payment, { yearly_payment: lambda { |u| u.monthly_payment * 12} }
+  tp User.all, :email, 
+     { daily_payment: lambda { |u| u.monthly_payment / 30} },
+     :monthly_payment, 
+     { yearly_payment: lambda { |u| u.monthly_payment * 12} }
 
 ==== Column Helper Methods
 
 There are helper methods to build the column option hashes:
 
-* `COLUMN.as(LABEL)` - use LABEL for the COLUMN header
-* `COLUMN.width(W)`  - set the COLUMN width to W
-* `COLUMN.right`     - set the COLUMN.align to :right
-* `COLUMN.left`      - set the COLUMN.align to :left
-* `COLUMN.center`    - set the COLUMN.align to :center
++COLUMN.as(LABEL)+::       - use +LABEL+ for the +COLUMN+ header
++COLUMN.from(SRC)+::       - use +SRC+ for the data for +COLUMN+
++COLUMN.width(W)+::        - set the +COLUMN+ width to +W+
++COLUMN.right(W=nil)+::    - set the +COLUMN.align+ to +:right+, in width +W+ if given
++COLUMN.left(W=nil)+::     - set the +COLUMN.align+ to +:left+, in width +W+ if given
++COLUMN.center(W=nil)+::   - set the +COLUMN.align+ to +:center+, in width +W+ if given
++COLUMN.formatter(FMT)+::  - set +FMT+ as a formatter for +COLUMN+
++COLUMN.as_num(W=nil)+::   - set +NumFormatter+ as the formatter, with width +W+
++COLUMN.as_money(W=nil)+:: - set +MoneyFormatter+ as the formatter, with width +W+
 
 These helper methods can be chained, and can be in any order.
 
-Example:
+Examples:
 
-  tp User.all :id.as('Id').right, :email.as('Email Address').width(12), :age.right
+  tp User.all, :id.as('Id').right, :email.as('Email Address').width(12), :age.right(4)
+  tp Accounts.all, :acct_id.as('Acct'), :acct_type.as('Type'), :acct_amount.as('Amount').as_money(10)
 
 ==== Column formatters
 
@@ -143,10 +159,15 @@ This example is actually one of the formatters applied to all columns.
 
   tp User.all, :bio => {:formatters => [NoNewlineFormatter.new]} # strip newlines from user bios
 
+Of course, you can use the +.formatter+ helper function:
+
+  tp User.all, :bio.formatter(NoNewLineFormatter.new).width(40)
+
 === HTML Output
 
-Currently the best way to show table_print output on an HTML page is using a <pre> tag. You can create a helper
-method to send table_print output directly into your <pre> tag:
+Currently the best way to show table_print output on an HTML page is using a
++<pre>+ tag. You can create a helper method to send table_print output directly
+into your +<pre>+ tag:
 
   def tp_pre data, options={}
     content_tag :pre, TablePrint::Printer.new(data, options).table_print
@@ -154,9 +175,10 @@ method to send table_print output directly into your <pre> tag:
 
 === Config
 
-Use tp.set and tp.clear to set options on a class-by-class basis.
+Use +tp.set+ and +tp.clear+ to set options on a class-by-class basis.
 
-  tp.set User, :id, :email # now whenever you print users, the only columns shown will be id and email
+  tp.set User, :id, :email 
+  # now whenever you print users, the only columns shown will be id and email
 
   > tp User.first
   ID | EMAIL
@@ -177,7 +199,7 @@ Use tp.set and tp.clear to set options on a class-by-class basis.
 
   tp.clear User # back to square one - print all the columns we can find
 
-To see the config for a given object, use tp.config_for.
+To see the config for a given object, use +tp.config_for+.
 
   > tp.set User, :id, :email
   > tp.config_for User
@@ -199,21 +221,33 @@ You can redirect output:
 
 === Multibyte
 
-Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be
-working with a lot of multibyte characters, set the multibyte option first to enable the slower yet more precise
-width calculation:
+Unfortunately, the current approach to finding the width of multibyte strings
+is too slow. If you're going to be working with a lot of multibyte characters,
+set the multibyte option first to enable the slower yet more precise width
+calculation:
 
   > tp.set :multibyte, true
 
 == Contributing to table_print
 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Check out the latest master to make sure the feature hasn't been implemented
+  or the bug hasn't been fixed yet
+
+* Check out the issue tracker to make sure someone already hasn't requested it
+  and/or contributed it
+
 * Fork the project
+
 * Start a feature/bugfix branch
+
 * Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+
+* Make sure to add tests for it. This is important so I don't break it in a 
+  future version unintentionally.
+
+* Please try not to mess with the Rakefile, version, or history. If you want to
+  have your own version, or is otherwise necessary, that is fine, but please
+  isolate to its own commit so I can cherry-pick around it.
 
 == Copyright
 
