@@ -90,4 +90,25 @@ describe Column do
       end
     end
   end
+
+  describe "#align" do
+    context "when no :align attribute is given" do
+      let(:c) {Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => :tagline)}
+      it "should default to :left" do
+        c.align.should == :left
+      end
+    end
+    context "when :align :right is given" do
+      let(:c) {Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => :tagline, :align => :right)}
+      it "should return the correct value of :right" do
+        c.align.should == :right
+      end
+    end
+    context "when :align :center is given" do
+      let(:c) {Column.new(:data => ["Once upon a time", "there was a dark and stormy night"], :name => :tagline, :align => :center)}
+      it "should return the correct value of :center" do
+        c.align.should == :center
+      end
+    end
+  end
 end

@@ -19,14 +19,24 @@ module TablePrint
 
   class FixedWidthFormatter
     attr_accessor :width
+    attr_accessor :align
 
-    def initialize(width)
+    def initialize(width, align=:left)
       self.width = width
+      self.align = align
     end
 
     def format(value)
-      padding = width - length(value.to_s)
-      truncate(value) + (padding < 0 ? '' : " " * padding)
+      case align
+      when :left, 'left', 'l'
+        truncate(value).ljust(width)
+      when :right, 'right', 'r'
+        truncate(value).rjust(width)
+      when :center, 'center', 'c'
+        truncate(value).center(width)
+      else
+        truncate(value).ljust(width)
+      end
     end
 
     private

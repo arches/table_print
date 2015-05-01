@@ -16,6 +16,9 @@ doc
 # jeweler generated
 pkg
 
+# ignore built gems
+*.gem
+
 # Have editor/IDE/OS specific files you need to ignore? Consider using a global gitignore: 
 #
 # * Create a file at ~/.gitignore

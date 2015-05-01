@@ -46,3 +46,10 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+task :console do
+  require 'pry'
+  require 'table_print'
+  ARGV.clear
+  Pry.start
+end
