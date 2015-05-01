@@ -124,15 +124,15 @@ if this column isn't the last one.
 
 There are helper methods to build the column option hashes:
 
-+COLUMN.as(LABEL)+::       - use +LABEL+ for the +COLUMN+ header
-+COLUMN.from(SRC)+::       - use +SRC+ for the data for +COLUMN+
-+COLUMN.width(W)+::        - set the +COLUMN+ width to +W+
-+COLUMN.right(W=nil)+::    - set the +COLUMN.align+ to +:right+, in width +W+ if given
-+COLUMN.left(W=nil)+::     - set the +COLUMN.align+ to +:left+, in width +W+ if given
-+COLUMN.center(W=nil)+::   - set the +COLUMN.align+ to +:center+, in width +W+ if given
-+COLUMN.formatter(FMT)+::  - set +FMT+ as a formatter for +COLUMN+
-+COLUMN.as_num(W=nil)+::   - set +NumFormatter+ as the formatter, with width +W+
-+COLUMN.as_money(W=nil)+:: - set +MoneyFormatter+ as the formatter, with width +W+
+<tt>COL.as(LABEL)</tt>::       use +LABEL+ for the +COL+ header
+<tt>COL.from(SRC)</tt>::       use +SRC+ for the data for +COL+
+<tt>COL.width(W)</tt>::        set the +COL+ width to +W+
+<tt>COL.right(W=nil)</tt>::    set the +COL.align+ to +:right+, in width +W+ if given
+<tt>COL.left(W=nil)</tt>::     set the +COL.align+ to +:left+, in width +W+ if given
+<tt>COL.center(W=nil)</tt>::   set the +COL.align+ to +:center+, in width +W+ if given
+<tt>COL.formatter(FMT)</tt>::  set +FMT+ as a formatter for +COL+
+<tt>COL.as_num(W=nil)</tt>::   set +NumFormatter+ as the formatter, with width +W+
+<tt>COL.as_money(W=nil)</tt>:: set +MoneyFormatter+ as the formatter, with width +W+
 
 These helper methods can be chained, and can be in any order.
 
