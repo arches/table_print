@@ -83,7 +83,7 @@ a skinny email column, set the width explicitly:
 Available column options:
 
 +display_method+:: string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
-+formatters+::     array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
++formatters+::     array of objects - each will be called in turn as the cells are printed. Must define a +format+ method. See below.
 +time_format+::    string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
 +width+::          integer - how wide you want your column.
 +display_name+::   string - useful if you want spaces in your column name
@@ -94,7 +94,7 @@ Available column options:
 Columns are named after hash keys. To rename a column, use the name you want as
 the key, and pass the method as an option.
 
-  tp User.all, :active => {:display_method => :active_in_the_past_six_months} 
+  tp User.all, :active => {:display_method => :active_in_the_past_six_months}
   # the User class defines active_in_the_past_six_months method
 
 or
@@ -106,30 +106,34 @@ or
 
 You can pass a proc as the display_method for a column:
 
-  tp User.all, :email, :monthly_payment, yearly_payment: lambda{|u| u.monthly_payment * 12}
+  tp User.all, :email, :monthly_payment,
+      yearly_payment: lambda{|u| u.monthly_payment * 12}
 
 Or if you want to pass other options along with the lambda:
 
-  tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :width => 10}
+  tp User.all,
+     :yearly_payment =>
+         {:display_method =>
+             lambda{|u| u.monthly_payment * 12}, :width => 10}
 
 Make sure to add curly braces if you have more than one column with a lambda or
 if this column isn't the last one.
 
-  tp User.all, :email, 
+  tp User.all, :email,
      { daily_payment: lambda { |u| u.monthly_payment / 30} },
-     :monthly_payment, 
+     :monthly_payment,
      { yearly_payment: lambda { |u| u.monthly_payment * 12} }
 
 ==== Column Helper Methods
 
 There are helper methods to build the column option hashes:
 
-<tt>COL.as(LABEL)</tt>::       use +LABEL+ for the +COL+ header
-<tt>COL.from(SRC)</tt>::       use +SRC+ for the data for +COL+
-<tt>COL.width(W)</tt>::        set the +COL+ width to +W+
-<tt>COL.right(W=nil)</tt>::    set the +COL.align+ to +:right+, in width +W+ if given
-<tt>COL.left(W=nil)</tt>::     set the +COL.align+ to +:left+, in width +W+ if given
-<tt>COL.center(W=nil)</tt>::   set the +COL.align+ to +:center+, in width +W+ if given
+<tt>COL.as(LABEL)</tt>::       set +display_name+ to +LABEL+ for +COL+
+<tt>COL.from(SRC)</tt>::       set +display_method+ to +SRC+ for +COL+
+<tt>COL.width(W)</tt>::        set +width+ to +W+ for +COL+
+<tt>COL.right(W=nil)</tt>::    set +align+ to +:right+, & +width+ to +W+ if given
+<tt>COL.left(W=nil)</tt>::     set +align+ to +:left+, & +width+ to +W+ if given
+<tt>COL.center(W=nil)</tt>::   set +align+ to +:center+ & +width+ to +W+ if given
 <tt>COL.formatter(FMT)</tt>::  set +FMT+ as a formatter for +COL+
 <tt>COL.as_num(W=nil)</tt>::   set +NumFormatter+ as the formatter, with width +W+
 <tt>COL.as_money(W=nil)</tt>:: set +MoneyFormatter+ as the formatter, with width +W+
@@ -177,7 +181,7 @@ into your +<pre>+ tag:
 
 Use +tp.set+ and +tp.clear+ to set options on a class-by-class basis.
 
-  tp.set User, :id, :email 
+  tp.set User, :id, :email
   # now whenever you print users, the only columns shown will be id and email
 
   > tp User.first
@@ -242,7 +246,7 @@ calculation:
 
 * Commit and push until you are happy with your contribution
 
-* Make sure to add tests for it. This is important so I don't break it in a 
+* Make sure to add tests for it. This is important so I don't break it in a
   future version unintentionally.
 
 * Please try not to mess with the Rakefile, version, or history. If you want to
