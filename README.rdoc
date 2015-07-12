@@ -10,6 +10,8 @@ see exactly the data you care about.
 This {three minute screencast}[http://tableprintgem.com] will give you a quick overview of table_print's most
 powerful features and how to use them.
 
+http://arches.io/tp_example.gif
+
 == Installation
 
   # Install as a standalone gem
