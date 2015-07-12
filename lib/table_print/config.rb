@@ -3,13 +3,13 @@ module TablePrint
 
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-    DEFAULT_IO = STDOUT
+    DEFAULT_IO = $stdout
     DEFAULT_CAPITALIZE_HEADERS = true
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
     @@multibyte = false
-    @@io = STDOUT
+    @@io = DEFAULT_IO
     @@capitalize_headers = true
 
     @@klasses = {}
