@@ -61,11 +61,8 @@ module TablePrint
     end
 
     def strip_escape(string)
-      if string.class == String
-        string.gsub(/\e\[([0-9]{1,2};){0,2}[0-9]{1,2}m/,'')
-      else
-        string
-      end
+      return string unless string.class == String
+      string.gsub(/\e\[([0-9]{1,2};){0,2}[0-9]{1,2}m/,'')
     end
   end
 end

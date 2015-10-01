@@ -51,6 +51,7 @@ module TablePrint
     end
 
     def escape_strip(string, return_stripped_stuff = false)
+      return string unless string.class == String
       stripped_stuff = ''
       string_stripped = string.gsub(/\e\[([0-9]{1,2};){0,2}[0-9]{1,2}m/) do |s|
         stripped_stuff << s
