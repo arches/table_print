@@ -1,7 +1,7 @@
 module TablePrint
   class Column
     attr_reader :formatters
-    attr_accessor :name, :data, :time_format, :default_width
+    attr_accessor :name, :data, :time_format, :default_width, :min_width
 
     def initialize(attr_hash={})
       @formatters = []
@@ -48,7 +48,8 @@ module TablePrint
     end
 
     def width
-      [(default_width || max_width), data_width].min
+      width = [(default_width || max_width), data_width].min
+      [(min_width || 0), width].max
     end
 
     private

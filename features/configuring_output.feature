@@ -13,6 +13,21 @@ Feature: Configuring output
     ------|-----------------------------------------
     post! | Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ry... 
     """
+
+  Scenario: Setting a minimum width for an individual column
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan'}
+    And table_print Blog, {:include => {:author => {:min_width => 40}}}
+    Then the output should contain
+    """
+    TITLE | AUTHOR                                  
+    ------|-----------------------------------------
+    post! | Ryan Ryan                                
+    """
+
   Scenario: Specifying configuration on a per-object basis
     Given a class named Blog
 
