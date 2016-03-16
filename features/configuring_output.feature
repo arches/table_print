@@ -23,8 +23,36 @@ Feature: Configuring output
     And table_print Blog, {:include => {:author => {:min_width => 40}}}
     Then the output should contain
     """
-    TITLE | AUTHOR                                  
+    TITLE | AUTHOR
     ------|-----------------------------------------
+    post! | Ryan Ryan
+    """
+
+  Scenario: Setting a fixed width for an individual column, when data width is greater than fixed width
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan Ryan Ryan Ryan Ryan Ryan'}
+    And table_print Blog, {:include => {:author => {:fixed_width => 15}}}
+    Then the output should contain
+    """
+    TITLE | AUTHOR
+    ------|----------------
+    post! | Ryan Ryan Ry...
+    """
+
+  Scenario: Setting a fixed width for an individual column, when data width is less than fixed width
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan'}
+    And table_print Blog, {:include => {:author => {:fixed_width => 15}}}
+    Then the output should contain
+    """
+    TITLE | AUTHOR
+    ------|----------------
     post! | Ryan Ryan                                
     """
 
