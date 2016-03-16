@@ -5,8 +5,8 @@ Gem::Specification.new do |gem|
   gem.name                = "table_print"
 
   gem.authors             = ["Chris Doyle"]
-  gem.email               = ["archslide@gmail.com"]
-  gem.email               = "archslide@gmail.com"
+  gem.email               = ["chris@arches.io"]
+  gem.email               = "chris@arches.io"
 
   gem.description         = "TablePrint turns objects into nicely formatted columns for easy reading. Works great in rails console, works on pure ruby objects, autodetects columns, lets you traverse ActiveRecord associations. Simple, powerful."
   gem.summary             = "Turn objects into nicely formatted columns for easy reading"
