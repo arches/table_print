@@ -99,7 +99,7 @@ Feature: Configuring output
     Ryan
     """
 
-  Scenario: Setting a lowecase column name
+  Scenario: Setting a lowercase column name
     Given a class named Blog
 
     Given Blog has attributes title, author
@@ -112,4 +112,19 @@ Feature: Configuring output
     Wom Bat
     -------
     Ryan
+    """
+
+  Scenario: Setting the column separator
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And I configure separator with ','
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE , AUTHOR
+    ------,-------
+    post! , Ryan
     """

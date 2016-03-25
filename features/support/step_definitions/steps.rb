@@ -66,6 +66,10 @@ When /^I configure capitalize_headers with (.*)$/ do |value|
   TablePrint::Config.set(:capitalize_headers, [value == "true"])
 end
 
+When /^I configure separator with '(.*)'$/ do |value|
+  TablePrint::Config.set(:separator, [value])
+end
+
 When /^configure (.*) with (.*)$/ do |klass, config|
   klass = Sandbox.const_get_from_string(klass)
   TablePrint::Config.set(klass, eval(config))

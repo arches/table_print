@@ -64,7 +64,7 @@ module TablePrint
     def horizontal_separator
       columns.collect do |column|
         '-' * column.width
-      end.join('-|-')
+      end.join("-#{TablePrint::Config.separator}-")
     end
 
     def header
@@ -73,7 +73,7 @@ module TablePrint
         f.format(column.name)
       end
 
-      header_string = padded_names.join(" | ")
+      header_string = padded_names.join(" #{TablePrint::Config.separator} ")
       header_string.upcase! if TablePrint::Config.capitalize_headers
 
       header_string
@@ -177,7 +177,7 @@ module TablePrint
     def format
       column_names = columns.collect(&:name)
 
-      output = [column_names.collect { |name| apply_formatters(name, @cells[name]) }.join(" | ")]
+      output = [column_names.collect { |name| apply_formatters(name, @cells[name]) }.join(" #{TablePrint::Config.separator} ")]
       output.concat @children.collect { |g| g.format }
 
       output.join("\n")
