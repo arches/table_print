@@ -88,6 +88,7 @@ Available column options:
 * *time_format* - string - passed to strftime[http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime], only affects time columns
 * *width* - integer - how wide you want your column.
 * *display_name* - string - useful if you want spaces in your column name
+* *separator* - string - default is vertical bar for console and markdown, change it to a comma for CSV output
 
 ==== Display method
 
@@ -130,6 +131,14 @@ method to send table_print output directly into your <pre> tag:
   def tp_pre data, options={}
     content_tag :pre, TablePrint::Printer.new(data, options).table_print
   end
+
+=== CSV Output
+
+Set the column separator to get an output you can save as a CSV:
+
+  tp.set :separator, ","
+
+Since your CSV viewer probably already handles column widths for you, setting +max_width+ to something very large will help you export your full data set.  Otherwise, this CSV output will still be truncated to the default max_width of 30 characters.
 
 === Config
 
