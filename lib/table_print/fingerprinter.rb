@@ -61,7 +61,7 @@ module TablePrint
     end
 
     def handleable_columns(hash)
-      # get the keys where the value is an empty hash
+      # if the value is an empty hash, we're at the end of the method chain
       hash.select { |k, v| v == {} }.collect { |k, v| k }
     end
 
