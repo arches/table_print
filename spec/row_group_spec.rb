@@ -104,15 +104,17 @@ describe RowRecursion do
     end
 
     it "matches the header width" do
+      parent.add_child(child)
       child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
-      child.horizontal_separator.should == '------------------------------' # 30 hyphens
+      parent.horizontal_separator.should == '------------------------------' # 30 hyphens
     end
   end
 
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
+      parent.add_child(child)
       child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
-      compare_rows(child.header, "AUTHOR | SUBTITLE           | TITLE     ")
+      compare_rows(parent.header, "AUTHOR | SUBTITLE           | TITLE     ")
     end
   end
 end
