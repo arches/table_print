@@ -35,7 +35,7 @@ describe RowRecursion do
 
   describe "tabling" do
     let(:table) { Table.new }
-    let(:column) { Column.new(name: "title", data: [""]) }
+    let(:column) { Column.new(:name => "title", :data => [""]) }
     let(:group) { RowGroup.new }
 
     before {
@@ -56,8 +56,8 @@ describe RowRecursion do
 
         table = Table.new
         table.columns = [
-          Column.new(name: "title", data: ["foobar"]),
-          Column.new(name: "subtitle", data: ["elemental"]),
+          Column.new(:name => "title", :data => ["foobar"]),
+          Column.new(:name => "subtitle", :data => ["elemental"]),
         ]
 
         table.width.should == 18
@@ -71,9 +71,9 @@ describe RowRecursion do
 
         table = Table.new
         table.columns = [
-          Column.new(name: "title", data: %w{ aaaaa aaaaaa }),
-          Column.new(name: "description", data: %w{ bbb bbbb }),
-          Column.new(name: "category", data: %w{ cccccccccc ccccccccc}),
+          Column.new(:name => "title", :data => %w{ aaaaa aaaaaa }),
+          Column.new(:name => "description", :data => %w{ bbb bbbb }),
+          Column.new(:name => "category", :data => %w{ cccccccccc ccccccccc}),
         ]
 
         table.header.size.should == table.horizontal_separator.size
@@ -95,9 +95,9 @@ describe RowRecursion do
         return
 
         table.columns = [
-          Column.new(name: "title", data: ['first post']),
-          Column.new(name: "author", data: ['chris']),
-          Column.new(name: "subtitle", data: ['first is the worst']),
+          Column.new(:name => "title", :data => ['first post']),
+          Column.new(:name => "author", :data => ['chris']),
+          Column.new(:name => "subtitle", :data => ['first is the worst']),
         ]
 
         compare_rows(table.header, "AUTHOR | SUBTITLE           | TITLE     ")
@@ -121,9 +121,9 @@ describe TablePrint::Row do
 
   before {
     table.columns = [
-      Column.new(name: "title", data: ['wonky']),
-      Column.new(name: "author", data: ['bob jones']),
-      Column.new(name: "pub_date", data: ['2012']),
+      Column.new(:name => "title", :data => ['wonky']),
+      Column.new(:name => "author", :data => ['bob jones']),
+      Column.new(:name => "pub_date", :data => ['2012']),
     ]
     table.add_child(group)
     group.add_child(row)
@@ -156,14 +156,14 @@ describe TablePrint::Row do
       f1 = Sandbox::DoubleFormatter.new
       f2 = Sandbox::ChopFormatter.new
 
-      column = Column.new(name: "title", fixed_width: 9)
+      column = Column.new(:name => "title", :fixed_width => 9)
       column.formatters = [f1, f2]
 
       row.apply_formatters(column).should == "wonkywonk"
     end
 
     it "uses the config'd time_format to format times" do
-      column = Column.new(name: "title", fixed_width: 20, formatters: [], time_format: "%Y %m %d")
+      column = Column.new(:name => "title", :fixed_width => 20, :formatters => [], :time_format => "%Y %m %d")
 
       time_formatter = TablePrint::TimeFormatter.new
       TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
