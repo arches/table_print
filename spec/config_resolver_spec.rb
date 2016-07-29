@@ -163,9 +163,19 @@ describe TablePrint::ConfigResolver do
       c.usable_column_names.should == ['author', 'pub_date']
     end
 
+    it "doesn't double up if a default column is re-specified" do
+      c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:include => :author])
+      c.usable_column_names.should == ['title', 'author']
+    end
+
     it "applies excepts on top of default columns" do
       c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:except => :author])
       c.usable_column_names.should == ['title']
+    end
+
+    it "doesn't double up on intermediary objects" do
+      c = TablePrint::ConfigResolver.new(Object, [:title, :comment], [:include => ["comment.body", "comment.author"]])
+      c.usable_column_names.should == ['title', 'comment.body', 'comment.author']
     end
 
     it "applies excepts on top of specified columns" do

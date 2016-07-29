@@ -86,7 +86,10 @@ module TablePrint
     def usable_column_names
       base = @default_columns
       base = @only_columns unless @only_columns.empty?
-      Array(base).collect(&:name) + Array(@included_columns).collect(&:name) - Array(@excepted_columns).collect(&:to_s)
+      
+      names = (Array(base).collect(&:name) + Array(@included_columns).collect(&:name) - Array(@excepted_columns).collect(&:to_s)).uniq
+
+      names.reject{ |name| names.any?{ |other| other.start_with? name and other != name }}
     end
 
     def columns

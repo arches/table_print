@@ -1,7 +1,27 @@
 module TablePrint
+  
 
-  module TableFormatMethods
-    def header
+  class OriginalFormatter
+
+    attr_accessor :columns
+
+    def initialize(columns)
+      @columns = columns
+    end
+
+    def format_cell(value)
+      value
+    end
+
+    def format_row(cells)
+      cells.join "-|-"
+    end
+
+    def format_table(header, rows)
+      [header, horizontal_separator].concat(rows).join("\n")
+    end
+
+    def format_header
       padded_names = columns.collect do |column|
         f = FixedWidthFormatter.new(column.width)
         f.format(column.name)
@@ -18,51 +38,8 @@ module TablePrint
         '-' * column.width
       end.join("-#{TablePrint::Config.separator}-")
     end
-
-    def width
-      columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
-    end
-
-    # more of a structural method than actual formatting
-    def format
-      rows = @children
-      rows = @children[1..-1] if @skip_first_row
-      rows ||= []
-      rows = rows.collect { |row| row.format }.join("\n")
-
-      return nil if rows.length == 0
-      rows
-    end
   end
 
-  module RowFormatMethods
-    def format
-      column_names = columns.collect(&:name)
-
-      output = [column_names.collect { |name| apply_formatters(name, @cells[name]) }.join(" #{TablePrint::Config.separator} ")]
-      output.concat @children.collect { |g| g.format }
-
-      output.join("\n")
-    end
-
-    def apply_formatters(column_name, value)
-      column_name = column_name.to_s
-      return value unless column_for(column_name)
-
-      column = column_for(column_name)
-      formatters = []
-      formatters.concat(Array(column.formatters))
-
-      formatters << TimeFormatter.new(column.time_format)
-      formatters << NoNewlineFormatter.new
-      formatters << FixedWidthFormatter.new(column_for(column_name).width)
-
-      # successively apply the formatters for a column
-      formatters.inject(value) do |value, formatter|
-        formatter.format(value)
-      end
-    end
-  end
 
   module RowRecursion
     attr_accessor :parent
@@ -97,19 +74,21 @@ module TablePrint
       parent.columns
     end
 
-    def column_for(name)
-      parent.column_for(name)
+    def formatter
+      parent.formatter
     end
   end
 
   class Table
-    include TableFormatMethods
     include RowRecursion
+
+    attr_accessor :formatter
 
     def initialize
       super
 
-      @columns = {}
+      @columns = []
+
     end
 
     def collapse!
@@ -117,19 +96,27 @@ module TablePrint
     end
 
     def columns=(cols)
-      cols.each { |column| add_column(column) }
+      @columns = cols
     end
 
     def add_column(column)
-      @columns[column.name.to_s] = column
+      @columns << column
     end
 
     def columns
-      @columns.values.select { |column| column.data.compact.any? }
+      @columns.select { |column| column.data.compact.any? }
     end
 
-    def column_for(name)
-      @columns[name.to_s]
+    def width
+      columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
+    end
+
+    def format
+      formatter.format_table(formatter.format_header, children.collect(&:format))
+    end
+
+    def formatter
+      @formatter ||= OriginalFormatter.new(@columns)
     end
   end
 
@@ -155,7 +142,7 @@ module TablePrint
       rows = @children
       rows = @children[1..-1] if @skip_first_row
       rows ||= []
-      rows = rows.collect { |row| row.format }.join("\n")
+      rows = rows.collect { |row| row.format }
 
       return nil if rows.length == 0
       rows
@@ -176,7 +163,6 @@ module TablePrint
     attr_reader :cells
 
     include RowRecursion
-    include RowFormatMethods
 
     def initialize
       super
@@ -218,6 +204,24 @@ module TablePrint
 
       return false if @already_absorbed_a_multigroup
       @already_absorbed_a_multigroup = true # only call this method once
+    end
+
+    def format
+      output = [
+        columns.collect { |column|
+          apply_formatters(column)
+        }.join(" #{TablePrint::Config.separator} ")
+      ]
+      output.concat @children.collect { |group| group.format }
+
+      output.join("\n")
+    end
+
+    def apply_formatters(column)
+      raw_value = @cells[column.name]
+      formatted_value = column.format(raw_value)
+
+      formatter.format_cell(formatted_value)
     end
 
     # this is a development tool, to show the structure of the row/row_group tree

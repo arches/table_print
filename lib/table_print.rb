@@ -35,7 +35,7 @@ module TablePrint
       fingerprinter = Fingerprinter.new(columns)
       group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
       group_data.each do |data|
-        table.add_children(fingerprinter.lift([], data))
+        table.add_children(fingerprinter.lift(data))
       end
 
       # munge the tree of data we created, to condense the output
@@ -43,7 +43,7 @@ module TablePrint
       return "No data." if table.columns.empty?
 
       # turn everything into a string for output
-      [table.header, table.horizontal_separator, table.format].join("\n")
+      table.format
     end
 
     def message

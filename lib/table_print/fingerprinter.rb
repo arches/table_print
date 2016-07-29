@@ -15,17 +15,7 @@ module TablePrint
       end
     end
 
-    def lift(columns, object)
-      if columns.any?
-        @columns = {}
-        columns.each do |column|
-          @columns[column.display_method] = column
-          column.data = []
-        end
-
-        display_methods_to_nested_hash(columns.collect(&:display_method))
-      end
-
+    def lift(object)
       hash_to_rows("", @column_hash, object)
     end
 

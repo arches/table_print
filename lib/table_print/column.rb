@@ -34,6 +34,20 @@ module TablePrint
       @formatters << formatter
     end
 
+    def format(value)
+      cell_formatters = []
+      cell_formatters.concat(Array(self.formatters))
+
+      cell_formatters << TimeFormatter.new(time_format)
+      cell_formatters << NoNewlineFormatter.new
+      cell_formatters << FixedWidthFormatter.new(width)
+
+      # successively apply the cell_formatters for a column
+      cell_formatters.inject(value) do |value, formatter|
+        formatter.format(value)
+      end
+    end
+
     def data_width
       if multibyte_count
         [

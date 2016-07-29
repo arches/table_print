@@ -15,7 +15,7 @@ describe Fingerprinter do
 
   describe "#lift" do
     it "turns a single level of columns into a single row" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name")], OpenStruct.new(:name => "dale carnegie"))
+      rows = Fingerprinter.new([Column.new(:name => "name")]).lift(OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
@@ -23,7 +23,7 @@ describe Fingerprinter do
     end
 
     it "uses the display_method to get the data" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name of work", :display_method => "title")], OpenStruct.new(:title => "of mice and men"))
+      rows = Fingerprinter.new([Column.new(:name => "name of work", :display_method => "title")]).lift(OpenStruct.new(:title => "of mice and men"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
@@ -31,7 +31,7 @@ describe Fingerprinter do
     end
 
     it "turns multiple levels of columns into multiple rows" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name"), Column.new(:name => "books.title")], OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
+      rows = Fingerprinter.new([Column.new(:name => "name"), Column.new(:name => "books.title")]).lift(OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 1
@@ -40,7 +40,7 @@ describe Fingerprinter do
     end
 
     it "doesn't choke if an association doesn't exist" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name"), Column.new(:name => "books.title")], OpenStruct.new(:name => "dale carnegie", :books => []))
+      rows = Fingerprinter.new([Column.new(:name => "name"), Column.new(:name => "books.title")]).lift(OpenStruct.new(:name => "dale carnegie", :books => []))
 
       rows.length.should == 1
 
@@ -49,7 +49,7 @@ describe Fingerprinter do
     end
 
     it "allows a lambda as the display_method" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => lambda { |row| row.name.gsub(/[aeiou]/, "") })], OpenStruct.new(:name => "dale carnegie"))
+      rows = Fingerprinter.new([Column.new(:name => "name", :display_method => lambda { |row| row.name.gsub(/[aeiou]/, "") })]).lift(OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0
@@ -57,7 +57,7 @@ describe Fingerprinter do
     end
 
     it "doesn't puke if a lambda returns nil" do
-      rows = Fingerprinter.new.lift([Column.new(:name => "name", :display_method => lambda { |row| nil })], OpenStruct.new(:name => "dale carnegie"))
+      rows = Fingerprinter.new([Column.new(:name => "name", :display_method => lambda { |row| nil })]).lift(OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
       row.children.length.should == 0

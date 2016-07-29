@@ -51,12 +51,6 @@ describe RowRecursion do
       end
     end
 
-    describe "#column_for" do
-      it "returns the column object for a given column name" do
-        child.column_for(:title).should == table.columns.first
-      end
-    end
-
     describe "#width" do
       it "returns the total width of the columns" do
 
@@ -72,6 +66,8 @@ describe RowRecursion do
 
     describe "#horizontal_separator" do
       it "returns hyphens equal to the table width" do
+        pending "move to formatter spec"
+        return
 
         table = Table.new
         table.columns = [
@@ -85,6 +81,9 @@ describe RowRecursion do
       end
 
       it "matches the header width" do
+        pending "move to formatter spec"
+        return
+
         column.data = %w{foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar}
         table.horizontal_separator.should == '------------------------------' # 30 hyphens
       end
@@ -92,6 +91,9 @@ describe RowRecursion do
 
     describe "#header" do
       it "returns the column names, padded to the proper width, separated by the | character" do
+        pending "move to formatter spec"
+        return
+
         table.columns = [
           Column.new(name: "title", data: ['first post']),
           Column.new(name: "author", data: ['chris']),
@@ -123,8 +125,8 @@ describe TablePrint::Row do
       Column.new(name: "author", data: ['bob jones']),
       Column.new(name: "pub_date", data: ['2012']),
     ]
-    group.add_child(row)
     table.add_child(group)
+    group.add_child(row)
   }
 
   describe "#format" do
@@ -135,9 +137,9 @@ describe TablePrint::Row do
     it "also formats the children" do
       row.add_child(RowGroup.new.add_child(Row.new.set_cell_values(:title => "wonky2", :author => "bob jones2", :pub_date => "20122")))
 
-      table.column_for("title").data << "wonky2"
-      table.column_for("author").data << "bob jones2"
-      table.column_for("pub_date").data << "20122"
+      table.columns.find{|c| c.name.to_s == "title"}.data << "wonky2"
+      table.columns.find{|c| c.name.to_s == "author"}.data << "bob jones2"
+      table.columns.find{|c| c.name.to_s == "pub_date"}.data << "20122"
 
       compare_rows(row.format, "wonky  | bob jones  | 2012    \nwonky2 | bob jones2 | 20122   ")
     end
@@ -154,17 +156,21 @@ describe TablePrint::Row do
       f1 = Sandbox::DoubleFormatter.new
       f2 = Sandbox::ChopFormatter.new
 
-      row.stub(:column_for) {OpenStruct.new(:width => 11, :formatters => [f1, f2])}
+      column = Column.new(name: "title", fixed_width: 9)
+      column.formatters = [f1, f2]
 
-      row.apply_formatters(:title, "foobar").should == "foobarfooba"
+      row.apply_formatters(column).should == "wonkywonk"
     end
 
     it "uses the config'd time_format to format times" do
-      row.stub(:column_for) {OpenStruct.new(:width => 20, :formatters => [], :time_format => "%Y %m %d")}
+      column = Column.new(name: "title", fixed_width: 20, formatters: [], time_format: "%Y %m %d")
 
       time_formatter = TablePrint::TimeFormatter.new
       TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
-      row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20))
+
+      row.set_cell_values(title: Time.local(2012, 6, 1, 14, 20, 20))
+
+      row.apply_formatters(column)
     end
   end
 
