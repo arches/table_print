@@ -66,7 +66,7 @@ describe Fingerprinter do
 
   describe "#hash_to_rows" do
     it "uses hashes with empty values as column names" do
-      f = Fingerprinter.new([Column.new(name: "name")])
+      f = Fingerprinter.new([Column.new(:name => "name")])
       rows = f.hash_to_rows("", {'name' => {}}, OpenStruct.new(:name => "dale carnegie"))
       rows.length.should == 1
       row = rows.first
@@ -75,7 +75,7 @@ describe Fingerprinter do
     end
 
     it 'recurses for subsequent levels of hash' do
-      f = Fingerprinter.new([Column.new(name: "name"), Column.new(name: "books.title")])
+      f = Fingerprinter.new([Column.new(:name => "name"), Column.new(:name => "books.title")])
       rows = f.hash_to_rows("", {'name' => {}, 'books' => {'title' => {}}}, [OpenStruct.new(:name => 'dale carnegie', :books => [OpenStruct.new(:title => "hallmark")])])
       rows.length.should == 1
 
@@ -91,25 +91,25 @@ describe Fingerprinter do
 
   describe "#populate_row" do
     it "fills a row by calling methods on the target object" do
-      f = Fingerprinter.new([Column.new(name: "title"), Column.new(name: "author")])
+      f = Fingerprinter.new([Column.new(:name => "title"), Column.new(:name => "author")])
       row = f.populate_row("", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'title' => "foobar", 'author' => 'bobby'}
     end
 
     it "uses the provided prefix to name the cells" do
-      f = Fingerprinter.new([Column.new(name: "bar.title"), Column.new(name: "bar.author")])
+      f = Fingerprinter.new([Column.new(:name => "bar.title"), Column.new(:name => "bar.author")])
       row = f.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'bar.title' => "foobar", 'bar.author' => 'bobby'}
     end
 
     it "uses the column name as the cell name but uses the display method to get the value" do
-      f = Fingerprinter.new([Column.new(name: "title", display_method: "bar.title"), Column.new(name: "bar.author")])
+      f = Fingerprinter.new([Column.new(:name => "title", :display_method => "bar.title"), Column.new(:name => "bar.author")])
       row = f.populate_row("bar", {'title' => {}, 'author' => {}, 'publisher' => {'address' => {}}}, OpenStruct.new(:title => "foobar", :author => "bobby"))
       row.cells.should == {'title' => "foobar", 'bar.author' => 'bobby'}
     end
 
     context 'using a hash as input_data' do
-      let(:f) { Fingerprinter.new([Column.new(name: "title"), Column.new(name: "author")]) }
+      let(:f) { Fingerprinter.new([Column.new(:name => "title"), Column.new(:name => "author")]) }
 
       it "fills a row by calling methods on the target object" do
         input_data = {:title => 'foobar', :author => 'bobby'}
@@ -126,7 +126,7 @@ describe Fingerprinter do
 
     context "when the method isn't found" do
       it "sets the cell value to an error string" do
-        f = Fingerprinter.new([Column.new(name: "foo")])
+        f = Fingerprinter.new([Column.new(:name => "foo")])
         row = f.populate_row('', {'foo' => {}}, Hash.new)
         row.cells.should == {'foo' => 'Method Missing'}
       end
