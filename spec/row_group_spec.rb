@@ -168,7 +168,7 @@ describe TablePrint::Row do
       time_formatter = TablePrint::TimeFormatter.new
       TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
 
-      row.set_cell_values(title: Time.local(2012, 6, 1, 14, 20, 20))
+      row.set_cell_values(:title => Time.local(2012, 6, 1, 14, 20, 20))
 
       row.apply_formatters(column)
     end
