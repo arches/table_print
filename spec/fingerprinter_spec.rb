@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'pry'
 
 class TablePrint::Row
   attr_accessor :groups, :cells

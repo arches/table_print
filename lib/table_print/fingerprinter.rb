@@ -1,6 +1,12 @@
 module TablePrint
   class Fingerprinter
     def lift(columns, object)
+      #@columns = {}
+      #columns.each do |column|
+      #  @columns[column.display_method.to_s] = column
+      #  column.data = []
+      #end
+
       @column_names_by_display_method = {}
       columns.each { |c| @column_names_by_display_method[c.display_method] = c.name }
 
@@ -11,8 +17,6 @@ module TablePrint
 
     def hash_to_rows(prefix, hash, objects)
       rows = []
-
-
 
       # convert each object into its own row
       Array(objects).each do |target|
@@ -46,6 +50,7 @@ module TablePrint
           cell_value = "Method Missing"
         end
         cells[@column_names_by_display_method[display_method]] = cell_value
+        #@columns[display_method].data << cell_value
       end
 
       row.set_cell_values(cells)

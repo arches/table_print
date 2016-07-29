@@ -6,6 +6,12 @@ describe RowRecursion do
   let(:parent) { RowGroup.new }
   let(:child) { Row.new }
 
+  before {
+    parent.set_column(Column.new(name: "title"))
+    parent.set_column(Column.new(name: "author"))
+    parent.set_column(Column.new(name: "subtitle"))
+  }
+
   describe "#set_column" do
     it "assigns the column object to the column name" do
       column = Column.new(:name => "foobar")
@@ -43,6 +49,9 @@ describe RowRecursion do
 
   describe "#columns" do
     it "returns columns populated with names and data" do
+      parent = RowGroup.new
+      parent.set_column(Column.new(name: "title"))
+
       child.set_cell_values(:title => 'foobar')
       parent.add_child(child)
 
@@ -52,6 +61,9 @@ describe RowRecursion do
     end
 
     it "gets the columns from the root node" do
+      parent = RowGroup.new
+      parent.set_column(Column.new(name: "title"))
+
       parent.add_child(child)
       child.set_cell_values(:title => 'foobar')
 
@@ -69,19 +81,15 @@ describe RowRecursion do
     end
   end
 
-  describe "#add_formatter" do
-    it "adds the formatter to the column object" do
-      parent.add_child(child)
-      child.set_cell_values(:title => 'foobar')
-      column = parent.columns.first
-      parent.add_formatter(:title, {})
-
-      column.formatters.should == [{}]
-    end
-  end
-
   describe "#width" do
     it "returns the total width of the columns" do
+      pending "pulling out table concept"
+      return
+
+      parent = RowGroup.new
+      parent.set_column(Column.new(name: "title"))
+      parent.set_column(Column.new(name: "subtitle"))
+
       parent.add_child(r1 = Row.new)
       parent.add_child(r2 = Row.new)
 
@@ -94,6 +102,14 @@ describe RowRecursion do
 
   describe "#horizontal_separator" do
     it "returns hyphens equal to the table width" do
+      pending "pulling out table concept"
+      return
+
+      parent = RowGroup.new
+      parent.set_column(Column.new(name: "title"))
+      parent.set_column(Column.new(name: "description"))
+      parent.set_column(Column.new(name: "category"))
+
       parent.add_child(r1 = Row.new)
       parent.add_child(r2 = Row.new)
 
@@ -104,6 +120,12 @@ describe RowRecursion do
     end
 
     it "matches the header width" do
+      pending "pulling out table concept"
+      return
+
+      parent = RowGroup.new
+      parent.set_column(Column.new(name: "title"))
+
       parent.add_child(child)
       child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
       parent.horizontal_separator.should == '------------------------------' # 30 hyphens
@@ -112,6 +134,9 @@ describe RowRecursion do
 
   describe "#header" do
     it "returns the column names, padded to the proper width, separated by the | character" do
+      pending "pulling out table concept"
+      return
+
       parent.add_child(child)
       child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
       compare_rows(parent.header, "AUTHOR | SUBTITLE           | TITLE     ")
@@ -139,6 +164,12 @@ end
 
 describe TablePrint::Row do
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
+
+  before {
+    row.set_column(Column.new(name: "title"))
+    row.set_column(Column.new(name: "author"))
+    row.set_column(Column.new(name: "pub_date"))
+  }
 
   describe "#format" do
     it "formats the row with padding" do

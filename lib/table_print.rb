@@ -29,6 +29,8 @@ module TablePrint
       # it's groups all the way down
       # make a top-level group to hold everything we're about to do
       group = TablePrint::RowGroup.new
+      table = TablePrint::Table.new
+      table.columns = columns
 
       # parse the config and attach it to the group
       columns.each do |c|
@@ -46,7 +48,7 @@ module TablePrint
       return "No data." if group.columns.empty?
 
       # turn everything into a string for output
-      [group.header, group.horizontal_separator, group.format].join("\n")
+      [table.header, table.horizontal_separator, group.format].join("\n")
     end
 
     def message
