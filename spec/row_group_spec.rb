@@ -6,20 +6,6 @@ describe RowRecursion do
   let(:parent) { RowGroup.new }
   let(:child) { Row.new }
 
-  before {
-    parent.set_column(Column.new(name: "title"))
-    parent.set_column(Column.new(name: "author"))
-    parent.set_column(Column.new(name: "subtitle"))
-  }
-
-  describe "#set_column" do
-    it "assigns the column object to the column name" do
-      column = Column.new(:name => "foobar")
-      parent.set_column(column)
-      parent.column_for(:foobar).should == column
-    end
-  end
-
   describe "#add_child" do
     it "adds the child to my children" do
       parent.add_child(child)
@@ -47,112 +33,76 @@ describe RowRecursion do
     end
   end
 
-  describe "#columns" do
-    it "returns columns populated with names and data" do
-      parent = RowGroup.new
-      parent.set_column(Column.new(name: "title"))
+  describe "tabling" do
+    let(:table) { Table.new }
+    let(:column) { Column.new(name: "title", data: [""]) }
+    let(:group) { RowGroup.new }
 
-      child.set_cell_values(:title => 'foobar')
-      parent.add_child(child)
+    before {
+      table.add_column(column)
+      table.add_child(group)
+      group.add_child(child)
+    }
 
-      parent.columns.length.should == 1
-      parent.columns.first.name.should == 'title'
-      parent.columns.first.data.should == ['foobar']
+    describe "#columns" do
+      it "gets the columns from the root node" do
+        table.columns.length.should == 1
+        child.columns.should == table.columns
+      end
     end
 
-    it "gets the columns from the root node" do
-      parent = RowGroup.new
-      parent.set_column(Column.new(name: "title"))
-
-      parent.add_child(child)
-      child.set_cell_values(:title => 'foobar')
-
-      parent.columns.length.should == 1
-      child.columns.should == parent.columns
-    end
-  end
-
-  describe "#column_for" do
-    it "returns the column object for a given column name" do
-      parent.add_child(child)
-      child.set_cell_values(:title => 'foobar')
-      column = parent.columns.first
-      parent.column_for(:title).should == column
-    end
-  end
-
-  describe "#width" do
-    it "returns the total width of the columns" do
-      pending "pulling out table concept"
-      return
-
-      parent = RowGroup.new
-      parent.set_column(Column.new(name: "title"))
-      parent.set_column(Column.new(name: "subtitle"))
-
-      parent.add_child(r1 = Row.new)
-      parent.add_child(r2 = Row.new)
-
-      r1.set_cell_values(:title => 'foobar')
-      r2.set_cell_values(:subtitle => 'elemental')
-
-      parent.width.should == 18
-    end
-  end
-
-  describe "#horizontal_separator" do
-    it "returns hyphens equal to the table width" do
-      pending "pulling out table concept"
-      return
-
-      parent = RowGroup.new
-      parent.set_column(Column.new(name: "title"))
-      parent.set_column(Column.new(name: "description"))
-      parent.set_column(Column.new(name: "category"))
-
-      parent.add_child(r1 = Row.new)
-      parent.add_child(r2 = Row.new)
-
-      r1.set_cell_values(:title => 'a' * 5, :description => 'b' * 3, :category => 'c' * 10)
-      r2.set_cell_values(:title => 'a' * 6, :description => 'b' * 4, :category => 'c' * 9)
-      parent.header.size.should == parent.horizontal_separator.size
-      compare_rows(parent.horizontal_separator, '-' * 6 + '-|-' + '-' * 'description'.size + '-|-' + '-' * 10)
+    describe "#column_for" do
+      it "returns the column object for a given column name" do
+        child.column_for(:title).should == table.columns.first
+      end
     end
 
-    it "matches the header width" do
-      pending "pulling out table concept"
-      return
+    describe "#width" do
+      it "returns the total width of the columns" do
 
-      parent = RowGroup.new
-      parent.set_column(Column.new(name: "title"))
+        table = Table.new
+        table.columns = [
+          Column.new(name: "title", data: ["foobar"]),
+          Column.new(name: "subtitle", data: ["elemental"]),
+        ]
 
-      parent.add_child(child)
-      child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
-      parent.horizontal_separator.should == '------------------------------' # 30 hyphens
+        table.width.should == 18
+      end
+    end
+
+    describe "#horizontal_separator" do
+      it "returns hyphens equal to the table width" do
+
+        table = Table.new
+        table.columns = [
+          Column.new(name: "title", data: %w{ aaaaa aaaaaa }),
+          Column.new(name: "description", data: %w{ bbb bbbb }),
+          Column.new(name: "category", data: %w{ cccccccccc ccccccccc}),
+        ]
+
+        table.header.size.should == table.horizontal_separator.size
+        compare_rows(table.horizontal_separator, '-' * 6 + '-|-' + '-' * 'description'.size + '-|-' + '-' * 10)
+      end
+
+      it "matches the header width" do
+        column.data = %w{foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar}
+        table.horizontal_separator.should == '------------------------------' # 30 hyphens
+      end
+    end
+
+    describe "#header" do
+      it "returns the column names, padded to the proper width, separated by the | character" do
+        table.columns = [
+          Column.new(name: "title", data: ['first post']),
+          Column.new(name: "author", data: ['chris']),
+          Column.new(name: "subtitle", data: ['first is the worst']),
+        ]
+
+        compare_rows(table.header, "AUTHOR | SUBTITLE           | TITLE     ")
+      end
     end
   end
 
-  describe "#header" do
-    it "returns the column names, padded to the proper width, separated by the | character" do
-      pending "pulling out table concept"
-      return
-
-      parent.add_child(child)
-      child.set_cell_values(:title => 'first post', :author => 'chris', :subtitle => 'first is the worst')
-      compare_rows(parent.header, "AUTHOR | SUBTITLE           | TITLE     ")
-    end
-  end
-end
-
-describe TablePrint::RowGroup do
-  describe "#raw_column_data" do
-    it "returns the column data from its child rows" do
-      group = RowGroup.new
-      group.add_child(Row.new.set_cell_values(:title => 'foo'))
-      group.add_child(Row.new.set_cell_values(:title => 'bar'))
-      group.raw_column_data(:title).should == ['foo', 'bar']
-    end
-  end
 end
 
 def compare_rows(actual_rows, expected_rows)
@@ -163,12 +113,18 @@ def compare_rows(actual_rows, expected_rows)
 end
 
 describe TablePrint::Row do
+  let(:table) { Table.new }
+  let(:group) { RowGroup.new }
   let(:row) { Row.new.set_cell_values({'title' => "wonky", 'author' => "bob jones", 'pub_date' => "2012"}) }
 
   before {
-    row.set_column(Column.new(name: "title"))
-    row.set_column(Column.new(name: "author"))
-    row.set_column(Column.new(name: "pub_date"))
+    table.columns = [
+      Column.new(name: "title", data: ['wonky']),
+      Column.new(name: "author", data: ['bob jones']),
+      Column.new(name: "pub_date", data: ['2012']),
+    ]
+    group.add_child(row)
+    table.add_child(group)
   }
 
   describe "#format" do
@@ -178,6 +134,11 @@ describe TablePrint::Row do
 
     it "also formats the children" do
       row.add_child(RowGroup.new.add_child(Row.new.set_cell_values(:title => "wonky2", :author => "bob jones2", :pub_date => "20122")))
+
+      table.column_for("title").data << "wonky2"
+      table.column_for("author").data << "bob jones2"
+      table.column_for("pub_date").data << "20122"
+
       compare_rows(row.format, "wonky  | bob jones  | 2012    \nwonky2 | bob jones2 | 20122   ")
     end
   end
@@ -204,20 +165,6 @@ describe TablePrint::Row do
       time_formatter = TablePrint::TimeFormatter.new
       TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
       row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20))
-    end
-  end
-
-  describe "#raw_column_data" do
-    it "returns all the values for a given column" do
-      row = Row.new.set_cell_values(:title => 'one', :author => 'two')
-
-      group = RowGroup.new
-      ['two', 'three', 'four', 'five', 'six', 'seven'].each do |title|
-        group.add_child(Row.new.set_cell_values(:title => title))
-      end
-      row.add_child(group)
-
-      row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
     end
   end
 

@@ -20,10 +20,19 @@ module TablePrint
     end
 
     def width
-      return parent.width if parent
       columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
     end
 
+    # more of a structural method than actual formatting
+    def format
+      rows = @children
+      rows = @children[1..-1] if @skip_first_row
+      rows ||= []
+      rows = rows.collect { |row| row.format }.join("\n")
+
+      return nil if rows.length == 0
+      rows
+    end
   end
 
   module RowFormatMethods
@@ -61,7 +70,6 @@ module TablePrint
 
     def initialize
       @children = []
-      @columns = {}
     end
 
     def add_child(child)
@@ -71,7 +79,7 @@ module TablePrint
 
     def insert_children(i, children)
       @children.insert(i, children).flatten!
-      children.each {|c| c.parent = self }
+      children.each { |c| c.parent = self }
       self
     end
 
@@ -85,59 +93,62 @@ module TablePrint
       @children.length
     end
 
-    def set_column(column)
-      return parent.set_column(column) if parent
-      @columns[column.name.to_s] = column
-    end
-
     def columns
-      return parent.columns if parent
-
-      #raw_column_names.collect{|k, v| column_for(k)}
-      @columns.each do |name, column|
-        column.data ||= raw_column_data(column.name)
-      end
-
-      @columns.values.select { |column| column.data.compact.any? }
-    end
-
-    def column_count
-      return parent.column_count if parent
-      @columns.size
+      parent.columns
     end
 
     def column_for(name)
-      return parent.column_for(name) if parent
-      column = @columns[name.to_s] #||= Column.new(:name => name)
-
-      # assign the data sets to the column before we return it
-      # do this as late as possible, since new rows could be added at any time
-      column.data ||= raw_column_data(column.name)
-      column
+      parent.column_for(name)
     end
   end
 
   class Table
     include TableFormatMethods
+    include RowRecursion
 
     def initialize
+      super
+
       @columns = {}
     end
 
+    def collapse!
+      @children.each(&:collapse!)
+    end
+
     def columns=(cols)
-      cols.each do |column|
-        @columns[column.name.to_s] = column
-      end
+      cols.each { |column| add_column(column) }
+    end
+
+    def add_column(column)
+      @columns[column.name.to_s] = column
     end
 
     def columns
       @columns.values.select { |column| column.data.compact.any? }
+    end
+
+    def column_for(name)
+      @columns[name.to_s]
     end
   end
 
 
   class RowGroup
     include RowRecursion
+
+    def initialize
+      super
+      @skip_first_row = false
+    end
+
+    def collapse!
+      @children.each(&:collapse!)
+    end
+
+    def skip_first_row!
+      @skip_first_row = true
+    end
 
     # more of a structural method than actual formatting
     def format
@@ -150,21 +161,6 @@ module TablePrint
       rows
     end
 
-    def initialize
-      super
-      @skip_first_row = false
-    end
-
-    # TODO: save a separate set of data on the column during fingerprinting so we can avoid this tree search
-    def raw_column_data(column_name)
-      @children.collect { |r| r.raw_column_data(column_name) }.flatten
-    end
-
-    def raw_column_names
-      return @raw_column_names if @raw_column_names
-      @raw_column_names = @children.collect { |r| r.raw_column_names }.flatten.uniq
-    end
-
     # this is a development tool, to show the structure of the row/row_group tree
     def vis(prefix="")
       if prefix == ""
@@ -173,14 +169,6 @@ module TablePrint
 
       puts "#{prefix}group"
       children.each{|c| c.vis(prefix + "  ")}
-    end
-
-    def collapse!
-      @children.each(&:collapse!)
-    end
-
-    def skip_first_row!
-      @skip_first_row = true
     end
   end
 
@@ -202,19 +190,6 @@ module TablePrint
       self
     end
 
-    def raw_column_data(column_name)
-      output = [@cells[column_name.to_s]]
-      output << @children.collect { |g| g.raw_column_data(column_name) }
-      output.flatten
-    end
-
-    def raw_column_names
-      output = [@cells.keys]
-      output << @children.collect { |g| g.raw_column_names }
-      output.flatten.uniq
-    end
-
-
     def collapse!
       children.each(&:collapse!)  # depth-first. start collapsing from the bottom and work our way up.
 
@@ -235,19 +210,6 @@ module TablePrint
         i = children.index(absorbable_group)
         children.delete(absorbable_group) if absorbable_group.children.empty?
         insert_children(i, absorbable_row.children) if absorbable_row.children.any?
-      end
-    end
-
-    def absorb_children(column_names, rollup)
-      @children.each do |group|
-        next unless can_absorb?(group)
-        group.skip_first_row!
-
-        column_names.collect do |name|
-          next unless group.children and group.children.length > 0
-          value = group.children.first.cells[name]
-          rollup[name] = value if value
-        end
       end
     end
 

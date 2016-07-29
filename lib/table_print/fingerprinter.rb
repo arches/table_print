@@ -1,18 +1,32 @@
 module TablePrint
   class Fingerprinter
+
+    attr_reader :columns
+
+    def initialize(columns=nil)
+      if columns
+        @columns ||= {}
+        columns.each do |column|
+          @columns[column.display_method] = column
+          column.data = []
+        end
+
+        display_methods_to_nested_hash(columns.collect(&:display_method))
+      end
+    end
+
     def lift(columns, object)
-      #@columns = {}
-      #columns.each do |column|
-      #  @columns[column.display_method.to_s] = column
-      #  column.data = []
-      #end
+      if columns.any?
+        @columns = {}
+        columns.each do |column|
+          @columns[column.display_method] = column
+          column.data = []
+        end
 
-      @column_names_by_display_method = {}
-      columns.each { |c| @column_names_by_display_method[c.display_method] = c.name }
+        display_methods_to_nested_hash(columns.collect(&:display_method))
+      end
 
-      column_hash = display_methods_to_nested_hash(columns.collect(&:display_method))
-
-      hash_to_rows("", column_hash, object)
+      hash_to_rows("", @column_hash, object)
     end
 
     def hash_to_rows(prefix, hash, objects)
@@ -49,8 +63,9 @@ module TablePrint
         else
           cell_value = "Method Missing"
         end
-        cells[@column_names_by_display_method[display_method]] = cell_value
-        #@columns[display_method].data << cell_value
+        column = @columns[display_method]
+        cells[column.name] = cell_value
+        column.data << cell_value
       end
 
       row.set_cell_values(cells)
@@ -76,10 +91,10 @@ module TablePrint
     end
 
     def display_methods_to_nested_hash(display_methods)
-      extended_hash = {}.extend TablePrint::HashExtensions::ConstructiveMerge
+      @column_hash = {}.extend TablePrint::HashExtensions::ConstructiveMerge
 
       # turn each column chain into a nested hash and add it to the output
-      display_methods.inject(extended_hash) do |hash, display_method|
+      display_methods.inject(@column_hash) do |hash, display_method|
         hash.constructive_merge!(display_method_to_nested_hash(display_method))
       end
     end

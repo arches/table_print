@@ -28,27 +28,22 @@ module TablePrint
 
       # it's groups all the way down
       # make a top-level group to hold everything we're about to do
-      group = TablePrint::RowGroup.new
       table = TablePrint::Table.new
       table.columns = columns
 
-      # parse the config and attach it to the group
-      columns.each do |c|
-        group.set_column(c)
-      end
-
       # copy data from original objects into the group
+      fingerprinter = Fingerprinter.new(columns)
       group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
       group_data.each do |data|
-        group.add_children(Fingerprinter.new.lift(columns, data))
+        table.add_children(fingerprinter.lift([], data))
       end
 
       # munge the tree of data we created, to condense the output
-      group.collapse!
-      return "No data." if group.columns.empty?
+      table.collapse!
+      return "No data." if table.columns.empty?
 
       # turn everything into a string for output
-      [table.header, table.horizontal_separator, group.format].join("\n")
+      [table.header, table.horizontal_separator, table.format].join("\n")
     end
 
     def message

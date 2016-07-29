@@ -5,6 +5,7 @@ module TablePrint
 
     def initialize(attr_hash={})
       @formatters = []
+      @data = []
       attr_hash.each do |k, v|
         self.send("#{k}=", v)
       end
