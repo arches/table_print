@@ -14,7 +14,7 @@ module TablePrint
     end
 
     def format_row(cells)
-      cells.join "-|-"
+      cells.join(" #{TablePrint::Config.separator} ")
     end
 
     def format_table(header, rows)
@@ -208,9 +208,9 @@ module TablePrint
 
     def format
       output = [
-        columns.collect { |column|
+        formatter.format_row(columns.collect { |column|
           apply_formatters(column)
-        }.join(" #{TablePrint::Config.separator} ")
+        })
       ]
       output.concat @children.collect { |group| group.format }
 
