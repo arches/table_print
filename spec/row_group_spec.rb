@@ -108,8 +108,8 @@ describe RowRecursion do
 end
 
 def compare_rows(actual_rows, expected_rows)
-  actual_rows.split("\n").length.should == expected_rows.split("\n").length
-  actual_rows.split("\n").zip(expected_rows.split("\n")).each do |actual, expected|
+  Array(actual_rows).length.should == Array(expected_rows).length
+  Array(actual_rows).zip(Array(expected_rows)).each do |actual, expected|
     actual.split(//).sort.join.should == expected.split(//).sort.join
   end
 end
@@ -141,7 +141,7 @@ describe TablePrint::Row do
       table.columns.find{|c| c.name.to_s == "author"}.data << "bob jones2"
       table.columns.find{|c| c.name.to_s == "pub_date"}.data << "20122"
 
-      compare_rows(row.format, "wonky  | bob jones  | 2012    \nwonky2 | bob jones2 | 20122   ")
+      compare_rows(row.format, ["wonky  | bob jones  | 2012    ", "wonky2 | bob jones2 | 20122   "])
     end
   end
 

@@ -1,7 +1,7 @@
 module TablePrint
-  
 
-  class OriginalFormatter
+
+  class MarkdownFormatter
 
     attr_accessor :columns
 
@@ -9,8 +9,18 @@ module TablePrint
       @columns = columns
     end
 
-    def format_cell(value)
-      value
+    def format_cell(column, value)
+      cell_formatters = []
+      cell_formatters.concat(Array(column.formatters))
+
+      cell_formatters << TimeFormatter.new(column.time_format)
+      cell_formatters << NoNewlineFormatter.new
+      cell_formatters << FixedWidthFormatter.new(column.width)
+
+      # successively apply the cell_formatters for a column
+      cell_formatters.inject(value) do |value, formatter|
+        formatter.format(value)
+      end
     end
 
     def format_row(cells)
@@ -116,7 +126,7 @@ module TablePrint
     end
 
     def formatter
-      @formatter ||= OriginalFormatter.new(@columns)
+      @formatter ||= MarkdownFormatter.new(@columns)
     end
   end
 
@@ -214,14 +224,11 @@ module TablePrint
       ]
       output.concat @children.collect { |group| group.format }
 
-      output.join("\n")
+      output.flatten
     end
 
     def apply_formatters(column)
-      raw_value = @cells[column.name]
-      formatted_value = column.format(raw_value)
-
-      formatter.format_cell(formatted_value)
+      formatter.format_cell(column, @cells[column.name])
     end
 
     # this is a development tool, to show the structure of the row/row_group tree
