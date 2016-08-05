@@ -26,8 +26,6 @@ module TablePrint
     def table_print
       return "No data." if @data.empty?
 
-      # it's groups all the way down
-      # make a top-level group to hold everything we're about to do
       table = TablePrint::Table.new
       table.columns = columns
 
