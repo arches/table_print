@@ -129,6 +129,27 @@ describe TablePrint::Row do
     group.add_child(row)
   }
 
+  describe "data_equal" do
+    it "is true when the cells are equal" do
+      row1 = TablePrint::Row.new.set_cell_values({'title' => "wonky"})
+      row2 = TablePrint::Row.new.set_cell_values({'title' => "wonky"})
+      expect(row1.data_equal(row2)).to be_true
+    end
+
+    it "is false when the cells are not equal" do
+      row1 = TablePrint::Row.new.set_cell_values({'title' => "wonky"})
+
+      row2 = TablePrint::Row.new.set_cell_values({'title' => "wonkier"})
+      expect(row1.data_equal(row2)).not_to be_true
+
+      row2 = TablePrint::Row.new.set_cell_values({'zitle' => "wonky"})
+      expect(row1.data_equal(row2)).not_to be_true
+
+      expect(row1.data_equal(nil)).not_to be_true
+      expect(row1.data_equal("seven")).not_to be_true
+    end
+  end
+
   describe "#format" do
     it "formats the row with padding" do
       compare_rows(row.format, "wonky | bob jones | 2012    ")
@@ -474,6 +495,51 @@ describe TablePrint::Row do
       it "collapses the second group" do
         @row.children.last.children.first.cells.should == {"bar" => "baz", "barry" => "bazaar"}
         @row.children.last.children.first.children.first.children.first.cells.should == {"barry" => "bizarre"}
+      end
+    end
+  end
+end
+
+describe TablePrint::RowGroup do
+  let(:group1) { TablePrint::RowGroup.new }
+
+  before do
+    group1.children << TablePrint::Row.new.set_cell_values({'foo' => 'bar'})
+  end
+
+  describe "data_equal" do
+    it "is true if the children are equal" do
+      group2 = TablePrint::RowGroup.new
+      group2.children << TablePrint::Row.new.set_cell_values({'foo' => 'bar'})
+
+      expect(group1.data_equal(group2)).to be_true
+    end
+
+    context "with different cell values" do
+      it "is false" do
+        group2 = TablePrint::RowGroup.new
+        group2.children << TablePrint::Row.new.set_cell_values({'foo' => 'baz'})
+
+        expect(group1.data_equal(group2)).not_to be_true
+
+        group2 = TablePrint::RowGroup.new
+        group2.children << TablePrint::Row.new.set_cell_values({'far' => 'bar'})
+
+        expect(group1.data_equal(group2)).not_to be_true
+      end
+    end
+
+    context "with different child lengths" do
+      it "is false" do
+        group2 = TablePrint::RowGroup.new
+
+        expect(group1.data_equal(group2)).not_to be_true
+
+        group2 = TablePrint::RowGroup.new
+        group2.children << TablePrint::Row.new.set_cell_values({'foo' => 'bar'})
+        group2.children << TablePrint::Row.new.set_cell_values({'foo' => 'bar'})
+
+        expect(group1.data_equal(group2)).not_to be_true
       end
     end
   end

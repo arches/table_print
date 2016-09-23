@@ -158,6 +158,12 @@ module TablePrint
       rows
     end
 
+    def data_equal(other)
+      return false unless children.length == other.children.length
+
+      children.zip(other.children).all? { |row1, row2| row1.data_equal(row2) }
+    end
+
     # this is a development tool, to show the structure of the row/row_group tree
     def vis(prefix="")
       if prefix == ""
@@ -229,6 +235,12 @@ module TablePrint
 
     def apply_formatters(column)
       formatter.format_cell(column, @cells[column.name])
+    end
+
+    def data_equal(other)
+      cells == other.cells
+    rescue NoMethodError
+      false
     end
 
     # this is a development tool, to show the structure of the row/row_group tree
