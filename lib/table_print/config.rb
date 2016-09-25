@@ -26,74 +26,29 @@ module TablePrint
 
     @@singleton = nil
 
-    def self.set(klass, val)
+    def set(klass, val)
       if klass.is_a? Class
-        singleton.klasses[klass] = val  # val is a hash of column options
+        klasses[klass] = val  # val is a hash of column options
       else
-        TablePrint::Config.send("#{klass}=", val.first)
+        send("#{klass}=", val.first)
       end
     end
 
-    def self.for(klass)
-      singleton.klasses.fetch(klass) {}
+    def for(klass)
+      klasses.fetch(klass) {}
     end
 
-    def self.clear(klass)
+    def clear(klass)
       if klass.is_a? Class
-        singleton.klasses.delete(klass)
+        klasses.delete(klass)
       else
-        original_value = TablePrint::Config.const_get("DEFAULT_#{klass.to_s.upcase}")
-        TablePrint::Config.send("#{klass}=", original_value)
+        send("#{klass}=", self.class.const_get("DEFAULT_#{klass.to_s.upcase}"))
       end
     end
 
-    def self.max_width
-      singleton.max_width
-    end
-
-    def self.max_width=(width)
-      singleton.max_width = width
-    end
-
-    def self.multibyte
-      singleton.multibyte
-    end
-
-    def self.multibyte=(width)
-      singleton.multibyte = width
-    end
-
-    def self.time_format
-      singleton.time_format
-    end
-
-    def self.time_format=(format)
-      singleton.time_format = format
-    end
-
-    def self.capitalize_headers
-      singleton.capitalize_headers
-    end
-
-    def self.capitalize_headers=(caps)
-      singleton.capitalize_headers = caps
-    end
-
-    def self.separator
-      singleton.separator
-    end
-
-    def self.separator=(separator)
-      singleton.separator = separator
-    end
-
-    def self.io
-      singleton.io
-    end
-
-    def self.io=(io)
+    def io=(io)
       raise StandardError.new("IO object must respond to :puts") unless io.respond_to? :puts
-      singleton.io = io
+      @io = io
     end
 
     def initialize(opts={})
@@ -106,7 +61,6 @@ module TablePrint
       self
     end
 
-    private
     def self.singleton
       @@singleton ||= Config.new({
         capitalize_headers: true,

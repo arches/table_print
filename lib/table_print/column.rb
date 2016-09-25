@@ -57,11 +57,11 @@ module TablePrint
 
     private
     def max_width
-      TablePrint::Config.max_width
+      TablePrint::Config.singleton.max_width
     end
 
     def multibyte_count
-      TablePrint::Config.multibyte
+      TablePrint::Config.singleton.multibyte
     end
   end
 end

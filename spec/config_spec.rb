@@ -2,27 +2,27 @@ require 'spec_helper'
 
 describe TablePrint::Config do
   it "defaults max_width to 30" do
-    TablePrint::Config.max_width.should == 30
+    TablePrint::Config.singleton.max_width.should == 30
   end
 
   it "defaults time_format to year-month-day-hour-minute-second" do
-    TablePrint::Config.time_format.should == "%Y-%m-%d %H:%M:%S"
+    TablePrint::Config.singleton.time_format.should == "%Y-%m-%d %H:%M:%S"
   end
 
   describe "individual config options" do
     describe "storing and retrieving" do
       it "sets the variable" do
-        TablePrint::Config.set(:max_width, [10])
-        TablePrint::Config.max_width.should == 10
-        TablePrint::Config.set(:max_width, [30])
+        TablePrint::Config.singleton.set(:max_width, [10])
+        TablePrint::Config.singleton.max_width.should == 10
+        TablePrint::Config.singleton.set(:max_width, [30])
       end
     end
 
     describe "clearing" do
       it "resets the variable to its initial value" do
-        TablePrint::Config.set(:max_width, [10])
-        TablePrint::Config.clear(:max_width)
-        TablePrint::Config.max_width.should == 30
+        TablePrint::Config.singleton.set(:max_width, [10])
+        TablePrint::Config.singleton.clear(:max_width)
+        TablePrint::Config.singleton.max_width.should == 30
       end
     end
   end
@@ -34,16 +34,16 @@ describe TablePrint::Config do
 
     describe "storing and retrieving" do
       it "stores the column hash" do
-        TablePrint::Config.set(Sandbox::Blog, [:title, :author])
-        TablePrint::Config.for(Sandbox::Blog).should == [:title, :author]
+        TablePrint::Config.singleton.set(Sandbox::Blog, [:title, :author])
+        TablePrint::Config.singleton.for(Sandbox::Blog).should == [:title, :author]
       end
     end
 
     describe "clearing" do
       it "removes the class from storage" do
-        TablePrint::Config.set(Sandbox::Blog, [:title, :author])
-        TablePrint::Config.clear(Sandbox::Blog)
-        TablePrint::Config.for(Sandbox::Blog).should be_nil
+        TablePrint::Config.singleton.set(Sandbox::Blog, [:title, :author])
+        TablePrint::Config.singleton.clear(Sandbox::Blog)
+        TablePrint::Config.singleton.for(Sandbox::Blog).should be_nil
       end
     end
   end
@@ -56,21 +56,21 @@ describe TablePrint::Config do
 
     it "accepts object that respond to puts" do
       myIO = Sandbox::MyIO.new
-      TablePrint::Config.set(:io, [myIO])
-      TablePrint::Config.io.should == myIO
+      TablePrint::Config.singleton.set(:io, [myIO])
+      TablePrint::Config.singleton.io.should == myIO
     end
 
     it "doesn't accept objects unless they respond to puts" do
       lambda {
-        TablePrint::Config.set(:io, [""])
+        TablePrint::Config.singleton.set(:io, [""])
       }.should raise_error StandardError
     end
 
     it "defaults to STDOUT" do
       myIO = Sandbox::MyIO.new
-      TablePrint::Config.set(:io, [myIO])
-      TablePrint::Config.clear(:io)
-      TablePrint::Config.io.should == STDOUT
+      TablePrint::Config.singleton.set(:io, [myIO])
+      TablePrint::Config.singleton.clear(:io)
+      TablePrint::Config.singleton.io.should == STDOUT
     end
   end
 end

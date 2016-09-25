@@ -2,7 +2,7 @@ module TablePrint
   class TimeFormatter
     def initialize(time_format=nil)
       @format = time_format
-      @format ||= TablePrint::Config.time_format
+      @format ||= TablePrint::Config.singleton.time_format
     end
 
     def format(value)
@@ -40,7 +40,7 @@ module TablePrint
     end
 
     def length(str)
-      if TablePrint::Config.multibyte
+      if TablePrint::Config.singleton.multibyte
         str.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+)
       else
         str.length

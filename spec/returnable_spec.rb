@@ -13,19 +13,19 @@ describe TablePrint::Returnable do
   end
 
   it "passes #set through to TablePrint::Config" do
-    TablePrint::Config.should_receive(:set).with(Object, [:foo])
+    TablePrint::Config.singleton.should_receive(:set).with(Object, [:foo])
     r = TablePrint::Returnable.new
     r.set(Object, :foo)
   end
 
   it "passes #clear through to TablePrint::Config" do
-    TablePrint::Config.should_receive(:clear).with(Object)
+    TablePrint::Config.singleton.should_receive(:clear).with(Object)
     r = TablePrint::Returnable.new
     r.clear(Object)
   end
 
   it "passes #config_for through to TablePrint::Config.for" do
-    TablePrint::Config.should_receive(:for).with(Object)
+    TablePrint::Config.singleton.should_receive(:for).with(Object)
     r = TablePrint::Returnable.new
     r.config_for(Object)
   end

@@ -12,6 +12,9 @@ require 'table_print/row_group'
 require 'table_print/row'
 require 'table_print/returnable'
 
+
+
+
 module TablePrint
   class Printer
 
@@ -55,20 +58,18 @@ module TablePrint
 
     private
     def configged?
-      !!Config.for(@data.first.class)
+      !!Config.singleton.for(@data.first.class)
     end
 
     def columns
       return @columns if @columns
-      defaults = TablePrint::Printable.default_display_methods(@data.first)
-      c = TablePrint::ConfigResolver.new(@data.first.class, defaults, @options)
-      @columns = c.columns
+      @columns = TablePrint::ConfigResolver.new(@data.first, @options).columns
     end
   end
 end
 
 def tp(data=Class, *options)
   printer = TablePrint::Printer.new(data, options)
-  TablePrint::Config.io.puts printer.table_print unless data.is_a? Class
+  TablePrint::Config.singleton.io.puts printer.table_print unless data.is_a? Class
   TablePrint::Returnable.new(printer.message) # we have to return *something*, might as well be execution time.
 end

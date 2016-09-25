@@ -13,28 +13,28 @@ describe TablePrint::ConfigResolver do
 
   describe "#get_and_remove" do
     it "deletes and returns the :except key from an array" do
-      c = TablePrint::ConfigResolver.new(Object, [])
+      c = TablePrint::ConfigResolver.new(Object.new, [])
       options = [:title, :author, {:except => [:title]}]
       c.get_and_remove(options, :except).should == [:title]
       options.should == [:title, :author]
     end
 
     it "deletes and returns the :except key from an array with an :include key" do
-      c = TablePrint::ConfigResolver.new(Object, [])
+      c = TablePrint::ConfigResolver.new(Object.new, [])
       options = [:title, {:except => [:title]}, {:include => [:author]}]
       c.get_and_remove(options, :except).should == [:title]
       options.should == [:title, {:include => [:author]}]
     end
 
     it "deletes and returns the :except key from a hash with an :include key" do
-      c = TablePrint::ConfigResolver.new(Object, [])
+      c = TablePrint::ConfigResolver.new(Object.new, [])
       options = [:title, {:except => [:title], :include => [:author]}]
       c.get_and_remove(options, :except).should == [:title]
       options.should == [:title, {:include => [:author]}]
     end
 
     it "deletes and returns both the :include and :except keys" do
-      c = TablePrint::ConfigResolver.new(Object, [])
+      c = TablePrint::ConfigResolver.new(Object.new, [])
       options = [:title, {:except => [:title]}, {:include => [:author]}]
       c.get_and_remove(options, :include).should == [:author]
       c.get_and_remove(options, :except).should == [:title]
@@ -42,7 +42,7 @@ describe TablePrint::ConfigResolver do
     end
 
     it "works even if the array doesn't have an exception hash" do
-      c = TablePrint::ConfigResolver.new(Object, [])
+      c = TablePrint::ConfigResolver.new(Object.new, [])
       options = [:title, :author]
       c.get_and_remove(options, :except).should == []
       options.should == [:title, :author]
@@ -52,21 +52,21 @@ describe TablePrint::ConfigResolver do
   describe ":only" do
     context "with a symbol" do
       it "returns a column named foo" do
-        c = TablePrint::ConfigResolver.new(Object, [:title], :foo)
+        c = TablePrint::ConfigResolver.new(Struct.new(:title), :foo)
         c.columns.length.should == 1
         c.columns.first.name.should == 'foo'
       end
     end
     context "with a string" do
       it "returns a column named foo" do
-        c = TablePrint::ConfigResolver.new(Object, [:title], 'foo')
+        c = TablePrint::ConfigResolver.new(Struct.new(:title), 'foo')
         c.columns.length.should == 1
         c.columns.first.name.should == 'foo'
       end
     end
     context "with an array of symbols and strings" do
       it "returns columns named foo and bar" do
-        c = TablePrint::ConfigResolver.new(Object, [:title], :foo, 'bar')
+        c = TablePrint::ConfigResolver.new(Struct.new(:title), :foo, 'bar')
         c.columns.length.should == 2
         c.columns.first.name.should == 'foo'
         c.columns.last.name.should == 'bar'
@@ -125,7 +125,7 @@ describe TablePrint::ConfigResolver do
   describe "lambdas" do
     it "uses the key as the name and the lambda as the display method" do
       lam = lambda {}
-      c = TablePrint::ConfigResolver.new(Object, [:title], :foo => {:display_method => lam})
+      c = TablePrint::ConfigResolver.new(Struct.new(:title), :foo => {:display_method => lam})
       c.columns.length.should == 1
       c.columns.first.name.should == 'foo'
       c.columns.first.display_method.should == lam
@@ -134,7 +134,7 @@ describe TablePrint::ConfigResolver do
     context "without the display_method keyword" do
       it "uses the key as the name and the lambda as the display method" do
         lam = lambda {}
-        c = TablePrint::ConfigResolver.new(Object, [:title], :foo => lam)
+        c = TablePrint::ConfigResolver.new(Struct.new(:title), :foo => lam)
         c.columns.length.should == 1
         c.columns.first.name.should == 'foo'
         c.columns.first.display_method.should == lam
@@ -149,7 +149,7 @@ describe TablePrint::ConfigResolver do
     end
 
     it "returns specified columns instead of default columns" do
-      c = TablePrint::ConfigResolver.new(Object, [:title], [:author])
+      c = TablePrint::ConfigResolver.new(Struct.new(:title), [:author])
       c.usable_column_names.should == ['author']
     end
 
@@ -159,7 +159,7 @@ describe TablePrint::ConfigResolver do
     end
 
     it "applies includes on top of specified columns" do
-      c = TablePrint::ConfigResolver.new(Object, [:title], [:author, {:include => :pub_date}])
+      c = TablePrint::ConfigResolver.new(Struct.new(:title), [:author, {:include => :pub_date}])
       c.usable_column_names.should == ['author', 'pub_date']
     end
 
@@ -179,12 +179,12 @@ describe TablePrint::ConfigResolver do
     end
 
     it "applies excepts on top of specified columns" do
-      c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:pub_date, :length, {:except => :length}])
+      c = TablePrint::ConfigResolver.new(Struct.new(:title, :author), [:pub_date, :length, {:except => :length}])
       c.usable_column_names.should == ['pub_date']
     end
 
     it "applies both includes and excepts on top of specified columns" do
-      c = TablePrint::ConfigResolver.new(Object, [:title, :author], [:pub_date, :length, {:except => :length, :include => :foobar}])
+      c = TablePrint::ConfigResolver.new(Struct.new(:title, :author), [:pub_date, :length, {:except => :length, :include => :foobar}])
       c.usable_column_names.should == ['pub_date', 'foobar']
     end
   end

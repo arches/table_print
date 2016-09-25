@@ -59,20 +59,20 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
 end
 
 When /^I configure multibyte with (.*)$/ do |value|
-  TablePrint::Config.set(:multibyte, [value == "true"])
+  TablePrint::Config.singleton.set(:multibyte, [value == "true"])
 end
 
 When /^I configure capitalize_headers with (.*)$/ do |value|
-  TablePrint::Config.set(:capitalize_headers, [value == "true"])
+  TablePrint::Config.singleton.set(:capitalize_headers, [value == "true"])
 end
 
 When /^I configure separator with '(.*)'$/ do |value|
-  TablePrint::Config.set(:separator, [value])
+  TablePrint::Config.singleton.set(:separator, [value])
 end
 
 When /^configure (.*) with (.*)$/ do |klass, config|
   klass = Sandbox.const_get_from_string(klass)
-  TablePrint::Config.set(klass, eval(config))
+  TablePrint::Config.singleton.set(klass, eval(config))
 end
 
 When /table_print ([\w:]*), (.*)$/ do |klass, options|

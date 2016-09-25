@@ -1,15 +1,16 @@
 module TablePrint
   class ConfigResolver
-    def initialize(klass, default_column_names, *options)
+    def initialize(example, *options)
       @column_hash = {}
 
+      default_column_names = Printable.default_display_methods(example)
       @default_columns = default_column_names.collect { |name| option_to_column(name) }
 
       @included_columns = []
       @excepted_columns = []
       @only_columns = []
 
-      process_option_set(TablePrint::Config.for(klass))
+      process_option_set(TablePrint::Config.singleton.for(example.class))
       process_option_set(options)
     end
 
