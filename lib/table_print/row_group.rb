@@ -4,7 +4,6 @@ module TablePrint
 
     def initialize
       super
-      @skip_first_row = false
     end
 
     #### structural ####
@@ -13,16 +12,11 @@ module TablePrint
       @children.each(&:collapse!)
     end
 
-    def skip_first_row!
-      @skip_first_row = true
-    end
-
     #### format ####
     
     # more of a structural method than actual formatting
     def format
       rows = @children
-      rows = @children[1..-1] if @skip_first_row
       rows ||= []
       rows = rows.collect { |row| row.format }
 
