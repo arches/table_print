@@ -16,7 +16,7 @@ module TablePrint
     end
 
     def lift(object)
-      hash_to_rows("", @column_hash, object)
+      RowGroup.new.add_children hash_to_rows("", @column_hash, object)
     end
 
     def hash_to_rows(prefix, hash, objects)

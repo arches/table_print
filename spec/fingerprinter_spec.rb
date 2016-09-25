@@ -1,66 +1,90 @@
 require 'spec_helper'
 
-class TablePrint::Row
-  attr_accessor :groups, :cells
-end
-
 include TablePrint
 
 describe Fingerprinter do
 
-  before(:each) do
-    Sandbox.cleanup!
-  end
-
   describe "#lift" do
     it "turns a single level of columns into a single row" do
-      rows = Fingerprinter.new([Column.new(:name => "name")]).lift(OpenStruct.new(:name => "dale carnegie"))
-      rows.length.should == 1
-      row = rows.first
-      row.children.length.should == 0
-      row.cells.should == {'name' => "dale carnegie"}
+      columns = [Column.new(:name => "name")]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:name => "dale carnegie"))
+
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name' => 'dale carnegie'})
+          )
+        )
+      ).to be_true
     end
 
     it "uses the display_method to get the data" do
-      rows = Fingerprinter.new([Column.new(:name => "name of work", :display_method => "title")]).lift(OpenStruct.new(:title => "of mice and men"))
-      rows.length.should == 1
-      row = rows.first
-      row.children.length.should == 0
-      row.cells.should == {'name of work' => "of mice and men"}
+      columns = [Column.new(:name => "name of work", :display_method => "title")]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:title => "of mice and men"))
+
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name of work' => 'of mice and men'})
+          )
+        )
+      ).to be_true
     end
 
     it "turns multiple levels of columns into multiple rows" do
-      rows = Fingerprinter.new([Column.new(:name => "name"), Column.new(:name => "books.title")]).lift(OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
-      rows.length.should == 1
-      row = rows.first
-      row.children.length.should == 1
-      row.cells.should == {'name' => "dale carnegie"}
-      row.children.first.children.first.cells.should == {'books.title' => "how to make influences"}
+      columns = [Column.new(:name => "name"), Column.new(:name => "books.title")]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:name => "dale carnegie", :books => [OpenStruct.new(:title => "how to make influences")]))
+
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name' => 'dale carnegie'}).add_child(
+              RowGroup.new.add_child(
+                Row.new.set_cell_values({'books.title' => "how to make influences"})
+              )
+            )
+          )
+        )
+      ).to be_true
     end
 
     it "doesn't choke if an association doesn't exist" do
-      rows = Fingerprinter.new([Column.new(:name => "name"), Column.new(:name => "books.title")]).lift(OpenStruct.new(:name => "dale carnegie", :books => []))
+      columns = [Column.new(:name => "name"), Column.new(:name => "books.title")]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:name => "dale carnegie", :books => []))
 
-      rows.length.should == 1
-
-      row = rows.first
-      row.children.length.should == 0
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name' => 'dale carnegie'})
+          )
+        )
+      ).to be_true
     end
 
     it "allows a lambda as the display_method" do
-      rows = Fingerprinter.new([Column.new(:name => "name", :display_method => lambda { |row| row.name.gsub(/[aeiou]/, "") })]).lift(OpenStruct.new(:name => "dale carnegie"))
-      rows.length.should == 1
-      row = rows.first
-      row.children.length.should == 0
-      row.cells.should == {'name' => "dl crng"}
+      columns = [Column.new(:name => "name", :display_method => lambda { |row| row.name.gsub(/[aeiou]/, "") })]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:name => "dale carnegie"))
+
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name' => 'dl crng'})
+          )
+        )
+      ).to be_true
     end
 
     it "doesn't puke if a lambda returns nil" do
-      rows = Fingerprinter.new([Column.new(:name => "name", :display_method => lambda { |row| nil })]).lift(OpenStruct.new(:name => "dale carnegie"))
-      rows.length.should == 1
-      row = rows.first
-      row.children.length.should == 0
-      row.cells.should == {'name' => nil}
+      columns = [Column.new(:name => "name", :display_method => lambda { |row| nil })]
+      group = Fingerprinter.new(columns).lift(OpenStruct.new(:name => "dale carnegie"))
+
+      expect(
+        group.data_equal(
+          RowGroup.new.add_child(
+            Row.new.set_cell_values({'name' => nil})
+          )
+        )
+      ).to be_true
     end
   end
 

@@ -33,11 +33,11 @@ module TablePrint
       table = TablePrint::Table.new
       table.columns = columns
 
-      # copy data from original objects into the group
+      # copy data from original objects into the table
       fingerprinter = Fingerprinter.new(columns)
       group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
       group_data.each do |data|
-        table.add_children(fingerprinter.lift(data))
+        table.add_child(fingerprinter.lift(data))
       end
 
       # munge the tree of data we created, to condense the output
