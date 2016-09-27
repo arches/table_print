@@ -23,7 +23,7 @@ module TablePrint
     end
 
     def format_row(cells)
-      cells.join(" #{TablePrint::Config.singleton.separator} ")
+      cells.join(" #{config.separator} ")
     end
 
     def format_table(header, rows)
@@ -36,8 +36,8 @@ module TablePrint
         f.format(column.name)
       end
 
-      header_string = padded_names.join(" #{TablePrint::Config.singleton.separator} ")
-      header_string.upcase! if TablePrint::Config.singleton.capitalize_headers
+      header_string = padded_names.join(" #{config.separator} ")
+      header_string.upcase! if config.capitalize_headers
 
       header_string
     end
@@ -45,7 +45,12 @@ module TablePrint
     def horizontal_separator
       columns.collect do |column|
         '-' * column.width
-      end.join("-#{TablePrint::Config.singleton.separator}-")
+      end.join("-#{config.separator}-")
+    end
+
+    private
+    def config
+      TablePrint::Config.singleton
     end
   end
 
