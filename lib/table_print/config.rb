@@ -42,7 +42,7 @@ module TablePrint
       if klass.is_a? Class
         klasses.delete(klass)
       else
-        send("#{klass}=", self.class.const_get("DEFAULT_#{klass.to_s.upcase}"))
+        send("#{klass}=", Config.const_get("DEFAULT_#{klass.to_s.upcase}"))
       end
     end
 
