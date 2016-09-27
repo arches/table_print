@@ -61,8 +61,11 @@ module TablePrint
       self
     end
 
-    def self.singleton
-      @@singleton ||= Config.new({
+    def self.singleton(name=:global)
+      @@singleton ||= {}
+
+      @@singleton[name.to_sym] ||= Config.new({
+
         capitalize_headers: true,
         io: DEFAULT_IO,
         max_width: DEFAULT_MAX_WIDTH,
