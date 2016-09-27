@@ -3,6 +3,7 @@ module TablePrint
     include RowRecursion
 
     attr_accessor :formatter, :columns
+    attr_writer :config
 
     def initialize
       super
@@ -18,10 +19,18 @@ module TablePrint
 
     def columns=(cols)
       @columns = cols
+      cols.each { |c| c.table = self }
+      cols
     end
 
     def add_column(column)
       @columns << column
+      column.table = self
+      column
+    end
+
+    def config
+      @config ||= TablePrint::Config.singleton
     end
 
     #### format? ####
@@ -37,7 +46,7 @@ module TablePrint
     end
 
     def formatter
-      @formatter ||= MarkdownFormatter.new(@columns)
+      @formatter ||= MarkdownFormatter.new(config, columns)
     end
   end
 end

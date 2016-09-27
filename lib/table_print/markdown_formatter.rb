@@ -2,9 +2,10 @@ module TablePrint
 
   class MarkdownFormatter
 
-    attr_accessor :columns
+    attr_accessor :config, :columns
 
-    def initialize(columns)
+    def initialize(config, columns)
+      @config = config
       @columns = columns
     end
 
@@ -12,9 +13,11 @@ module TablePrint
       cell_formatters = []
       cell_formatters.concat(Array(column.formatters))
 
-      cell_formatters << TimeFormatter.new(column.time_format)
+      cell_formatters << TimeFormatter.new(column.time_format || config.time_format)
       cell_formatters << NoNewlineFormatter.new
-      cell_formatters << FixedWidthFormatter.new(column.width)
+      fixed_width = FixedWidthFormatter.new(column.width)
+      fixed_width.multibyte = config.multibyte
+      cell_formatters << fixed_width
 
       # successively apply the cell_formatters for a column
       cell_formatters.inject(value) do |value, formatter|
@@ -47,11 +50,5 @@ module TablePrint
         '-' * column.width
       end.join("-#{config.separator}-")
     end
-
-    private
-    def config
-      TablePrint::Config.singleton
-    end
   end
-
 end

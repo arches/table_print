@@ -1,8 +1,7 @@
 module TablePrint
   class TimeFormatter
     def initialize(time_format=nil)
-      @format = time_format
-      @format ||= TablePrint::Config.singleton.time_format
+      @format = time_format || "%Y-%m-%d %H:%M:%S"
     end
 
     def format(value)
@@ -18,10 +17,11 @@ module TablePrint
   end
 
   class FixedWidthFormatter
-    attr_accessor :width
+    attr_accessor :width, :multibyte
 
     def initialize(width)
       self.width = width
+      self.multibyte = false
     end
 
     def format(value)
@@ -40,7 +40,7 @@ module TablePrint
     end
 
     def length(str)
-      if TablePrint::Config.singleton.multibyte
+      if multibyte
         str.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+)
       else
         str.length

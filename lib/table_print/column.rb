@@ -1,7 +1,7 @@
 module TablePrint
   class Column
     attr_reader :formatters
-    attr_accessor :name, :data, :time_format, :default_width, :min_width, :fixed_width
+    attr_accessor :name, :data, :time_format, :default_width, :min_width, :fixed_width, :table
 
     def initialize(attr_hash={})
       @formatters = []
@@ -57,11 +57,13 @@ module TablePrint
 
     private
     def max_width
-      TablePrint::Config.singleton.max_width
+      table.config.max_width
     end
 
     def multibyte_count
-      TablePrint::Config.singleton.multibyte
+      table.config.multibyte
+    rescue
+      false
     end
   end
 end
