@@ -2,7 +2,7 @@ module TablePrint
   class Table
     include RowRecursion
 
-    attr_accessor :formatter
+    attr_accessor :formatter, :columns
 
     def initialize
       super
@@ -13,6 +13,7 @@ module TablePrint
 
     def collapse!
       @children.each(&:collapse!)
+      @columns = @columns.select { |column| column.data.compact.any? }
     end
 
     def columns=(cols)
@@ -25,11 +26,6 @@ module TablePrint
 
     #### format? ####
     
-    # suspect
-    def columns
-      @columns.select { |column| column.data.compact.any? }
-    end
-
     # suspect
     def width
       columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator

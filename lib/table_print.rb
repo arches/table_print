@@ -4,7 +4,6 @@ require 'table_print/config'
 require 'table_print/fingerprinter'
 require 'table_print/formatter'
 require 'table_print/hash_extensions'
-require 'table_print/printable'
 require 'table_print/markdown_formatter'
 require 'table_print/row_recursion'
 require 'table_print/table'
@@ -26,7 +25,6 @@ module TablePrint
     def initialize(data, options={})
       @data = Array(data).compact
       @options = options
-      @columns = nil
       @start_time = Time.now
     end
 
@@ -34,10 +32,10 @@ module TablePrint
       return "No data." if @data.empty?
 
       table = TablePrint::Table.new
-      table.columns = columns
+      table.columns = TablePrint::ConfigResolver.new(@data.first, @options).columns
 
       # copy data from original objects into the table
-      fingerprinter = Fingerprinter.new(columns)
+      fingerprinter = Fingerprinter.new(table.columns)
       group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
       group_data.each do |data|
         table.add_child(fingerprinter.lift(data))
@@ -59,11 +57,6 @@ module TablePrint
     private
     def configged?
       !!Config.singleton.for(@data.first.class)
-    end
-
-    def columns
-      return @columns if @columns
-      @columns = TablePrint::ConfigResolver.new(@data.first, @options).columns
     end
   end
 end
