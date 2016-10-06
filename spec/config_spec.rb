@@ -79,7 +79,7 @@ describe TablePrint::Config do
 
   describe "a named singleton" do
     it "is a different object than the top-level singleton" do
-      expect(TablePrint::Config.singleton).not_to eq(TablePrint::Config.singleton(:csv))
+      expect(TablePrint::Config.singleton.object_id).not_to eq(TablePrint::Config.singleton(:csv).object_id)
     end
 
     it "is tolerant of name types" do
@@ -94,6 +94,15 @@ describe TablePrint::Config do
 
       expect(global.time_format).not_to eq(csv.time_format)
       expect(TablePrint::Config.singleton(:html)).not_to eq(csv.time_format)
+    end
+  end
+
+  describe "duping" do
+    it "creates a new equal config" do
+      c1 = TablePrint::Config.new
+      c2 = c1.dup
+      expect(c1.object_id).not_to eq(c2.object_id)
+      expect(c1).to eq(c2)
     end
   end
 end

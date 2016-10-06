@@ -32,9 +32,8 @@ module TablePrint
       parent.columns if parent
     end
 
-    # suspect
-    def formatter
-      parent.formatter
+    def config
+      parent.config
     end
   end
 end

@@ -41,28 +41,17 @@ module TablePrint
       end
     end
 
-    def can_absorb?(group)
-      return true if group.child_count == 1
-
-      return false if @already_absorbed_a_multigroup
-      @already_absorbed_a_multigroup = true # only call this method once
-    end
-
     #### format ####
-    
+
     def format
       output = [
         formatter.format_row(columns.collect { |column|
-          apply_formatters(column)
+          formatter.format_cell(column, @cells[column.name])
         })
       ]
       output.concat @children.collect { |group| group.format }
 
       output.flatten
-    end
-
-    def apply_formatters(column)
-      formatter.format_cell(column, @cells[column.name])
     end
 
     #### helper ####
@@ -86,5 +75,18 @@ module TablePrint
       children.each{|c| c.vis(prefix + "  ")}
     end
 
+
+    private
+
+    def formatter
+      config.formatter
+    end
+
+    def can_absorb?(group)
+      return true if group.child_count == 1
+
+      return false if @already_absorbed_a_multigroup
+      @already_absorbed_a_multigroup = true # only call this method once
+    end
   end
 end

@@ -1,13 +1,21 @@
 module TablePrint
   class Config
 
-    attr_accessor :capitalize_headers,
+    ATTRIBUTES = [ 
+      :capitalize_headers,
+      :colors,
+      :fixed_width,
+      :formatter,
+      :formatters,
       :io,
       :klasses,
       :max_width,
       :multibyte,
       :separator,
-      :time_format
+      :time_format,
+    ]
+
+    attr_accessor *ATTRIBUTES
 
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -25,6 +33,14 @@ module TablePrint
     @@klasses = {}
 
     @@singleton = nil
+
+    def ==(other)
+      ATTRIBUTES.all? do |attr|
+        other.send(attr) == send(attr)
+      end
+    rescue NoMethodError
+      false
+    end
 
     def set(klass, val)
       if klass.is_a? Class
@@ -59,6 +75,22 @@ module TablePrint
       end
 
       self
+    end
+
+    def display(data, *column_options)
+      resolver = TablePrint::ConfigResolver.new(self, @data.first, @options)
+
+      columns = resolver.columns
+
+      fingerprinter = Fingerprinter.new(self, columns)
+
+      table = fingerprinter.lift(data)
+
+      table.collapse!
+
+      io.puts table.format
+
+      TablePrint::Returnable.new(message)
     end
 
     def self.singleton(name=:global)

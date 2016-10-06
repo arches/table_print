@@ -2,8 +2,7 @@ module TablePrint
   class Table
     include RowRecursion
 
-    attr_accessor :formatter, :columns
-    attr_writer :config
+    attr_accessor :config, :columns
 
     def initialize
       super
@@ -29,19 +28,16 @@ module TablePrint
       column
     end
 
-    def config
-      @config ||= TablePrint::Config.singleton
-    end
-
-    #### format? ####
+    #### format ####
     
-    # suspect
     def format
       formatter.format_table(formatter.format_header, children.collect(&:format))
     end
 
+    private
+
     def formatter
-      @formatter ||= MarkdownFormatter.new(config, columns)
+      config.formatter
     end
   end
 end

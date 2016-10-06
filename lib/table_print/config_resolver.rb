@@ -1,18 +1,33 @@
 module TablePrint
   class ConfigResolver
-    def initialize(example, *options)
-      @column_hash = {}
 
-      default_column_names = ConfigResolver.default_display_methods(example)
-      @default_columns = default_column_names.collect { |name| option_to_column(name) }
+    attr_accessor :base_config, :example, :options
+
+    def initialize(base_config, example, *options)
+      @base_config = base_config
+      @example = example
+      @options = options
+
+      @column_hash = {}
 
       @included_columns = []
       @excepted_columns = []
       @only_columns = []
-
-      process_option_set(TablePrint::Config.singleton.for(example.class))
-      process_option_set(options)
     end
+
+    def columns
+      default_column_names = default_display_methods(example)
+      @default_columns = default_column_names.collect { |name| option_to_column(name) }
+
+      process_option_set(base_config.for(example.class))
+      process_option_set(options)
+
+      usable_column_names.collect do |name|
+        @column_hash[name]
+      end
+    end
+
+    private
 
     def process_option_set(options)
 
@@ -59,6 +74,8 @@ module TablePrint
     end
 
     def option_to_column(option)
+      column_config = base_config.dup
+
       if option.is_a? Hash
         name = option.keys.first
         if option[name].is_a? Proc
@@ -70,8 +87,8 @@ module TablePrint
         option = {:name => option}
       end
 
-      if option.has_key? :width
-        option[:default_width] = option.delete(:width)
+      if option.has_key? :fixed_width
+        column_config.fixed_width = option.delete(:fixed_width)
       end
 
       if option.has_key? :display_name
@@ -79,7 +96,12 @@ module TablePrint
         option[:name] = option.delete(:display_name)
       end
 
+      if option.has_key? :formatters
+        column_config.formatters = option.delete(:formatters)
+      end
+
       c = Column.new(option)
+      c.config = column_config
       @column_hash[c.name] = c
       c
     end
@@ -93,14 +115,8 @@ module TablePrint
       names.reject{ |name| names.any?{ |other| other.start_with? name and other != name }}
     end
 
-    def columns
-      usable_column_names.collect do |name|
-        @column_hash[name]
-      end
-    end
-
     # Sniff the data class for non-standard methods to use as a baseline for display
-    def self.default_display_methods(target)
+    def default_display_methods(target)
       if target.class.respond_to? :columns
         if target.class.columns.first.respond_to? :name
 

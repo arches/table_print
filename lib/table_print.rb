@@ -31,8 +31,12 @@ module TablePrint
     def table_print
       return "No data." if @data.empty?
 
+      config = Config.singleton
+      columns = TablePrint::ConfigResolver.new(config, @data.first, @options).columns
+
       table = TablePrint::Table.new
-      table.columns = TablePrint::ConfigResolver.new(@data.first, @options).columns
+      table.config = config
+      table.columns = columns
 
       # copy data from original objects into the table
       fingerprinter = Fingerprinter.new(table.columns)
@@ -44,6 +48,8 @@ module TablePrint
       # munge the tree of data we created, to condense the output
       table.collapse!
       return "No data." if table.columns.empty?
+
+      config.formatter = MarkdownFormatter.new(Config.singleton, table.columns)
 
       # turn everything into a string for output
       table.format

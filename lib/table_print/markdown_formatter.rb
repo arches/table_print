@@ -9,11 +9,12 @@ module TablePrint
       @columns = columns
     end
 
+    # todo: combine column-level stuff with table-level stuff?
     def format_cell(column, value)
       cell_formatters = []
-      cell_formatters.concat(Array(column.formatters))
+      #cell_formatters.concat(Array(column.formatters))
 
-      cell_formatters << TimeFormatter.new(column.time_format || config.time_format)
+      cell_formatters << TimeFormatter.new(column.config.time_format || config.time_format)
       cell_formatters << NoNewlineFormatter.new
       fixed_width = FixedWidthFormatter.new(column.width)
       fixed_width.multibyte = config.multibyte

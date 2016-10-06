@@ -6,26 +6,12 @@ Feature: Configuring output
     Given Blog has attributes title, author
 
     When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ryan'}
-    And table_print Blog, {:include => {:author => {:width => 40}}}
+    And table_print Blog, {:include => {:author => {:fixed_width => 40}}}
     Then the output should contain
     """
     TITLE | AUTHOR                                  
     ------|-----------------------------------------
     post! | Ryan Ryan Ryan Ryan Ryan Ryan Ryan Ry... 
-    """
-
-  Scenario: Setting a minimum width for an individual column
-    Given a class named Blog
-
-    Given Blog has attributes title, author
-
-    When I instantiate a Blog with {:title => "post!", :author => 'Ryan Ryan'}
-    And table_print Blog, {:include => {:author => {:min_width => 40}}}
-    Then the output should contain
-    """
-    TITLE | AUTHOR
-    ------|-----------------------------------------
-    post! | Ryan Ryan
     """
 
   Scenario: Setting a fixed width for an individual column, when data width is greater than fixed width

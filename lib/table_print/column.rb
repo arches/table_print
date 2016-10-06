@@ -1,10 +1,9 @@
 module TablePrint
   class Column
-    attr_reader :formatters
-    attr_accessor :name, :data, :time_format, :default_width, :min_width, :fixed_width, :table
+
+    attr_accessor :table, :config, :name, :data
 
     def initialize(attr_hash={})
-      @formatters = []
       @data = []
       attr_hash.each do |k, v|
         self.send("#{k}=", v)
@@ -15,12 +14,6 @@ module TablePrint
       @name = n.to_s
     end
 
-    def formatters=(formatter_list)
-      formatter_list.each do |f|
-        add_formatter(f)
-      end
-    end
-
     def display_method=(method)
       method = method.to_s unless method.is_a? Proc
       @display_method = method
@@ -28,10 +21,6 @@ module TablePrint
 
     def display_method
       @display_method ||= name
-    end
-
-    def add_formatter(formatter)
-      @formatters << formatter
     end
 
     def data_width
@@ -51,17 +40,20 @@ module TablePrint
     def width
       return fixed_width if fixed_width
 
-      width = [(default_width || max_width), data_width].min
-      [(min_width || 0), width].max
+      [max_width, data_width].min
     end
 
     private
     def max_width
-      table.config.max_width
+      config.max_width
+    end
+
+    def fixed_width
+      config.fixed_width
     end
 
     def multibyte_count
-      table.config.multibyte
+      config.multibyte
     rescue
       false
     end
