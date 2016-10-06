@@ -56,19 +56,6 @@ describe RowRecursion do
       end
     end
 
-    describe "#width" do
-      it "returns the total width of the columns" do
-
-        table = Table.new
-        table.columns = [
-          Column.new(:name => "title", :data => ["foobar"]),
-          Column.new(:name => "subtitle", :data => ["elemental"]),
-        ]
-
-        table.width.should == 18
-      end
-    end
-
     describe "#horizontal_separator" do
       it "returns hyphens equal to the table width" do
         pending "move to formatter spec"

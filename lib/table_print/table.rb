@@ -36,11 +36,6 @@ module TablePrint
     #### format? ####
     
     # suspect
-    def width
-      columns.collect(&:width).inject(&:+) + (columns.length - 1) * 3 # add (n-1)*3 for the 3-character separator
-    end
-
-    # suspect
     def format
       formatter.format_table(formatter.format_header, children.collect(&:format))
     end
