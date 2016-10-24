@@ -34,6 +34,16 @@ module TablePrint
       formatter.format_table(formatter.format_header, children.collect(&:format))
     end
 
+
+    #### format ####
+    
+    def data_equal(other)
+
+      return false unless children.length == other.children.length
+
+      children.zip(other.children).all? { |row1, row2| row1.data_equal(row2) }
+    end
+
     private
 
     def formatter

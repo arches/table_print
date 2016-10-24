@@ -34,22 +34,17 @@ module TablePrint
       config = Config.singleton
       columns = TablePrint::ConfigResolver.new(config, @data.first, @options).columns
 
-      table = TablePrint::Table.new
-      table.config = config
-      table.columns = columns
+      config.formatter = MarkdownFormatter.new(config, columns)
 
       # copy data from original objects into the table
-      fingerprinter = Fingerprinter.new(table.columns)
-      group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
-      group_data.each do |data|
-        table.add_child(fingerprinter.lift(data))
-      end
+      fingerprinter = Fingerprinter.new(config, columns)
+
+      table = fingerprinter.lift(@data)
 
       # munge the tree of data we created, to condense the output
       table.collapse!
       return "No data." if table.columns.empty?
 
-      config.formatter = MarkdownFormatter.new(Config.singleton, table.columns)
 
       # turn everything into a string for output
       table.format

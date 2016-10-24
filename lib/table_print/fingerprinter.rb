@@ -1,9 +1,11 @@
 module TablePrint
   class Fingerprinter
 
-    attr_reader :columns
+    attr_accessor :columns, :config
 
-    def initialize(columns=nil)
+    def initialize(config, columns=nil)
+      @config = config
+
       if columns
         @columns ||= {}
         columns.each do |column|
@@ -15,8 +17,18 @@ module TablePrint
       end
     end
 
-    def lift(object)
-      RowGroup.new.add_children hash_to_rows("", @column_hash, object)
+    def lift(objects)
+      table = Table.new
+      table.config = config
+      table.columns = columns.values
+
+      group_data = (objects.first.is_a?(Hash) || objects.first.is_a?(Struct)) ? [objects] : objects
+      group_data.each do |data|
+        group = RowGroup.new.add_children hash_to_rows("", @column_hash, data)
+        table.add_child group
+      end
+
+      table
     end
 
     def hash_to_rows(prefix, hash, objects)
