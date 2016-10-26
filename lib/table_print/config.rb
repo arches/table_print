@@ -77,20 +77,25 @@ module TablePrint
       self
     end
 
-    def display(data, *column_options)
-      resolver = TablePrint::ConfigResolver.new(self, @data.first, @options)
+    def display(data, options={})
+      data = Array(data).compact
 
-      columns = resolver.columns
+      columns = TablePrint::ConfigResolver.new(self, data.first, options).columns
 
+      self.formatter = MarkdownFormatter.new(self, columns)
+
+
+      # copy data from original objects into the table
       fingerprinter = Fingerprinter.new(self, columns)
 
       table = fingerprinter.lift(data)
 
+      # munge the tree of data we created, to condense the output
       table.collapse!
 
-      io.puts table.format
+      return unless table.columns.any?
 
-      TablePrint::Returnable.new(message)
+      io.puts table.format
     end
 
     def self.singleton(name=:global)

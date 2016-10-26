@@ -31,7 +31,7 @@ module TablePrint
     end
 
     def format_table(header, rows)
-      [header, horizontal_separator].concat(rows).join("\n")
+      [header, horizontal_separator].concat(rows).join("\n") + "\n"
     end
 
     def format_header

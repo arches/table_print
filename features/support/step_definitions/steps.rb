@@ -96,6 +96,10 @@ end
 
 def tp(data, options={})
   @r, w = IO.pipe
-  w.puts TablePrint::Printer.table_print(data, options)
+
+  config = TablePrint::Config.singleton
+  config.io = w
+  config.display(data, options)
+
   w.close
 end

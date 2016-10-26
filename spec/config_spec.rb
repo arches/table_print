@@ -1,6 +1,61 @@
 require 'spec_helper'
 
 describe TablePrint::Config do
+  class TestIO
+    def puts(content)
+      @content = content
+    end
+
+    def read
+      @content
+    end
+
+    def clear
+      @content = nil
+    end
+  end
+
+  let(:config) { TablePrint::Config.singleton }
+  let(:io) { TestIO.new }
+
+  before(:each) do
+    config.io = io
+  end
+
+  after(:each) do
+    io.clear
+  end
+
+  context "display" do
+    it "writes formatted data to the io" do
+      config.display(OpenStruct.new(foo: "bar"), 'foo')
+
+      expect(io.read).to eq(<<OUTPUT)
+FOO
+---
+bar
+OUTPUT
+    end
+
+    context "empty data set" do
+      it "writes nothing" do
+        config.display([], 'foo')
+
+        expect(io.read).to be_nil
+      end
+    end
+
+    context "only association columns, no data" do
+      it "writes nothing" do
+        Sandbox.add_class("Blog")
+        Sandbox.add_attributes("Blog", :author)
+
+        config.display(Sandbox::Blog.new, 'author.name')
+
+        expect(io.read).to be_nil
+      end
+    end
+  end
 
   context "top-level singleton" do
     it "defaults max_width to 30" do
