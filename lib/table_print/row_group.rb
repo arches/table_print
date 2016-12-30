@@ -70,7 +70,11 @@ module TablePrint
     def header
       padded_names = columns.collect do |column|
         f = FixedWidthFormatter.new(column.width)
-        f.format(column.name)
+        if TablePrint::Config.use_i18n
+          f.format(column.translated_name || column.name)
+        else
+          f.format(column.name)
+        end
       end
 
       header_string = padded_names.join(" #{TablePrint::Config.separator} ")

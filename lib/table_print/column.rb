@@ -1,7 +1,7 @@
 module TablePrint
   class Column
     attr_reader :formatters
-    attr_accessor :name, :data, :time_format, :default_width, :min_width, :fixed_width
+    attr_accessor :name, :data, :time_format, :default_width, :min_width, :fixed_width, :translated_name
 
     def initialize(attr_hash={})
       @formatters = []
