@@ -87,7 +87,7 @@ When /table_print ([\w\.:]*)$/ do |klass|
 end
 
 Then /^the output should contain$/ do |string|
-  output = @r.lines.to_a
+  output = @r.each_line.to_a
 
   output.zip(string.split("\n")).each do |actual, expected|
     actual.gsub(/\s/m, "").split(//).sort.join.should == expected.gsub(" ", "").split(//).sort.join
