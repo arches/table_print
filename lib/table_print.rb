@@ -14,5 +14,5 @@ require 'table_print/returnable'
 
 def tp(data=Class, *options)
   TablePrint::Config.singleton.display(data, options) unless data.is_a? Class
-  TablePrint::Returnable.new("printed!") # we have to return *something*, might as well be execution time.
+  TablePrint::Returnable.new("printed!")
 end
