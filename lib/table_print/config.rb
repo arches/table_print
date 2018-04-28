@@ -3,7 +3,6 @@ module TablePrint
 
     ATTRIBUTES = [ 
       :capitalize_headers,
-      :colors,
       :fixed_width,
       :formatter,
       :formatters,
