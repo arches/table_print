@@ -16,22 +16,26 @@ module TablePrint
 
     attr_accessor *ATTRIBUTES
 
+    # todo: move these down into the formatters
     DEFAULT_MAX_WIDTH = 30
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     DEFAULT_IO = $stdout
     DEFAULT_CAPITALIZE_HEADERS = true
     DEFAULT_SEPARATOR = "|"
 
-    @@max_width = DEFAULT_MAX_WIDTH
-    @@time_format = DEFAULT_TIME_FORMAT
-    @@multibyte = false
-    @@io = DEFAULT_IO
-    @@capitalize_headers = true
-    @@separator = DEFAULT_SEPARATOR
+    def initialize(opts={})
+      self.io = DEFAULT_IO
+      self.max_width = DEFAULT_MAX_WIDTH
+      self.capitalize_headers = true
 
-    @@klasses = {}
+      self.klasses = {}
 
-    @@singleton = nil
+      opts.each do |k,v|
+        send("#{k}=", v)
+      end
+
+      self
+    end
 
     def ==(other)
       ATTRIBUTES.all? do |attr|
@@ -66,16 +70,6 @@ module TablePrint
       @io = io
     end
 
-    def initialize(opts={})
-      self.klasses = {}
-
-      opts.each do |k,v|
-        send("#{k}=", v)
-      end
-
-      self
-    end
-
     def display(data, options={})
       data = Array(data).compact
 
@@ -100,15 +94,7 @@ module TablePrint
     def self.singleton(name=:global)
       @@singleton ||= {}
 
-      @@singleton[name.to_sym] ||= Config.new({
-
-        capitalize_headers: true,
-        io: DEFAULT_IO,
-        max_width: DEFAULT_MAX_WIDTH,
-        multibyte: false,
-        separator: DEFAULT_SEPARATOR,
-        time_format: DEFAULT_TIME_FORMAT,
-      })
+      @@singleton[name.to_sym] ||= Config.new
     end
   end
 end
