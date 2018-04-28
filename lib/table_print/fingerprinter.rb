@@ -67,7 +67,7 @@ module TablePrint
         end
         column = @columns[display_method]
         cells[column.name] = cell_value
-        column.data << cell_value
+        column.data << cell_value # todo: why denormalize this here, before we're done? wouldn't it make more sense to get the values from the table?
       end
 
       row.set_cell_values(cells)
