@@ -9,7 +9,7 @@ describe Column do
     Column.new(
       :config => config,
       :name => :tagline,
-      :data => ["Once upon a time", "there was a dark and stormy night"],
+      :data => ["Once upon a time", "there was a dark and stormy night"]
     )
   }
 
