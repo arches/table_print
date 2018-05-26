@@ -91,10 +91,8 @@ module TablePrint
       io.puts table.format
     end
 
-    def self.singleton(name=:global)
-      @@singleton ||= {}
-
-      @@singleton[name.to_sym] ||= Config.new
+    def self.singleton
+      @@singleton ||= Config.new
     end
   end
 end
