@@ -73,7 +73,7 @@ module TablePrint
     def display(data, options={})
       data = Array(data).compact
 
-      columns = TablePrint::ConfigResolver.new(self, data.first, options).columns
+      columns = TablePrint::RuntimeConfigResolver.new(self, data.first, options).columns
 
       self.formatter = MarkdownFormatter.new(self, columns)
 

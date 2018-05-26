@@ -1,5 +1,5 @@
 require 'table_print/column'
-require 'table_print/config_resolver'
+require 'table_print/runtime_config_resolver'
 require 'table_print/config'
 require 'table_print/fingerprinter'
 require 'table_print/formatter'

@@ -1,5 +1,5 @@
 module TablePrint
-  class ConfigResolver
+  class RuntimeConfigResolver
 
     attr_accessor :base_config, :example, :options
 
