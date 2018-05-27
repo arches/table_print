@@ -53,7 +53,7 @@ describe Column do
   describe "#width" do
     context "when fixed width is specified" do
       it "uses the fixed width" do
-        config.fixed_width = 10
+        config.set(:fixed_width, 10)
 
         column.stub(:data_width => 15)
         column.stub(:max_width => 20)
@@ -67,7 +67,7 @@ describe Column do
 
     context "When fixed width is not specified" do
       it "uses the data width" do
-        config.fixed_width = nil
+        config.set(:fixed_width, nil)
 
         column.stub(:data_width => 10)
         column.stub(:max_width => 20)
@@ -75,7 +75,7 @@ describe Column do
       end
 
       it "is limited by the config width" do
-        config.fixed_width = nil
+        config.set(:fixed_width, nil)
 
         column.stub(:data_width => 30)
         column.stub(:max_width => 20)

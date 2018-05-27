@@ -40,20 +40,20 @@ module TablePrint
     def width
       return fixed_width if fixed_width
 
-      [max_width, data_width].min
+      [max_width, data_width].compact.min
     end
 
     private
     def max_width
-      config.max_width
+      config.for(:max_width)
     end
 
     def fixed_width
-      config.fixed_width
+      config.for(:fixed_width)
     end
 
     def multibyte_count
-      config.multibyte
+      config.for(:multibyte)
     rescue
       false
     end

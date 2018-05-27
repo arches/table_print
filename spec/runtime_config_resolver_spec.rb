@@ -181,7 +181,7 @@ describe RuntimeConfigResolver do
         columns = RuntimeConfigResolver.new(config, Object, [:title], :include => {:foo => {:fixed_width => 10}}).columns
 
         expect(columns.collect(&:name)).to eq(%w{title foo})
-        columns.last.config.fixed_width.should == 10
+        columns.last.config.for(:fixed_width).should == 10
       end
     end
   end
@@ -305,7 +305,7 @@ describe RuntimeConfigResolver do
 
         
         expect(columns.collect(&:name)).to eq(%w{title})
-        expect(columns.first.config.formatters).to eq([f1, f2])
+        expect(columns.first.config.for(:formatters)).to eq([f1, f2])
       end
     end
 

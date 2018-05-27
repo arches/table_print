@@ -2,6 +2,10 @@ require 'cat'
 require 'ostruct'
 require 'table_print'
 
+Before do
+  TablePrint::Config.refresh_singleton
+end
+
 Given /^a class named (.*)$/ do |klass|
   Sandbox.add_class(klass)
 end
@@ -59,15 +63,15 @@ When /^I instantiate a (.*) with (\{.*\}) and (add it|assign it) to (.*)$/ do |k
 end
 
 When /^I configure multibyte with (.*)$/ do |value|
-  TablePrint::Config.singleton.set(:multibyte, [value == "true"])
+  TablePrint::Config.singleton.set(:multibyte, value == "true")
 end
 
 When /^I configure capitalize_headers with (.*)$/ do |value|
-  TablePrint::Config.singleton.set(:capitalize_headers, [value == "true"])
+  TablePrint::Config.singleton.set(:capitalize_headers, value == "true")
 end
 
 When /^I configure separator with '(.*)'$/ do |value|
-  TablePrint::Config.singleton.set(:separator, [value])
+  TablePrint::Config.singleton.set(:separator, value)
 end
 
 When /^configure (.*) with (.*)$/ do |klass, config|
@@ -98,7 +102,7 @@ def tp(data, options={})
   @r, w = IO.pipe
 
   config = TablePrint::Config.singleton
-  config.io = w
+  config.set(:io, w)
   config.display(data, options)
 
   w.close

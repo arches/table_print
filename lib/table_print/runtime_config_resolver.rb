@@ -29,10 +29,55 @@ module TablePrint
 
     private
 
+    # Examples of options
+    #
+    # :title
+    # ["author.name"]
+    # ["foo"]
+    # [:foo, "bar"]
+    # [:foo]
+    # [[:author, :url]]
+    # [[:author, {:include=>:pub_date}]]
+    # [[:author]]
+    # [[:id, "comments.id", "comments.username"]]
+    # [[:pub_date, :length, {:except=>:length, :include=>:foobar}]]
+    # [[:pub_date, :length, {:except=>:length}]]
+    # [[:title, :author], [{:except=>:author}]]
+    # [[:title, :author], [{:include=>:author}]]
+    # [[:title, :comment], [{:include=>["comment.body", "comment.author"]}]]
+    # [[:title, :foo, :bar], {:except=>[:foo, "bar"]}]
+    # [[:title, :foo], {:except=>:foo}]
+    # [[:title], [{:include=>:author}]]
+    # [[:title], {:include=>:foo}]
+    # [[:title], {:include=>[:foo, :bar]}]
+    # [[:title], {:include=>{:foo=>{:fixed_width=>10}}}]
+    # [[:title], {:title=>{:display_method=>:boofar}}]
+    # [[:title], {:title=>{:fixed_width=>100}}]
+    # [[:title], {:title=>{:formatters=>[{}, {}]}}]
+    # [[:title]]
+    # [[], {:title=>{:display_name=>"Ti Tle"}}]
+    # [[{:include=>:size}]]
+    # [[{:include=>{:two=>#<Proc:0x007ff60b1db970@(eval):1 (lambda)>}}]]
+    # [[{:include=>{:two=>#<Proc:0x007ff60bb90560@(eval):1 (lambda)>}}]]
+    # []
+    # [{:author=>{:display_name=>"Wom Bat"}}]
+    # [{:except=>:title}]
+    # [{:foo=>#<Proc:0x007fd1b82cbe88@/Users/cdoyle/gems/table_print/spec/runtime_config_resolver_spec.rb:216 (lambda)>}]
+    # [{:foo=>{:display_method=>#<Proc:0x007fd1b82ebb98@/Users/cdoyle/gems/table_print/spec/runtime_config_resolver_spec.rb:207 (lambda)>}}]
+    # [{:include=>:author}]
+    # [{:include=>["blog.author", "blog.title"]}]
+    # [{:include=>{:author=>{:fixed_width=>15}}}]
+    # [{:include=>{:author=>{:fixed_width=>40}}}]
+    # [{:wombat=>#<Proc:0x007ff609bca230@(eval):1 (lambda)>}]
+    # [{:wombat=>{:display_method=>#<Proc:0x007ff609c61658@(eval):1 (lambda)>}}]
+    # [{:wombat=>{:display_method=>:author}}]
+    # [{}]
+    # nil
+    # {:include=>{:foobar=>#<Proc:0x007ff60a1b6e78@(eval):1 (lambda)>}}
     def process_option_set(options)
 
       options = [options].flatten
-      options.delete_if { |o| o == {} }
+      options.delete_if { |o| o == {} } # remove literally blank hashes from the input
 
       # process special symbols
 
@@ -58,23 +103,23 @@ module TablePrint
     end
 
     def get_and_remove(options_array, key)
-      except = options_array.select do |option|
+      hash_for_key = options_array.select do |option|
         option.is_a? Hash and option.keys.include? key
       end
 
-      return [] if except.empty?
-      except = except.first
+      return [] if hash_for_key.empty?
+      hash_for_key = hash_for_key.first
 
-      option_of_interest = except.fetch(key)
-      except.delete(key)
+      option_of_interest = hash_for_key.fetch(key)
+      hash_for_key.delete(key)
 
-      options_array.delete(except) if except.keys.empty?  # if we've taken all the info from this option, get rid of it
+      options_array.delete(hash_for_key) if hash_for_key.keys.empty?  # if we've taken all the info from this option, get rid of it
 
       option_of_interest
     end
 
     def option_to_column(option)
-      column_config = base_config.dup
+      column_config = TablePrint::Config.new
 
       if option.is_a? Hash
         name = option.keys.first
@@ -88,7 +133,7 @@ module TablePrint
       end
 
       if option.has_key? :fixed_width
-        column_config.fixed_width = option.delete(:fixed_width)
+        column_config.set(:fixed_width, option.delete(:fixed_width))
       end
 
       if option.has_key? :display_name
@@ -97,11 +142,11 @@ module TablePrint
       end
 
       if option.has_key? :formatters
-        column_config.formatters = option.delete(:formatters)
+        column_config.set(:formatters, option.delete(:formatters))
       end
 
       c = Column.new(option)
-      c.config = column_config
+      c.config = base_config.with(column_config)
       @column_hash[c.name] = c
       c
     end
@@ -140,7 +185,7 @@ module TablePrint
         method = target.method(method_name)
 
         if method.owner == target.class
-          if method.arity == 0 #
+          if method.arity == 0 # only take methods that don't require args
             methods << method_name.to_s
           end
         end

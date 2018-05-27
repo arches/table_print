@@ -14,10 +14,10 @@ module TablePrint
       cell_formatters = []
       #cell_formatters.concat(Array(column.formatters))
 
-      cell_formatters << TimeFormatter.new(column.config.time_format || config.time_format)
+      cell_formatters << TimeFormatter.new(column.config.for(:time_format))
       cell_formatters << NoNewlineFormatter.new
       fixed_width = FixedWidthFormatter.new(column.width)
-      fixed_width.multibyte = config.multibyte
+      fixed_width.multibyte = config.for(:multibyte)
       cell_formatters << fixed_width
 
       # successively apply the cell_formatters for a column
@@ -27,7 +27,7 @@ module TablePrint
     end
 
     def format_row(cells)
-      cells.join(" #{config.separator} ")
+      cells.join(" #{config.for(:separator)} ")
     end
 
     def format_table(header, rows)
@@ -40,8 +40,8 @@ module TablePrint
         f.format(column.name)
       end
 
-      header_string = padded_names.join(" #{config.separator} ")
-      header_string.upcase! if config.capitalize_headers
+      header_string = padded_names.join(" #{config.for(:separator)} ")
+      header_string.upcase! if config.for(:capitalize_headers)
 
       header_string
     end
@@ -49,7 +49,7 @@ module TablePrint
     def horizontal_separator
       columns.collect do |column|
         '-' * column.width
-      end.join("-#{config.separator}-")
+      end.join("-#{config.for(:separator)}-")
     end
   end
 end

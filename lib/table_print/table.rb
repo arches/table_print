@@ -47,7 +47,7 @@ module TablePrint
     private
 
     def formatter
-      config.formatter
+      config.for(:formatter)
     end
   end
 end

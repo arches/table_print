@@ -79,7 +79,7 @@ module TablePrint
     private
 
     def formatter
-      config.formatter
+      config.for(:formatter)
     end
 
     def can_absorb?(group)
