@@ -4,6 +4,4 @@ rvm:
   - 2.2.4
   - jruby-18mode
   - jruby-19mode
-  - rbx-2
-  - ree
 
