@@ -30,6 +30,12 @@ module TablePrint
       attributes.fetch(attr) {}
     end
 
+    # Merge another config into this one, returning a new instance.
+    # Values from the other config take precedence, clobbering
+    # values in this config.
+    #
+    # @param other [Config]
+    # @return [Config]
     def with(other)
       c = Config.new
 
