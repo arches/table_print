@@ -129,31 +129,26 @@ module TablePrint
     def option_to_column(option)
       column_config = TablePrint::Config.new
 
+      column_args = {}
+
       if option.is_a? Hash
         name = option.keys.first
         if option[name].is_a? Proc
-          option = {:name => name, :display_method => option[name]}
+          column_args = {:name => name, :display_method => option[name]}
         else
-          option = option[name].merge(:name => name)
+          column_args = {}
+          column_args[:name] = option[name][:display_name] || name
+          column_args[:display_method] = option[name][:display_method] || name
+
+          column_config = TablePrint::Config.new(option[name])
         end
+
       else
-        option = {:name => option}
+        column_args = {:name => option}
       end
 
-      if option.has_key? :fixed_width
-        column_config.set(:fixed_width, option.delete(:fixed_width))
-      end
 
-      if option.has_key? :display_name
-        option[:display_method] = option[:name]
-        option[:name] = option.delete(:display_name)
-      end
-
-      if option.has_key? :formatters
-        column_config.set(:formatters, option.delete(:formatters))
-      end
-
-      c = Column.new(option)
+      c = Column.new(column_args)
       c.config = @base_config.with(column_config)
       @column_hash[c.name] = c
       c
