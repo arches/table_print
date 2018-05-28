@@ -1,10 +1,20 @@
 module TablePrint
+
+  # The Config class is both simple and critical. It begins as
+  # essentially a lightweight wrapper for a hash, but includes
+  # some additional functionality that make it a flexible tool
+  # for manipulating tabular output.
+  #
   class Config
 
     attr_accessor :attributes
 
+    # @param attributes [Hash] "an optional hash of config key-values"
+    # @return [Config]
     def initialize(attributes={})
       self.attributes = attributes
+
+      self
     end
 
     def ==(other)

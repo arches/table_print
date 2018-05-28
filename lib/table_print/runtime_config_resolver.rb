@@ -1,7 +1,9 @@
 module TablePrint
+  # This class rationalizes command-line options passed to us during display.
+  # The goal of this class is straightforward: return configs for each column.
+  # However, to flexibly handle a wide variety of input phrasings, the implementation
+  # gets a little complicated.
   class RuntimeConfigResolver
-
-    attr_accessor :base_config, :example, :options
 
     def initialize(base_config, example, *options)
       @base_config = base_config
@@ -16,12 +18,18 @@ module TablePrint
     end
 
     def columns
-      default_column_names = default_display_methods(example)
+      # Start by generating the column set we'd use if no runtime config was given.
+      # This will be overwritten by more specific configs as we progress.
+      default_column_names = default_display_methods(@example)
       @default_columns = default_column_names.collect { |name| option_to_column(name) }
 
-      process_option_set(base_config.for(example.class))
-      process_option_set(options)
+      # Enhance the default config with previously-stored config for this object type, if available
+      process_option_set(@base_config.for(@example.class))
 
+      # Lastly, enhance again using the runtime config
+      process_option_set(@options)
+
+      # Fine-tuning to arrive at our final column set
       usable_column_names.collect do |name|
         @column_hash[name]
       end
@@ -146,15 +154,19 @@ module TablePrint
       end
 
       c = Column.new(option)
-      c.config = base_config.with(column_config)
+      c.config = @base_config.with(column_config)
       @column_hash[c.name] = c
       c
     end
 
     def usable_column_names
+      # Start by assuming we're going to print all the default columns
       base = @default_columns
+
+      # If runtime config gives an explicit column set, what you config is what you get
       base = @only_columns unless @only_columns.empty?
       
+      # Make any additions or subtractions based on the :include and :except options
       names = (Array(base).collect(&:name) + Array(@included_columns).collect(&:name) - Array(@excepted_columns).collect(&:to_s)).uniq
 
       names.reject{ |name| names.any?{ |other| other.start_with? name and other != name }}
