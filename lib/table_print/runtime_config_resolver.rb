@@ -23,8 +23,13 @@ module TablePrint
       default_column_names = default_display_methods(@example)
       @default_columns = default_column_names.collect { |name| option_to_column(name) }
 
-      # Enhance the default config with previously-stored config for this object type, if available
-      process_option_set(@base_config.for(@example.class))
+
+      # Enhance the default config with previously-stored config for this object 
+      # type, if available. Also, make sure we fully dupe the object we pass into
+      # process_option_set because it gets modified during the processing!
+      kc = @base_config.for(@example.class)
+      kc = kc.map{|h| h.dup} if kc.is_a? Array
+      process_option_set(kc)
 
       # Lastly, enhance again using the runtime config
       process_option_set(@options)
@@ -102,7 +107,8 @@ module TablePrint
         @column_hash[c.name] = c
       end
 
-      # excepted columns don't need column objects since we're just going to throw them out anyway
+      # excepted columns don't need column objects since we're just 
+      # going to throw them out anyway
       @excepted_columns.concat [get_and_remove(options, :except)].flatten
 
       # anything that isn't recognized as a special option is assumed to be a column name
@@ -119,9 +125,17 @@ module TablePrint
       hash_for_key = hash_for_key.first
 
       option_of_interest = hash_for_key.fetch(key)
+
+      # For future reference - this line was causing a subtle bug where
+      # klass configs were being modified during printing. The fix was
+      # to make sure we dupe the klass config before we start messing around
+      # with it. Sounds obvious in retrospect but took a lot of digging to
+      # figure out this was the culprit because this delete happens far away
+      # from where the dupe has to happen (the `column` method).
       hash_for_key.delete(key)
 
-      options_array.delete(hash_for_key) if hash_for_key.keys.empty?  # if we've taken all the info from this option, get rid of it
+      # if we've taken all the info from this option, get rid of it
+      options_array.delete(hash_for_key) if hash_for_key.keys.empty?
 
       option_of_interest
     end
@@ -146,7 +160,6 @@ module TablePrint
       else
         column_args = {:name => option}
       end
-
 
       c = Column.new(column_args)
       c.config = @base_config.with(column_config)

@@ -86,6 +86,26 @@ describe RuntimeConfigResolver do
 
       expect(columns.collect(&:name).sort).to eq(%w{name surname})
     end
+
+    it "doesn't delete klass config using :include options" do
+      Sandbox.add_class("Blog")
+      config.set(Sandbox::Blog, [{:include => [:title, :author]}])
+      expect(config.for(Sandbox::Blog)).to eq([{:include => [:title, :author]}])
+
+      RuntimeConfigResolver.new(config, Sandbox::Blog.new).columns
+
+      expect(config.for(Sandbox::Blog)).to eq([{:include => [:title, :author]}])
+    end
+
+    it "doesn't delete klass config using :except options" do
+      Sandbox.add_class("Blog")
+      config.set(Sandbox::Blog, [{:except => [:title, :author]}])
+      expect(config.for(Sandbox::Blog)).to eq([{:except => [:title, :author]}])
+
+      RuntimeConfigResolver.new(config, Sandbox::Blog.new).columns
+
+      expect(config.for(Sandbox::Blog)).to eq([{:except => [:title, :author]}])
+    end
     
     context 'when keys are symbols' do
       it "pulls the column names off the array of hashes" do
