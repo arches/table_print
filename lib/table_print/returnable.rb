@@ -24,6 +24,6 @@ module TablePrint
 
     def inspect
       to_s
-     end
+    end
   end
 end
