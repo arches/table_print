@@ -221,8 +221,8 @@ module TablePrint
       formatters << FixedWidthFormatter.new(column_for(column_name).width)
 
       # successively apply the formatters for a column
-      formatters.inject(value) do |value, formatter|
-        formatter.format(value)
+      formatters.inject(value) do |inner_value, formatter|
+        formatter.format(inner_value)
       end
     end
 
