@@ -51,7 +51,10 @@ module TablePrint
 
     def message
       return "Printed with config" if configged?
-      Time.now - @start_time
+      (Time.now - @start_time).to_s
+      # the message is used to initiate Returnable
+      # whose argument is regarded in ruby 2.7.1 as string
+      # (ruby 2.7.1 calls ".includes?" method on this argument)
     end
 
     private

@@ -25,8 +25,10 @@ describe TablePrint::Printer do
   end
 
   describe "message" do
-    it "defaults to the time the print took" do
-      Printer.new([]).message.should be_a Numeric
+    it "defaults to the time the print took, but in string" do
+      message = Printer.new([]).message
+      message.should be_a String
+      expect(message.to_f.to_s).to eq(message)
     end
 
     it "shows a warning if the printed objects have config" do
