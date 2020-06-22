@@ -90,4 +90,10 @@ describe Column do
       end
     end
   end
+
+  describe "#escape_strip" do
+    it "should strip shell escape characters" do
+      c.send(:escape_strip, "\e[0;32;49mGREEN\e[0m").should == "GREEN"
+    end
+  end
 end

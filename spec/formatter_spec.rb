@@ -60,5 +60,19 @@ describe TablePrint::FixedWidthFormatter do
     it "turns objects into strings before trying to format them" do
       @f.format(123).should == "123       "
     end
+
+    it "ignores shell escape characters" do
+      @f.format("\e[0;32;49mGREEN\e[0m").should == "\e[0;32;49mGREEN\e[0m     "
+    end
+  end
+
+  describe "#escape_strip" do
+    it "should strip shell escape characters" do
+      @f.send(:escape_strip, "\e[0;32;49mGREEN\e[0m").should == "GREEN"
+    end
+
+    it "return stripped characters if requested" do
+      @f.send(:escape_strip, "\e[0;32;49mGREEN\e[0m", true).should == ["GREEN", "\e[0;32;49m\e[0m"]
+    end
   end
 end
