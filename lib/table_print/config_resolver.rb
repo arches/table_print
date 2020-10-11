@@ -3,7 +3,13 @@ module TablePrint
     def initialize(klass, default_column_names, *options)
       @column_hash = {}
 
-      @default_columns = default_column_names.collect { |name| option_to_column(name) }
+      if default_column_names.is_a? Hash
+        @translated_names = default_column_names
+        @default_columns = default_column_names.keys.collect { |name| option_to_column(name) }
+      else
+        @translated_names = {}
+        @default_columns = default_column_names.collect { |name| option_to_column(name) }
+      end
 
       @included_columns = []
       @excepted_columns = []
@@ -77,6 +83,8 @@ module TablePrint
         option[:display_method] = option[:name]
         option[:name] = option.delete(:display_name)
       end
+
+      option[:translated_name] = @translated_names[option[:name]]
 
       c = Column.new(option)
       @column_hash[c.name] = c

@@ -13,6 +13,7 @@ module TablePrint
     @@io = DEFAULT_IO
     @@capitalize_headers = true
     @@separator = DEFAULT_SEPARATOR
+    @@use_i18n = false
 
     @@klasses = {}
 
@@ -84,6 +85,14 @@ module TablePrint
     def self.io=(io)
       raise StandardError.new("IO object must respond to :puts") unless io.respond_to? :puts
       @@io = io
+    end
+
+    def self.use_i18n
+      @@use_i18n
+    end
+
+    def self.use_i18n=(use_i18n)
+      @@use_i18n = use_i18n
     end
   end
 end

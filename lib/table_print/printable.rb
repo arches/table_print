@@ -6,7 +6,12 @@ module TablePrint
         if target.class.columns.first.respond_to? :name
 
           # eg ActiveRecord
-          return target.class.columns.collect(&:name)
+          names = target.class.columns.collect(&:name)
+          return names unless target.class.respond_to?(:human_attribute_name)
+          return names.inject({}) do |h, n|
+            h[n] = target.class.human_attribute_name(n)
+            h
+          end
         else
 
           # eg Sequel
