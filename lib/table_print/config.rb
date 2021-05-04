@@ -25,7 +25,14 @@ module TablePrint
     end
 
     def self.for(klass)
-      @@klasses.fetch(klass) {}
+      config = @@klasses.fetch(klass) {}
+      if config.is_a?(Array)
+        config.map { |c| c.is_a?(Hash) ? c.dup : c }
+      elsif config.is_a?(Hash)
+        config.dup
+      else
+        config    
+      end
     end
 
     def self.clear(klass)
