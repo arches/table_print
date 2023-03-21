@@ -11,7 +11,7 @@ describe TablePrint::Printable do
       Sandbox.add_attributes("Hat", "brand")
 
       p = Sandbox::Hat.new
-      TablePrint::Printable.default_display_methods(p).should == %W(brand)
+      expect(TablePrint::Printable.default_display_methods(p)).to eq %W(brand)
     end
 
     it "ignores dangerous methods" do
@@ -19,7 +19,7 @@ describe TablePrint::Printable do
       Sandbox.add_method("Hat", "brand!") {}
 
       p = Sandbox::Hat.new
-      TablePrint::Printable.default_display_methods(p).should == []
+      expect(TablePrint::Printable.default_display_methods(p)).to eq []
     end
 
     it "ignores methods defined in a superclass" do
@@ -28,7 +28,7 @@ describe TablePrint::Printable do
       Sandbox.add_attributes("Hat::Bowler", "brim_width")
 
       p = Sandbox::Hat::Bowler.new
-      TablePrint::Printable.default_display_methods(p).should == %W(brim_width)
+      expect(TablePrint::Printable.default_display_methods(p)).to eq %W(brim_width)
     end
 
     it "ignores methods that require arguments" do
@@ -37,11 +37,11 @@ describe TablePrint::Printable do
       Sandbox.add_method("Hat", "tip?") { |person| person.rapscallion? }
 
       p = Sandbox::Hat.new
-      TablePrint::Printable.default_display_methods(p).should == %W(brand)
+      expect(TablePrint::Printable.default_display_methods(p)).to eq %W(brand)
     end
 
     it "ignores methods from an included module" do
-      pending "waiting for Cat to support module manipulation"
+      skip "waiting for Cat to support module manipulation"
     end
 
     it "uses column information when available (eg, from ActiveRecord objects)"
@@ -51,7 +51,7 @@ describe TablePrint::Printable do
       obj = test_struct.new
       obj.foo = 1
       obj.bar = 2
-      TablePrint::Printable.default_display_methods(obj).should == [:foo, :bar]
+      expect(TablePrint::Printable.default_display_methods(obj)).to eq [:foo, :bar]
     end
       
       
