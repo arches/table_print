@@ -10,19 +10,19 @@ describe RowRecursion do
     it "assigns the column object to the column name" do
       column = Column.new(:name => "foobar")
       parent.set_column(column)
-      parent.column_for(:foobar).should == column
+      expect(parent.column_for(:foobar)).to eq column
     end
   end
 
   describe "#add_child" do
     it "adds the child to my children" do
       parent.add_child(child)
-      parent.child_count.should == 1
+      expect(parent.child_count).to eq 1
     end
 
     it "sets me as my child's parent" do
       parent.add_child(child)
-      child.parent.should == parent
+      expect(child.parent).to eq parent
     end
   end
 
@@ -31,13 +31,13 @@ describe RowRecursion do
 
     it "adds all the children to myself" do
       parent.add_children([child, child2])
-      parent.child_count.should == 2
+      expect(parent.child_count).to eq 2
     end
 
     it "sets me as their parent" do
       parent.add_children([child, child2])
-      child.parent.should == parent
-      child2.parent.should == parent
+      expect(child.parent).to eq parent
+      expect(child2.parent).to eq parent
     end
   end
 
@@ -46,17 +46,17 @@ describe RowRecursion do
       child.set_cell_values(:title => 'foobar')
       parent.add_child(child)
 
-      parent.columns.length.should == 1
-      parent.columns.first.name.should == 'title'
-      parent.columns.first.data.should == ['foobar']
+      expect(parent.columns.length).to eq 1
+      expect(parent.columns.first.name).to eq 'title'
+      expect(parent.columns.first.data).to eq ['foobar']
     end
 
     it "gets the columns from the root node" do
       parent.add_child(child)
       child.set_cell_values(:title => 'foobar')
 
-      parent.columns.length.should == 1
-      child.columns.should == parent.columns
+      expect(parent.columns.length).to eq 1
+      expect(child.columns).to eq parent.columns
     end
   end
 
@@ -65,7 +65,7 @@ describe RowRecursion do
       parent.add_child(child)
       child.set_cell_values(:title => 'foobar')
       column = parent.columns.first
-      parent.column_for(:title).should == column
+      expect(parent.column_for(:title)).to eq column
     end
   end
 
@@ -76,7 +76,7 @@ describe RowRecursion do
       column = parent.columns.first
       parent.add_formatter(:title, {})
 
-      column.formatters.should == [{}]
+      expect(column.formatters).to eq [{}]
     end
   end
 
@@ -88,7 +88,7 @@ describe RowRecursion do
       r1.set_cell_values(:title => 'foobar')
       r2.set_cell_values(:subtitle => 'elemental')
 
-      parent.width.should == 18
+      expect(parent.width).to eq 18
     end
   end
 
@@ -99,13 +99,13 @@ describe RowRecursion do
 
       r1.set_cell_values(:title => 'a' * 5, :description => 'b' * 3, :category => 'c' * 10)
       r2.set_cell_values(:title => 'a' * 6, :description => 'b' * 4, :category => 'c' * 9)
-      parent.header.size.should == parent.horizontal_separator.size
+      expect(parent.header.size).to eq parent.horizontal_separator.size
       compare_rows(parent.horizontal_separator, '-' * 6 + '-|-' + '-' * 'description'.size + '-|-' + '-' * 10)
     end
 
     it "matches the header width" do
       child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
-      child.horizontal_separator.should == '------------------------------' # 30 hyphens
+      expect(child.horizontal_separator).to eq '------------------------------' # 30 hyphens
     end
   end
 
@@ -123,15 +123,15 @@ describe TablePrint::RowGroup do
       group = RowGroup.new
       group.add_child(Row.new.set_cell_values(:title => 'foo'))
       group.add_child(Row.new.set_cell_values(:title => 'bar'))
-      group.raw_column_data(:title).should == ['foo', 'bar']
+      expect(group.raw_column_data(:title)).to eq ['foo', 'bar']
     end
   end
 end
 
 def compare_rows(actual_rows, expected_rows)
-  actual_rows.split("\n").length.should == expected_rows.split("\n").length
+  expect(actual_rows.split("\n").length).to eq expected_rows.split("\n").length
   actual_rows.split("\n").zip(expected_rows.split("\n")).each do |actual, expected|
-    actual.split(//).sort.join.should == expected.split(//).sort.join
+    expect(actual.split(//).sort.join).to eq expected.split(//).sort.join
   end
 end
 
@@ -160,16 +160,16 @@ describe TablePrint::Row do
       f1 = Sandbox::DoubleFormatter.new
       f2 = Sandbox::ChopFormatter.new
 
-      row.stub(:column_for) {OpenStruct.new(:width => 11, :formatters => [f1, f2])}
+      allow(row).to receive(:column_for).and_return(OpenStruct.new(:width => 11, :formatters => [f1, f2]))
 
-      row.apply_formatters(:title, "foobar").should == "foobarfooba"
+      expect(row.apply_formatters(:title, "foobar")).to eq "foobarfooba"
     end
 
     it "uses the config'd time_format to format times" do
-      row.stub(:column_for) {OpenStruct.new(:width => 20, :formatters => [], :time_format => "%Y %m %d")}
+      allow(row).to receive(:column_for).and_return(OpenStruct.new(:width => 20, :formatters => [], :time_format => "%Y %m %d"))
 
       time_formatter = TablePrint::TimeFormatter.new
-      TablePrint::TimeFormatter.should_receive(:new).with("%Y %m %d") {time_formatter}
+      expect(TablePrint::TimeFormatter).to receive(:new).with("%Y %m %d") {time_formatter}
       row.apply_formatters(:title, Time.local(2012, 6, 1, 14, 20, 20))
     end
   end
@@ -184,7 +184,7 @@ describe TablePrint::Row do
       end
       row.add_child(group)
 
-      row.raw_column_data('title').should == ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
+      expect(row.raw_column_data('title')).to eq ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
     end
   end
 
@@ -206,11 +206,11 @@ describe TablePrint::Row do
       end
 
       it "pulls the cells up into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar"})
       end
 
       it "dereferences the now-defunct group" do
-        @row.children.length.should == 0
+        expect(@row.children.length).to eq 0
       end
     end
 
@@ -233,13 +233,13 @@ describe TablePrint::Row do
       end
 
       it "pulls the cells from the first row up into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar"})
       end
 
       it "deletes the absorbed row but leaves the second row in the group" do
-        @row.children.length.should == 1
-        @row.children.first.children.length.should == 1
-        @row.children.first.children.first.cells.should == {"bar" => "baz"}
+        expect(@row.children.length).to eq 1
+        expect(@row.children.first.children.length).to eq 1
+        expect(@row.children.first.children.first.cells).to eq({"bar" => "baz"})
       end
     end
 
@@ -264,11 +264,11 @@ describe TablePrint::Row do
       end
 
       it "pulls the cells from both groups into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar", "baz" => "baz"})
       end
 
       it "dereferences both now-defunct groups" do
-        @row.children.length.should == 0
+        expect(@row.children.length).to eq 0
       end
     end
 
@@ -290,11 +290,11 @@ describe TablePrint::Row do
       end
 
       it "pulls the cells from both groups into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar"})
       end
 
       it "dereferences both now-defunct groups" do
-        @row.children.length.should == 0
+        expect(@row.children.length).to eq 0
       end
     end
 
@@ -322,13 +322,13 @@ describe TablePrint::Row do
       end
 
       it "pulls the single row and the first row from the double into itself" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar", "baz" => "baz"})
       end
 
       it "keeps the second row from the second group in its own group" do
-        @row.children.length.should == 1
-        @row.children.first.children.length.should == 1
-        @row.children.first.children.first.cells.should == {"baz" => "bazaar"}
+        expect(@row.children.length).to eq 1
+        expect(@row.children.first.children.length).to eq 1
+        expect(@row.children.first.children.first.cells).to eq({"baz" => "bazaar"})
       end
     end
 
@@ -354,11 +354,11 @@ describe TablePrint::Row do
       end
 
       it "pulls the cells from both groups into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar", "baz" => "baz"})
       end
 
       it "dereferences both now-defunct groups" do
-        @row.children.length.should == 0
+        expect(@row.children.length).to eq 0
       end
     end
 
@@ -387,13 +387,13 @@ describe TablePrint::Row do
       end
 
       it "pulls the first row from each group up into itself" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar", "baz" => "baz"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar", "baz" => "baz"})
       end
 
       it "deletes only the intermediary group" do
-        @row.children.length.should == 1
-        @row.children.first.children.length.should == 1
-        @row.children.first.children.first.cells.should == {"baz" => "bazaar"}
+        expect(@row.children.length).to eq 1
+        expect(@row.children.first.children.length).to eq 1
+        expect(@row.children.first.children.first.cells).to eq({"baz" => "bazaar"})
       end
     end
 
@@ -425,19 +425,19 @@ describe TablePrint::Row do
       end
 
       it "pulls the first row from the first group into the parent" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar"})
       end
 
       it "leaves the second row in the first group" do
-        @row.children.length.should == 2
-        @row.children.first.children.length.should == 1
-        @row.children.first.children.first.cells.should == {"bar" => "bar2"}
+        expect(@row.children.length).to eq 2
+        expect(@row.children.first.children.length).to eq 1
+        expect(@row.children.first.children.first.cells).to eq({"bar" => "bar2"})
       end
 
       it "leaves the second group alone" do
-        @row.children.last.children.length.should == 2
-        @row.children.last.children.first.cells.should == {"baz" => "bazaar"}
-        @row.children.last.children.last.cells.should == {"baz" => "bazaar2"}
+        expect(@row.children.last.children.length).to eq 2
+        expect(@row.children.last.children.first.cells).to eq({"baz" => "bazaar"})
+        expect(@row.children.last.children.last.cells).to eq({"baz" => "bazaar2"})
       end
     end
 
@@ -478,16 +478,16 @@ describe TablePrint::Row do
       end
 
       it "pulls the first row from the first child into itself" do
-        @row.cells.should == {"foo" => "foo", "bar" => "bar", "barry" => "bare"}
+        expect(@row.cells).to eq({"foo" => "foo", "bar" => "bar", "barry" => "bare"})
       end
 
       it "leaves the second row from the first child in the first group" do
-        @row.children.first.children.first.cells.should == {"barry" => "bart"}
+        expect(@row.children.first.children.first.cells).to eq({"barry" => "bart"})
       end
 
       it "collapses the second group" do
-        @row.children.last.children.first.cells.should == {"bar" => "baz", "barry" => "bazaar"}
-        @row.children.last.children.first.children.first.children.first.cells.should == {"barry" => "bizarre"}
+        expect(@row.children.last.children.first.cells).to eq ({"bar" => "baz", "barry" => "bazaar"})
+        expect(@row.children.last.children.first.children.first.children.first.cells).to eq({"barry" => "bizarre"})
       end
     end
   end

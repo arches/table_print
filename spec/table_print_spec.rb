@@ -11,7 +11,7 @@ describe TablePrint::Printer do
   describe "printing an empty array" do
     it "returns the string 'no data'" do
       p = Printer.new([])
-      p.table_print.should == 'No data.'
+      expect(p.table_print).to eq 'No data.'
     end
   end
 
@@ -20,14 +20,14 @@ describe TablePrint::Printer do
       Sandbox.add_class("Blog")
       Sandbox.add_attributes("Blog", :author)
       p = Printer.new(Sandbox::Blog.new, "author.name")
-      p.table_print.should == 'No data.'
+      expect(p.table_print).to eq 'No data.'
     end
   end
 
   describe "message" do
     it "defaults to the time the print took, but in string" do
       message = Printer.new([]).message
-      message.should be_a String
+      expect(message).to be_a String
       expect(message.to_f.to_s).to eq(message)
     end
 
@@ -36,7 +36,7 @@ describe TablePrint::Printer do
 
       tp.set Sandbox::User, :id, :email
       p = Printer.new(Sandbox::User.new)
-      p.message.should == "Printed with config"
+      expect(p.message).to eq "Printed with config"
     end
   end
 
@@ -48,8 +48,8 @@ describe TablePrint::Printer do
 
       p = Printer.new(Sandbox::Post.new)
       cols = p.send(:columns)
-      cols.length.should == 1
-      cols.first.name.should == 'title'
+      expect(cols.length).to eq 1
+      expect(cols.first.name).to eq 'title'
     end
 
     it 'pull the column names off of the array of Structs' do
@@ -57,8 +57,8 @@ describe TablePrint::Printer do
       data = [struct.new("User 1", "Familyname 1"), struct.new("User 2", "Familyname 2")]
       p = Printer.new(data)
       cols = p.send(:columns)
-      cols.length.should == 2
-      cols.collect(&:name).sort.should == ['name', 'surname']
+      expect(cols.length).to eq 2
+      expect(cols.collect(&:name).sort).to eq ['name', 'surname']
     end
     
     context 'when keys are symbols' do
@@ -71,8 +71,8 @@ describe TablePrint::Printer do
 
         p = Printer.new(data)
         cols = p.send(:columns)
-        cols.length.should == 2
-        cols.collect(&:name).sort.should == ['name', 'surname']
+        expect(cols.length).to eq 2
+        expect(cols.collect(&:name).sort).to eq ['name', 'surname']
       end
     end
 
@@ -86,8 +86,8 @@ describe TablePrint::Printer do
 
         p = Printer.new(data)
         cols = p.send(:columns)
-        cols.length.should == 2
-        cols.collect(&:name).sort.should == ['name', 'surname']
+        expect(cols.length).to eq 2
+        expect(cols.collect(&:name).sort).to eq ['name', 'surname']
       end
     end
 
@@ -97,8 +97,8 @@ describe TablePrint::Printer do
 
       p = Printer.new(Sandbox::Post.new, :except => :title)
       cols = p.send(:columns)
-      cols.length.should == 1
-      cols.first.name.should == 'author'
+      expect(cols.length).to eq 1
+      expect(cols.first.name).to eq 'author'
     end
 
     it "adds included columns" do
@@ -107,9 +107,9 @@ describe TablePrint::Printer do
 
       p = Printer.new(Sandbox::Post.new, :include => :author)
       cols = p.send(:columns)
-      cols.length.should == 2
-      cols.first.name.should == 'title'
-      cols.last.name.should == 'author'
+      expect(cols.length).to eq 2
+      expect(cols.first.name).to eq 'title'
+      expect(cols.last.name).to eq 'author'
     end
   end
 end

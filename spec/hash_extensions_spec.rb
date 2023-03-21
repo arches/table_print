@@ -5,7 +5,7 @@ describe "#constructive_merge" do
     x = {'reviews' => {'user' => {}}}
     y = {'reviews' => {'ratings' => {}}}
     x.extend TablePrint::HashExtensions::ConstructiveMerge
-    x.constructive_merge(y).should == {'reviews' => {'user' => {}, 'ratings' => {}}}
+    expect(x.constructive_merge(y)).to eq({'reviews' => {'user' => {}, 'ratings' => {}}})
   end
 end
 
@@ -15,6 +15,6 @@ describe "#constructive_merge!" do
     y = {'reviews' => {'ratings' => {}}}
     x.extend TablePrint::HashExtensions::ConstructiveMerge
     x.constructive_merge!(y)
-    x.should == {'reviews' => {'user' => {}, 'ratings' => {}}}
+    expect(x).to eq({'reviews' => {'user' => {}, 'ratings' => {}}})
   end
 end
