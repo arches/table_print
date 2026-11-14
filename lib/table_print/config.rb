@@ -6,12 +6,13 @@ module TablePrint
     DEFAULT_IO = $stdout
     DEFAULT_CAPITALIZE_HEADERS = true
     DEFAULT_SEPARATOR = "|"
+    DEFAULT_MULTIBYTE = false
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
-    @@multibyte = false
+    @@multibyte = DEFAULT_MULTIBYTE
     @@io = DEFAULT_IO
-    @@capitalize_headers = true
+    @@capitalize_headers = DEFAULT_CAPITALIZE_HEADERS
     @@separator = DEFAULT_SEPARATOR
 
     @@klasses = {}

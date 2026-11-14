@@ -9,6 +9,10 @@ describe TablePrint::Config do
     expect(TablePrint::Config.time_format).to eq "%Y-%m-%d %H:%M:%S"
   end
 
+  it "defaults multibyte to false" do
+    expect(TablePrint::Config.multibyte).to eq false
+  end
+
   describe "individual config options" do
     describe "storing and retrieving" do
       it "sets the variable" do
@@ -23,6 +27,12 @@ describe TablePrint::Config do
         TablePrint::Config.set(:max_width, [10])
         TablePrint::Config.clear(:max_width)
         expect(TablePrint::Config.max_width).to eq 30
+      end
+
+      it "resets multibyte" do
+        TablePrint::Config.set(:multibyte, [true])
+        TablePrint::Config.clear(:multibyte)
+        expect(TablePrint::Config.multibyte).to eq false
       end
     end
   end
