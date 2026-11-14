@@ -17,7 +17,8 @@ module TablePrint
     end
 
     def initialize(data, options={})
-      @data = Array(data).compact
+      # a single hash is one row, not a list of [key, value] pairs
+      @data = data.is_a?(Hash) ? [data] : Array(data).compact
       @options = options
       @columns = nil
       @start_time = Time.now

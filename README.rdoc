@@ -52,7 +52,22 @@ on your model. Use symbols or strings to reference the columns.
   tp User.limit(30), :address, 'city', 'state', :zip
 
 If you're not using ActiveRecord, the TablePrint default is to show all the methods defined directly on your object (nothing
-from superclasses/mixins).
+from superclasses/mixins). If the objects are strings, symbols, numbers, or arrays, each one is shown in a single VALUE
+column instead:
+
+  > tp ["alice", "bob"]
+  VALUE
+  -----
+  alice
+  bob
+
+Hashes use their keys as columns. An array of hashes prints one row per hash, and a single hash prints as one row:
+
+  > settings = {host: "db.internal", user: "app"}
+  > tp settings
+  HOST        | USER
+  ------------|-----
+  db.internal | app
 
 You can reference nested objects with the method chain required to reach them. Say you had some users who wrote books, and those
 books had photos.

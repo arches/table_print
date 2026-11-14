@@ -15,6 +15,27 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "printing strings" do
+    it "prints the strings without modifying them" do
+      data = ["hello".dup, "world".dup]
+      expect(Printer.new(data).table_print).to eq "VALUE\n-----\nhello\nworld"
+      expect(data).to eq ["hello", "world"]
+    end
+
+    it "prints strings nested in arrays without modifying them" do
+      data = [["hello".dup, "world".dup]]
+      expect(Printer.new(data).table_print).to eq "VALUE\n-----\nhello\nworld"
+      expect(data).to eq [["hello", "world"]]
+    end
+  end
+
+  describe "printing a hash" do
+    it "prints the hash as one row with its keys as columns" do
+      data = {"host" => "db.internal", "user" => "app"}
+      expect(Printer.new(data).table_print).to eq "HOST        | USER\n------------|-----\ndb.internal | app "
+    end
+  end
+
   describe "printing an object where there are only association columns with no data" do
     it "returns the string 'no data'" do
       Sandbox.add_class("Blog")

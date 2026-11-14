@@ -20,6 +20,14 @@ module TablePrint
       return target.keys if target.is_a? Hash
       return target.members.collect(&:to_sym) if target.is_a? Struct
 
+      case target
+      when String, Symbol, Numeric, Array
+        # Show these as-is in a single VALUE column before hittint the loop below. Which call
+        # their methods instead, including String#clear, which empties the string.
+        # Arrays included for rows from CSV.read or .pluck, which hold strings.
+        return [{"value" => lambda { |value| value }}]
+      end
+
       methods = []
       target.methods.each do |method_name|
         method = target.method(method_name)
