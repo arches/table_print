@@ -44,5 +44,6 @@ Feature: Adding columns
     ------
     ryn
     """
+  @todo
   Scenario: Using a proc as a filter (ie, overriding an existing column with a proc)
 

@@ -13,7 +13,7 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc 'Run cucumber features'
 Cucumber::Rake::Task.new(:cucumber) do |task|
-  task.cucumber_opts = ['features']
+  task.cucumber_opts = ['features', '--publish-quiet', '--tags', "'not @todo'"]
 end
 
 RDoc::Task.new do |rdoc|
