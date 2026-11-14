@@ -9,8 +9,8 @@ Feature: Sensible defaults
 
   Scenario: A simple object
     Given a class named Foo
-    Given Foo has attributes herp
-    Given Foo has a method named derp with lambda{"hurrrrr"}
+    Given Foo has attributes mood
+    Given Foo has a method named rallying_cry with lambda{"tally ho!"}
 
     Given a class named Foo::Blog
     Given Foo::Blog has attributes title, author
