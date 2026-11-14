@@ -1,10 +1,16 @@
 require 'cat'
-gem 'rspec'
 require 'table_print'
 require 'ostruct'
 
-RSpec.configure do |c|
-  c.filter_run :focus => true
-  c.run_all_when_everything_filtered = true
-end
+RSpec.configure do |config|
+  config.filter_run_when_matching :focus
 
+  config.expect_with :rspec do |expectations|
+    expectations.syntax = :expect
+  end
+
+  config.mock_with :rspec do |mocks|
+    mocks.syntax = :expect
+    mocks.verify_partial_doubles = true
+  end
+end
