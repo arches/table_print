@@ -1,6 +1,6 @@
 = table_print
 
-{<img src="https://travis-ci.org/arches/table_print.svg?branch=master" />}[http://travis-ci.org/arches/table_print]
+{<img src="https://github.com/arches/table_print/actions/workflows/ci.yml/badge.svg" />}[https://github.com/arches/table_print/actions/workflows/ci.yml]
 {<img src="https://codeclimate.com/github/arches/table_print.png" />}[https://codeclimate.com/github/arches/table_print]
 
 TablePrint shows objects in nicely formatted columns for easy reading. It even lets you nest other tables

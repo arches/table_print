@@ -4,28 +4,30 @@ on: [push, pull_request]
 
 jobs:
   test:
+    name: Ruby ${{ matrix.ruby-version }}
     runs-on: ubuntu-latest
+
+    # Ruby 4.1 is still a preview, so let it report without failing the build.
+    continue-on-error: ${{ matrix.ruby-version == 'head' }}
 
     strategy:
       fail-fast: false
       matrix:
+        # Every branch in normal or security maintenance, plus the next preview.
+        # https://www.ruby-lang.org/en/downloads/branches/
         ruby-version:
-          - head
-          - '3.2'
-          - '3.1'
-          - '3.0'
-          - '2.7'
-          - '2.6'
-          - '2.5'
-          - jruby
-          - jruby-9.3
-          - jruby-9.2
+          - "3.3" # security maintenance until 2027-03
+          - "3.4" # normal maintenance
+          - "4.0" # current
+          - head # 4.1-preview
+          - jruby # latest 10.x
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Ruby ${{ matrix.ruby-version }}
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true # 'bundle install' and cache
-    - name: Run tests
-      run: bundle exec rake
+      - uses: actions/checkout@v5
+      - name: Set up Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # 'bundle install' and cache
+      - name: Run tests
+        run: bundle exec rake

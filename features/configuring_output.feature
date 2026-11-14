@@ -1,4 +1,5 @@
 Feature: Configuring output
+  @todo
   Scenario: Setting a (max? or specific?) width for all columns
   Scenario: Setting a specific width for an individual column
     Given a class named Blog
@@ -84,6 +85,7 @@ Feature: Configuring output
     ------|--------|-------
     post! | Ryan   | post!
     """
+  @todo
   Scenario: Applying a formatter
   Scenario: Setting a column name
     Given a class named Blog
