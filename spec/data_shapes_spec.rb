@@ -7,17 +7,30 @@ require 'spec_helper'
 # The last group pins types that print badly today, so that fixing one fails
 # here loudly instead of changing behaviour nobody notices.
 describe "printing" do
-  # Every cell is padded, and trailing spaces are invisible in a heredoc, so
-  # compare the tables without them.
   def printed(data, *options)
-    TablePrint::Printer.new(data, options).table_print.to_s.lines.collect { |line| line.rstrip + "\n" }.join
+    TablePrint::Printer.new(data, options).table_print.to_s
+  end
+
+  # Cells are padded, so a table's lines carry trailing spaces - invisible in a
+  # heredoc, stripped by most editors on save, and present if you paste real
+  # output. Compare line by line without them, on both sides.
+  RSpec::Matchers.define :print_as do |expected|
+    def lines(table)
+      table.to_s.lines.collect(&:rstrip)
+    end
+
+    match { |actual| lines(actual) == lines(expected) }
+
+    failure_message do |actual|
+      "expected:\n#{expected}\n     got:\n#{actual}"
+    end
   end
 
   # The first row is taken as representative of the whole set, whatever the data
   # is. Every other group below inherits this rule.
   describe "choosing columns" do
     it "takes them from the first row" do
-      expect(printed([{ a: 1 }, { b: 2 }])).to eq <<~TABLE
+      expect(printed([{ a: 1 }, { b: 2 }])).to print_as <<~TABLE
         A
         --------------
         1
@@ -26,7 +39,7 @@ describe "printing" do
     end
 
     it "shows nothing for cells past the first row's width" do
-      expect(printed([%w[a b], %w[c], %w[d e f]])).to eq <<~TABLE
+      expect(printed([%w[a b], %w[c], %w[d e f]])).to print_as <<~TABLE
         0 | 1
         --|---------------
         a | b
@@ -40,7 +53,7 @@ describe "printing" do
     it "puts strings in a single VALUE column, untouched" do
       data = ["hello".dup, "world".dup]
 
-      expect(printed(data)).to eq <<~TABLE
+      expect(printed(data)).to print_as <<~TABLE
         VALUE
         -----
         hello
@@ -51,7 +64,7 @@ describe "printing" do
     end
 
     it "treats symbols and numbers the same way" do
-      expect(printed([:sym, 42, 3.14])).to eq <<~TABLE
+      expect(printed([:sym, 42, 3.14])).to print_as <<~TABLE
         VALUE
         -----
         sym
@@ -61,7 +74,7 @@ describe "printing" do
     end
 
     it "treats booleans the same way" do
-      expect(printed([true, false])).to eq <<~TABLE
+      expect(printed([true, false])).to print_as <<~TABLE
         VALUE
         -----
         true
@@ -72,7 +85,7 @@ describe "printing" do
 
   describe "hashes" do
     it "prints one bare hash as a single row" do
-      expect(printed("host" => "db.internal", "user" => "app")).to eq <<~TABLE
+      expect(printed("host" => "db.internal", "user" => "app")).to print_as <<~TABLE
         HOST        | USER
         ------------|-----
         db.internal | app
@@ -80,7 +93,7 @@ describe "printing" do
     end
 
     it "uses the keys as columns, blank for a nil" do
-      expect(printed([{ a: 1, b: "two" }, { a: 3, b: nil }])).to eq <<~TABLE
+      expect(printed([{ a: 1, b: "two" }, { a: 3, b: nil }])).to print_as <<~TABLE
         A | B
         --|----
         1 | two
@@ -89,7 +102,7 @@ describe "printing" do
     end
 
     it "finds values behind keys that are neither strings nor symbols" do
-      expect(printed([{ 1 => "one", 2 => "two" }])).to eq <<~TABLE
+      expect(printed([{ 1 => "one", 2 => "two" }])).to print_as <<~TABLE
         1   | 2
         ----|----
         one | two
@@ -106,7 +119,7 @@ describe "printing" do
       row["author"] = "ryan"
 
       # the row keeps its own lookup, so :author finds the "author" key
-      expect(printed([row], include: { two: ->(r) { r[:author] * 2 } })).to eq <<~TABLE
+      expect(printed([row], include: { two: ->(r) { r[:author] * 2 } })).to print_as <<~TABLE
         AUTHOR | TWO
         -------|---------
         ryan   | ryanryan
@@ -116,7 +129,7 @@ describe "printing" do
 
   describe "arrays of arrays" do
     it "prints a grid, with each position as a column" do
-      expect(printed([[1, "alice"], [2, "bob"]])).to eq <<~TABLE
+      expect(printed([[1, "alice"], [2, "bob"]])).to print_as <<~TABLE
         0 | 1
         --|------
         1 | alice
@@ -125,7 +138,7 @@ describe "printing" do
     end
 
     it "lets you address a column by its index" do
-      expect(printed([[1, "alice"], [2, "bob"]], "1")).to eq <<~TABLE
+      expect(printed([[1, "alice"], [2, "bob"]], "1")).to print_as <<~TABLE
         1
         -----
         alice
@@ -136,7 +149,7 @@ describe "printing" do
 
   describe "structs, Data and OpenStruct" do
     it "uses a struct's members as columns" do
-      expect(printed([Struct.new(:title, :author).new("First", "ryan")])).to eq <<~TABLE
+      expect(printed([Struct.new(:title, :author).new("First", "ryan")])).to print_as <<~TABLE
         TITLE | AUTHOR
         ------|-------
         First | ryan
@@ -148,7 +161,7 @@ describe "printing" do
 
       # columns given explicitly: the default order comes from #methods, which
       # isn't the same on every ruby
-      expect(printed([point.new(x: 1, y: 2)], "x", "y")).to eq <<~TABLE
+      expect(printed([point.new(x: 1, y: 2)], "x", "y")).to print_as <<~TABLE
         X | Y
         --|--
         1 | 2
@@ -156,7 +169,7 @@ describe "printing" do
     end
 
     it "uses an OpenStruct's attributes rather than its methods" do
-      expect(printed([OpenStruct.new(name: "alice", age: 30)])).to eq <<~TABLE
+      expect(printed([OpenStruct.new(name: "alice", age: 30)])).to print_as <<~TABLE
         NAME  | AGE
         ------|----
         alice | 30
@@ -172,10 +185,49 @@ describe "printing" do
         end
       end
 
-      expect(printed([post.new])).to eq <<~TABLE
+      expect(printed([post.new])).to print_as <<~TABLE
         HEADLINE
         ----------------
         once upon a time
+      TABLE
+    end
+
+    # Only the object's own class counts, no methods from a superclass or a mixin
+    it "leaves out attributes inherited from a superclass" do
+      base = Class.new { attr_accessor :title }
+      post = Class.new(base) { attr_accessor :subtitle }.new
+      post.title = "First"
+      post.subtitle = "the worst"
+
+      expect(printed([post])).to print_as <<~TABLE
+        SUBTITLE
+        ---------
+        the worst
+      TABLE
+
+      expect(printed([post], include: :title)).to print_as <<~TABLE
+        SUBTITLE  | TITLE 
+        ----------|------
+        the worst | First 
+      TABLE
+
+      # an object whose attributes are all inherited has nothing left to show
+      expect(printed([Class.new(base).new])).to print_as "No data."
+    end
+
+    it "leaves out attributes mixed in from a module" do
+      titled = Module.new { attr_accessor :title }
+      post = Class.new do
+        include titled
+        attr_accessor :subtitle
+      end.new
+      post.title = "First"
+      post.subtitle = "the worst"
+
+      expect(printed([post])).to print_as <<~TABLE
+        SUBTITLE
+        ---------
+        the worst
       TABLE
     end
 
@@ -189,7 +241,7 @@ describe "printing" do
         author.new("carol", [])
       ]
 
-      expect(printed(authors, "name", "books.title", "books.reviews.stars")).to eq <<~TABLE
+      expect(printed(authors, "name", "books.title", "books.reviews.stars")).to print_as <<~TABLE
         NAME  | BOOKS.TITLE | BOOKS.REVIEWS.STARS
         ------|-------------|--------------------
         alice | Book A      | 5
@@ -221,7 +273,7 @@ describe "printing" do
         end
       end
 
-      expect(printed([post.new])).to eq <<~TABLE
+      expect(printed([post.new])).to print_as <<~TABLE
         ID | TITLE
         ---|--------------
         1  | from .columns
@@ -243,7 +295,7 @@ describe "printing" do
         end
       end
 
-      expect(printed([post.new])).to eq <<~TABLE
+      expect(printed([post.new])).to print_as <<~TABLE
         ID | TITLE
         ---|--------------
         2  | from .columns
@@ -265,7 +317,7 @@ describe "printing" do
         end
       end
 
-      expect(printed([post.new])).to eq <<~TABLE
+      expect(printed([post.new])).to print_as <<~TABLE
         ID | TITLE
         ---|-------------
         3  | from #fields
@@ -276,31 +328,6 @@ describe "printing" do
   # Everything below prints badly. The output is pinned so that a fix shows up
   # here as a failure, rather than quietly changing what users see.
   describe "types that don't work yet" do
-    it "ignores attributes inherited from a superclass" do
-      base = Class.new do
-        attr_accessor :title
-
-        def initialize(title)
-          @title = title
-        end
-      end
-
-      expect(printed([Class.new(base).new("First")])).to eq "No data.\n"
-    end
-
-    it "ignores attributes mixed in from a module" do
-      titled = Module.new { attr_accessor :title }
-      post = Class.new do
-        include titled
-
-        def initialize(title)
-          @title = title
-        end
-      end
-
-      expect(printed([post.new("First")])).to eq "No data.\n"
-    end
-
     it "can't follow a dotted path into a hash" do
       expect { printed([{ a: 1, b: { c: 2 } }], "a", "b.c") }.to raise_error NoMethodError
     end
@@ -308,7 +335,7 @@ describe "printing" do
     it "drops a column entirely when the association is nil" do
       author = Struct.new(:name, :books)
 
-      expect(printed([author.new("alice", nil)], "name", "books.title")).to eq <<~TABLE
+      expect(printed([author.new("alice", nil)], "name", "books.title")).to print_as <<~TABLE
         NAME
         -----
         alice
@@ -329,7 +356,7 @@ describe "printing" do
         end
       end
 
-      expect(printed(collection.new("mine", [1, 2]))).to eq <<~TABLE
+      expect(printed(collection.new("mine", [1, 2]))).to print_as <<~TABLE
         VALUE
         -----
         1
@@ -359,7 +386,7 @@ describe "printing" do
 
       # items reads as [] even though it's measured before clear runs: the cell
       # holds the same array that clear empties
-      expect(printed([stateful.new(items)], "items", "clear", "size")).to eq <<~TABLE
+      expect(printed([stateful.new(items)], "items", "clear", "size")).to print_as <<~TABLE
         ITEMS | CLEAR | SIZE
         ------|-------|-----
         []    | []    | 0
