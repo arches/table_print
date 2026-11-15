@@ -57,6 +57,16 @@ describe Column do
     end
   end
 
+  describe "#data_width" do
+    it "scans the data only once, however many times it's asked" do
+      data = ["Once upon a time"]
+      column = Column.new(:name => :tagline, :data => data)
+
+      expect(data).to receive(:compact).once.and_call_original
+      3.times { column.data_width }
+    end
+  end
+
   describe "#width" do
     context "when default width is specified" do
       it "uses the default width" do
