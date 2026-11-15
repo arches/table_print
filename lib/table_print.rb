@@ -55,7 +55,7 @@ module TablePrint
       return "No data." if group.columns.empty?
 
       # turn everything into a string for output
-      [group.header, group.horizontal_separator, group.format].join("\n")
+      [group.header, group.horizontal_separator, group.format].compact.join("\n")
     end
 
     def message

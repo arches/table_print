@@ -6,6 +6,7 @@ module TablePrint
     DEFAULT_IO = $stdout
     DEFAULT_CAPITALIZE_HEADERS = true
     DEFAULT_SEPARATOR = "|"
+    DEFAULT_HORIZONTAL_SEPARATOR = "-"
     DEFAULT_MULTIBYTE = false
 
     @@max_width = DEFAULT_MAX_WIDTH
@@ -14,6 +15,7 @@ module TablePrint
     @@io = DEFAULT_IO
     @@capitalize_headers = DEFAULT_CAPITALIZE_HEADERS
     @@separator = DEFAULT_SEPARATOR
+    @@horizontal_separator = DEFAULT_HORIZONTAL_SEPARATOR
 
     @@klasses = {}
 
@@ -76,6 +78,18 @@ module TablePrint
 
     def self.separator=(separator)
       @@separator = separator
+    end
+
+    def self.horizontal_separator
+      @@horizontal_separator
+    end
+
+    # the character under the header, or nil for no line at all
+    def self.horizontal_separator=(separator)
+      unless separator.nil? or separator.to_s.length == 1
+        raise StandardError.new("horizontal_separator must be a single character, or nil for no line, got #{separator.inspect}")
+      end
+      @@horizontal_separator = separator
     end
 
     def self.io

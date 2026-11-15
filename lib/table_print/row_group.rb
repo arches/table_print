@@ -62,9 +62,12 @@ module TablePrint
     end
 
     def horizontal_separator
+      character = TablePrint::Config.horizontal_separator
+      return nil unless character
+
       columns.collect do |column|
-        '-' * column.width
-      end.join("-#{TablePrint::Config.separator}-")
+        character * column.width
+      end.join("#{character}#{TablePrint::Config.separator}#{character}")
     end
 
     def header

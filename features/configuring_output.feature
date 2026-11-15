@@ -116,6 +116,35 @@ Feature: Configuring output
     Ryan
     """
 
+  Scenario: Setting the horizontal separator character
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And I configure horizontal_separator with '='
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE | AUTHOR
+    ======|=======
+    post! | Ryan
+    """
+
+  Scenario: Removing the horizontal separator
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And I turn the horizontal separator off
+    And table_print Blog
+    Then the output should contain
+    """
+    TITLE | AUTHOR
+    post! | Ryan
+    """
+
   Scenario: Setting the column separator
     Given a class named Blog
 

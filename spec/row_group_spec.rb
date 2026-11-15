@@ -103,6 +103,24 @@ describe RowRecursion do
       compare_rows(parent.horizontal_separator, '-' * 6 + '-|-' + '-' * 'description'.size + '-|-' + '-' * 10)
     end
 
+    it "uses the character from the config" do
+      child.set_cell_values(:title => 'foobar', :author => 'chris')
+      TablePrint::Config.set(:horizontal_separator, ["="])
+
+      expect(child.horizontal_separator).to eq '=' * 6 + '=|=' + '=' * 6
+    ensure
+      TablePrint::Config.clear(:horizontal_separator)
+    end
+
+    it "is absent when the config is nil" do
+      child.set_cell_values(:title => 'foobar')
+      TablePrint::Config.set(:horizontal_separator, [nil])
+
+      expect(child.horizontal_separator).to be_nil
+    ensure
+      TablePrint::Config.clear(:horizontal_separator)
+    end
+
     it "matches the header width" do
       child.set_cell_values(:title => 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar')
       expect(child.horizontal_separator).to eq '------------------------------' # 30 hyphens

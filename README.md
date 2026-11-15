@@ -185,10 +185,12 @@ end
 
 ### CSV Output
 
-Set the column separator to get an output you can save as a CSV:
+Set the column separator to get an output you can save as a CSV, and turn off the line under the header so it doesn't
+end up in the file:
 
 ```ruby
 tp.set :separator, ","
+tp.set :horizontal_separator, nil
 ```
 
 Since your CSV viewer probably already handles column widths for you, setting `max_width` to something very large will help you export your full data set. Otherwise, this CSV output will still be truncated to the default max_width of 30 characters.
@@ -234,6 +236,8 @@ You can also set global options:
 tp.set :max_width, 10 # columns won't exceed 10 characters
 tp.set :time_format, "%Y" # date columns will only show the year
 tp.set :capitalize_headers, false # don't capitalize column headers
+tp.set :horizontal_separator, "=" # draw the line under the header with = instead of -
+tp.set :horizontal_separator, nil # don't draw a line under the header at all
 ```
 
 You can redirect output:

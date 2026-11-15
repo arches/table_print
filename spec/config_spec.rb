@@ -58,6 +58,28 @@ describe TablePrint::Config do
     end
   end
 
+  describe "horizontal_separator" do
+    it "defaults to a hyphen" do
+      expect(TablePrint::Config.horizontal_separator).to eq "-"
+    end
+
+    it "takes a single character, or nil for no line" do
+      TablePrint::Config.set(:horizontal_separator, ["="])
+      expect(TablePrint::Config.horizontal_separator).to eq "="
+
+      TablePrint::Config.set(:horizontal_separator, [nil])
+      expect(TablePrint::Config.horizontal_separator).to be_nil
+
+      TablePrint::Config.clear(:horizontal_separator)
+      expect(TablePrint::Config.horizontal_separator).to eq "-"
+    end
+
+    it "rejects anything longer than one character" do
+      expect { TablePrint::Config.horizontal_separator = "==" }.to raise_error StandardError
+      expect(TablePrint::Config.horizontal_separator).to eq "-"
+    end
+  end
+
   describe "io" do
     before :all do
       Sandbox.add_class("MyIO")

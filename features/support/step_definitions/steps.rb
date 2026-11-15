@@ -75,6 +75,14 @@ When /^I configure separator with '(.*)'$/ do |value|
   TablePrint::Config.set(:separator, [value])
 end
 
+When /^I configure horizontal_separator with '(.*)'$/ do |value|
+  TablePrint::Config.set(:horizontal_separator, [value])
+end
+
+When /^I turn the horizontal separator off$/ do
+  TablePrint::Config.set(:horizontal_separator, [nil])
+end
+
 When /^configure (.*) with (.*)$/ do |klass, config|
   klass = Sandbox.const_get_from_string(klass)
   TablePrint::Config.set(klass, eval(config))
