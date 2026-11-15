@@ -161,7 +161,14 @@ Or if you want to pass other options along with the lambda:
 tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :max_width => 10}
 ```
 
-Make sure to add curly braces if you have more than one column with a lambda or if this column isn't the last one.
+One hash can name as many columns as you like:
+
+```ruby
+tp User.all, :email, daily_payment: lambda { |u| u.monthly_payment / 30 }, yearly_payment: lambda { |u| u.monthly_payment * 12 }
+```
+
+Braces of their own are only needed when a plain column name has to follow them, which is ruby's rule about hash
+arguments rather than table_print's:
 
 ```ruby
 tp User.all, :email, { daily_payment: lambda { |u| u.monthly_payment / 30} }, :monthly_payment, { yearly_payment: lambda { |u| u.monthly_payment * 12} }

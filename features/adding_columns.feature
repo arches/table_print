@@ -18,6 +18,20 @@ Feature: Adding columns
     glad | Ryan        | post!
     """
 
+  Scenario: Naming two columns in one hash
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And table_print Blog, {:shout => lambda{|b| b.title.upcase}, :quiet => lambda{|b| b.author.downcase}}
+    Then the output should contain
+    """
+    SHOUT | QUIET
+    ------|------
+    POST! | ryan
+    """
+
   Scenario: Providing a named proc
     Given a class named Blog
 

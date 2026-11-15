@@ -51,6 +51,24 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "several columns named in one options hash" do
+    it "applies each one to hash data" do
+      rows = [{ :title => "First post!", :author => "Ryan" }]
+
+      expect(Printer.new(rows, [{ :title => { :max_width => 6 }, :author => { :min_width => 8 } }]).table_print).to eq(
+        "TITLE  | AUTHOR  \n-------|---------\nFir... | Ryan    "
+      )
+    end
+
+    it "picks and sizes grid columns by index" do
+      rows = [[1, "alice", true], [2, "bob", false]]
+
+      expect(Printer.new(rows, [{ "0" => {}, "2" => {} }]).table_print).to eq(
+        "0 | 2    \n--|------\n1 | true \n2 | false"
+      )
+    end
+  end
+
   describe "printing an array of arrays" do
     it "prints one row per inner array, with the positions as columns" do
       expect(Printer.new([[1, "alice"], [2, "bob"]]).table_print).to eq "0 | 1    \n--|------\n1 | alice\n2 | bob  "

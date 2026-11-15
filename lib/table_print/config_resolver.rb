@@ -21,12 +21,8 @@ module TablePrint
       # process special symbols
 
       @included_columns.concat [get_and_remove(options, :include)].flatten
-      @included_columns.map! do |option|
-        if option.is_a? Column
-          option
-        else
-          option_to_column(option)
-        end
+      @included_columns = @included_columns.flat_map do |option|
+        option.is_a?(Column) ? [option] : options_to_columns(option)
       end
 
       @included_columns.each do |c|
@@ -38,7 +34,7 @@ module TablePrint
 
       # anything that isn't recognized as a special option is assumed to be a column name
       options.compact!
-      @only_columns = options.collect { |name| option_to_column(name) } unless options.empty?
+      @only_columns = options.flat_map { |option| options_to_columns(option) } unless options.empty?
     end
 
     def get_and_remove(options_array, key)
@@ -55,6 +51,14 @@ module TablePrint
       options_array.delete(except) if except.keys.empty?  # if we've taken all the info from this option, get rid of it
 
       option_of_interest
+    end
+
+    # One hash can name several columns - {:title => {...}, :author => {...}} -
+    # which is what you get when you write them without braces of their own.
+    def options_to_columns(option)
+      return [option_to_column(option)] unless option.is_a?(Hash) and option.length > 1
+
+      option.collect { |name, value| option_to_column(name => value) }
     end
 
     def option_to_column(option)

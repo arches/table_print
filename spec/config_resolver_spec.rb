@@ -142,6 +142,88 @@ describe TablePrint::ConfigResolver do
     end
   end
 
+  describe "several columns in one hash" do
+    let(:first) { lambda { |row| "one" } }
+    let(:second) { lambda { |row| "two" } }
+
+    it "makes a column out of every key" do
+      c = TablePrint::ConfigResolver.new(Object, [], :title => { :max_width => 3 }, :author => { :max_width => 5 })
+
+      expect(c.columns.collect(&:name)).to eq %w[title author]
+      expect(c.columns.collect(&:default_width)).to eq [3, 5]
+    end
+
+    it "handles more than two" do
+      c = TablePrint::ConfigResolver.new(Object, [], :a => {}, :b => {}, :c => {})
+
+      expect(c.columns.collect(&:name)).to eq %w[a b c]
+    end
+
+    it "keeps them in the order they were written" do
+      c = TablePrint::ConfigResolver.new(Object, [], :zebra => {}, :aardvark => {})
+
+      expect(c.columns.collect(&:name)).to eq %w[zebra aardvark]
+    end
+
+    it "takes a lambda for each one" do
+      c = TablePrint::ConfigResolver.new(Object, [], :a => first, :b => second)
+
+      expect(c.columns.collect(&:name)).to eq %w[a b]
+      expect(c.columns.collect(&:display_method)).to eq [first, second]
+    end
+
+    it "mixes lambdas and option hashes in the same hash" do
+      c = TablePrint::ConfigResolver.new(Object, [], :a => first, :title => { :max_width => 3 })
+
+      expect(c.columns.collect(&:name)).to eq %w[a title]
+      expect(c.columns.first.display_method).to eq first
+      expect(c.columns.last.default_width).to eq 3
+    end
+
+    it "works for columns added with :include" do
+      c = TablePrint::ConfigResolver.new(Object, [:title], :include => { :a => first, :b => second })
+
+      expect(c.columns.collect(&:name)).to eq %w[title a b]
+      expect(c.columns.last.display_method).to eq second
+    end
+
+    it "works alongside :except in the same hash" do
+      c = TablePrint::ConfigResolver.new(Object, [:title, :author], :except => :author, :include => { :a => first, :b => second })
+
+      expect(c.columns.collect(&:name)).to eq %w[title a b]
+    end
+
+    it "carries display_name and display_method through for each one" do
+      c = TablePrint::ConfigResolver.new(Object, [],
+                                         :one => { :display_name => "First One", :display_method => first },
+                                         :two => { :display_name => "Second One", :display_method => second })
+
+      expect(c.columns.collect(&:name)).to eq ["First One", "Second One"]
+      expect(c.columns.collect(&:display_method)).to eq [first, second]
+    end
+
+    it "still accepts a column per hash, with braces" do
+      c = TablePrint::ConfigResolver.new(Object, [], [{ :title => { :max_width => 3 } }, { :author => { :max_width => 5 } }])
+
+      expect(c.columns.collect(&:name)).to eq %w[title author]
+      expect(c.columns.collect(&:default_width)).to eq [3, 5]
+    end
+
+    it "still accepts a single-key hash" do
+      c = TablePrint::ConfigResolver.new(Object, [], :title => { :max_width => 3 })
+
+      expect(c.columns.collect(&:name)).to eq %w[title]
+      expect(c.columns.first.default_width).to eq 3
+    end
+
+    it "still accepts a Column object passed to :include" do
+      column = TablePrint::Column.new(:name => "handmade")
+      c = TablePrint::ConfigResolver.new(Object, [:title], :include => column)
+
+      expect(c.columns.collect(&:name)).to eq %w[title handmade]
+    end
+  end
+
   describe "#usable_column_names" do
     it "returns default columns" do
       c = TablePrint::ConfigResolver.new(Object, [:title])
