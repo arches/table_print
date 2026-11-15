@@ -1,0 +1,227 @@
+#!/usr/bin/env ruby
+# A REPL with table_print loaded from lib/, plus a pile of sample data.
+#
+#   bin/console
+#   > fixtures                 # inventory of everything defined below
+#   > tp AUTHORS, "name", "books.title", "books.reviews.stars"
+#   > reload!                  # after editing lib/, without losing your session
+
+require "bundler/setup"
+require "table_print"
+require "irb"
+require "ostruct"
+
+# Re-run every lib file. Method changes take effect; renamed or deleted methods
+# linger until you restart, and any tp.set config is reset.
+def quietly # re-executing files and re-assigning constants both warn
+  verbose, $VERBOSE = $VERBOSE, nil
+  yield
+ensure
+  $VERBOSE = verbose
+end
+
+def reload!
+  quietly { $LOADED_FEATURES.grep(%r{/lib/table_print}).each { |file| load file } }
+  :reloaded
+end
+
+# ---------------------------------------------------------------- nested data
+
+class Review
+  attr_accessor :stars, :body, :reviewer
+  def initialize(stars, body, reviewer = nil)
+    @stars, @body, @reviewer = stars, body, reviewer
+  end
+end
+
+class Tag
+  attr_accessor :label
+  def initialize(label) = @label = label
+end
+
+class Book
+  attr_accessor :title, :pages, :published_at, :reviews, :tags
+  def initialize(title, pages, published_at, reviews = [], tags = [])
+    @title, @pages, @published_at = title, pages, published_at
+    @reviews, @tags = reviews, tags
+  end
+end
+
+class Author
+  attr_accessor :name, :books
+  def initialize(name, books = []) = (@name, @books = name, books)
+end
+
+# Two books (one with two reviews, one with none), a single-book author, and an
+# author with none - fan-out, blanked repeats and empty associations in one go.
+# Also: a newline in a body, a title past max_width, a nil reviewer, multibyte.
+AUTHORS = [
+  Author.new("alice", [
+    Book.new("Book A", 100, Time.at(0).utc,
+             [Review.new(5, "great", "zed"), Review.new(3, "ok\nwith a newline", nil)],
+             [Tag.new("scifi"), Tag.new("long")]),
+    Book.new("A Title Longer Than The Thirty Character Default", 200, Time.at(10**9).utc,
+             [], [Tag.new("short")])
+  ]),
+  Author.new("日本語テキスト", [Book.new("Book C", 300, nil, [Review.new(1, "bad", "quinn")], [])]),
+  Author.new("carol", [])
+]
+
+# A reference cycle - fine to print as long as the path you ask for is finite.
+class Node
+  attr_accessor :name, :parent
+  def initialize(name) = @name = name
+end
+CYCLE = [Node.new("a"), Node.new("b")]
+CYCLE[0].parent, CYCLE[1].parent = CYCLE[1], CYCLE[0]
+
+# ------------------------------------------------------------------ flat data
+
+SETTINGS = { "host" => "db.internal", "user" => "app" }           # one bare hash = one row
+HASHES   = [{ a: 1, b: "two" }, { a: 3, b: nil }]                 # symbol keys, nil cell
+RAGGED   = [{ a: 1 }, { b: 2 }]                                   # columns come from row 0 only
+NESTED   = [{ a: 1, b: { c: 2 } }]                                # "b.c" raises - hashes aren't traversable
+ODD_KEYS = [{ 1 => "one", nil => "nil", [1] => "arr" }]           # non-string keys become columns
+ROWS     = [%w[a b], %w[c d], %w[e]]                              # array of arrays: all one VALUE column
+SCALARS  = ["hello", :sym, 42, 3.14]                              # single VALUE column
+STRUCTS  = [Struct.new(:title, :author).new("First", "ryan")]     # members as columns
+BOOLS    = [true, false]                                          # prints INSPECT | TO_S
+
+# --------------------------------------------------------- orm-shaped objects
+
+class ARPost # class.columns whose entries respond to #name (ActiveRecord)
+  Column = Struct.new(:name)
+  def self.columns = [Column.new("id"), Column.new("title")]
+  def id = 1
+  def title = "from .columns"
+  def secret = "not shown by default"
+end
+
+class SequelPost # class.columns of symbols
+  def self.columns = [:id, :title]
+  def id = 2
+  def title = "from .columns (symbols)"
+end
+
+class MongoPost # #fields returning a hash
+  def fields = { "id" => nil, "title" => nil }
+  def id = 3
+  def title = "from #fields"
+end
+
+AR_POSTS     = [ARPost.new]
+SEQUEL_POSTS = [SequelPost.new]
+MONGO_POSTS  = [MongoPost.new]
+
+# ------------------------------------------------- shapes that misbehave today
+
+class Base
+  attr_accessor :title
+  def initialize(title) = @title = title
+end
+class Inherited < Base; end
+INHERITED = [Inherited.new("First")] # "No data." - owner must == target.class
+
+module Titled
+  attr_accessor :title
+end
+class Moduled
+  include Titled
+  def initialize(title) = @title = title
+end
+MODULED = [Moduled.new("First")] # "No data." - module methods are skipped too
+
+class Proxy # permissive respond_to_missing? breaks Array(data) at the door
+  def respond_to_missing?(*) = true
+  def method_missing(name, *) = "delegated #{name}"
+end
+PROXIES = [Proxy.new] # raises TypeError: can't convert Proxy to Array
+
+class Collectionish # a record that is also a collection: attrs are lost
+  include Enumerable
+  attr_accessor :name
+  def initialize(name, items) = (@name, @items = name, items)
+  def each(&block) = @items.each(&block)
+end
+COLLECTIONISH = Collectionish.new("mine", [1, 2]) # prints the items, not the name
+
+OPENSTRUCTS = [OpenStruct.new(a: 1), OpenStruct.new(a: 2)] # every method is a column
+
+# Hazards: tp calls every public arity-0 method, so printing these changes them.
+# They're the same objects every time on purpose - print one twice and watch the
+# damage accumulate, which is what you'd see if they were your own objects.
+# reset! puts them all back.
+class Counter
+  def initialize = @n = 0
+  def bump = @n += 1   # tp calls this
+  def n = @n
+end
+
+class Stateful
+  def initialize(items) = @items = items
+  def items = @items
+  def size = @items.size
+  def clear = @items.clear # tp calls this too, and empties items
+end
+# Printing a Stateful shows [] in the ITEMS column even though items is read
+# before clear: the cell holds a reference to the array, and clear empties that
+# same object before anything gets rendered.
+
+class Exploder
+  def title = "ok"
+  def boom = raise(ArgumentError, "do not call me") # takes the whole print down
+end
+
+def reset!
+  quietly do
+    Object.const_set(:COUNTER, [Counter.new])            # constants can't be
+    Object.const_set(:STATEFUL, [Stateful.new(%w[a b])]) # assigned in a method
+    Object.const_set(:EXPLODER, [Exploder.new])
+  end
+  :reset
+end
+reset!
+
+INFINITE = (1..Float::INFINITY).lazy.map { |i| i * 2 } # tp hangs: Array() never returns
+
+# ----------------------------------------------------------------- inventory
+
+FIXTURES = [
+  { name: "AUTHORS",       shape: "nested objects",  note: "fan-out, blanks, empty assoc, multibyte, newline" },
+  { name: "CYCLE",         shape: "nested objects",  note: 'reference cycle; try "name", "parent.name"' },
+  { name: "SETTINGS",      shape: "hash",            note: "a single hash prints as one row" },
+  { name: "HASHES",        shape: "array of hashes", note: "symbol keys, nil cell" },
+  { name: "RAGGED",        shape: "array of hashes", note: "columns sniffed from row 0 -> Method Missing" },
+  { name: "NESTED",        shape: "array of hashes", note: 'nested hash; "b.c" raises NoMethodError' },
+  { name: "ODD_KEYS",      shape: "array of hashes", note: "non-string keys become column names" },
+  { name: "ROWS",          shape: "array of arrays", note: "stacks into one VALUE column, no grid" },
+  { name: "SCALARS",       shape: "array of scalars",note: "single VALUE column, inputs unharmed" },
+  { name: "STRUCTS",       shape: "array of structs",note: "members become columns" },
+  { name: "BOOLS",         shape: "array of scalars",note: "prints INSPECT | TO_S" },
+  { name: "AR_POSTS",      shape: "orm shim",        note: "class.columns with #name" },
+  { name: "SEQUEL_POSTS",  shape: "orm shim",        note: "class.columns of symbols" },
+  { name: "MONGO_POSTS",   shape: "orm shim",        note: "#fields hash" },
+  { name: "INHERITED",     shape: "misbehaves",      note: "No data. - attrs on the superclass" },
+  { name: "MODULED",       shape: "misbehaves",      note: "No data. - attrs from a module" },
+  { name: "PROXIES",       shape: "misbehaves",      note: "TypeError in Array(data)" },
+  { name: "COLLECTIONISH", shape: "misbehaves",      note: "unwrapped by to_a; attributes lost" },
+  { name: "OPENSTRUCTS",   shape: "misbehaves",      note: "8 columns, not one of them the real attribute" },
+  { name: "COUNTER",       shape: "hazard",          note: "tp calls #bump; print twice, watch it climb" },
+  { name: "STATEFUL",      shape: "hazard",          note: "tp calls #clear; even the ITEMS cell reads []" },
+  { name: "EXPLODER",      shape: "hazard",          note: "a raising reader kills the whole print" },
+  { name: "INFINITE",      shape: "hazard",          note: "hangs forever - do not print" }
+]
+
+def fixtures
+  tp FIXTURES, { name: { width: 14 } }, { shape: { width: 17 } }, { note: { width: 52 } }
+  nil
+end
+
+puts "table_print #{TablePrint::VERSION} from #{File.expand_path('../lib', __dir__)}"
+puts "fixtures -> inventory of #{FIXTURES.length} samples   |   reload! -> pick up lib/ edits   |   reset! -> restore hazards"
+
+# Plain single-line input: the multiline editor is off by default here. Pass
+# --multiline to bin/console to get it back for a session.
+ARGV.unshift("--nomultiline") unless ARGV.include?("--multiline")
+
+IRB.start(__FILE__)

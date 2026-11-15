@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'cat', '~> 0.2.1'
   gem.add_development_dependency 'cucumber', '~> 12.0'
+  gem.add_development_dependency 'irb', '~> 1.16'
   gem.add_development_dependency 'ostruct', '~> 0.6'
   gem.add_development_dependency 'rake', '~> 13.2'
   gem.add_development_dependency 'rspec', '~> 3.13'
