@@ -223,6 +223,21 @@ describe TablePrint::ConfigResolver do
         expect(c.columns.first.name).to eq 'Ti Tle'
         expect(c.columns.first.display_method).to eq "title"
       end
+
+      it "keeps a display_method the caller specified" do
+        lam = lambda { |row| row }
+        c = TablePrint::ConfigResolver.new(Object, [], :whatever => {:display_name => "Ti Tle", :display_method => lam})
+
+        expect(c.columns.first.name).to eq "Ti Tle"
+        expect(c.columns.first.display_method).to eq lam
+      end
+
+      it "keeps a display_method given as a symbol, too" do
+        c = TablePrint::ConfigResolver.new(Object, [], :whatever => {:display_name => "Ti Tle", :display_method => :title})
+
+        expect(c.columns.first.name).to eq "Ti Tle"
+        expect(c.columns.first.display_method).to eq "title"
+      end
     end
   end
 

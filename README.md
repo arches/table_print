@@ -141,6 +141,12 @@ Columns are named after hash keys. To rename a column, use the name you want as 
 tp User.all, :active => {:display_method => :active_in_the_past_six_months} # the User class defines active_in_the_past_six_months method
 ```
 
+Or keep the key and set the heading separately with `display_name`:
+
+```ruby
+tp User.all, :yearly_payment => {:display_name => "Yearly Pay", :display_method => lambda{|u| u.monthly_payment * 12}}
+```
+
 #### Lambdas
 
 You can pass a proc as the display_method for a column:

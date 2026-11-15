@@ -80,7 +80,8 @@ module TablePrint
       end
 
       if option.has_key? :display_name
-        option[:display_method] = option[:name]
+        # the key names the method, unless the caller named one themselves
+        option[:display_method] ||= option[:name]
         option[:name] = option.delete(:display_name)
       end
 
