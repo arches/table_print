@@ -69,8 +69,14 @@ module TablePrint
         option = {:name => option}
       end
 
+      # deprecated
       if option.has_key? :width
         option[:default_width] = option.delete(:width)
+      end
+
+      # :max_width is the preferred name now
+      if option.has_key? :max_width
+        option[:default_width] = option.delete(:max_width)
       end
 
       if option.has_key? :display_name

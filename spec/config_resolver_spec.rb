@@ -195,6 +195,16 @@ describe TablePrint::ConfigResolver do
         expect(c.columns.first.name).to eq 'title'
         expect(c.columns.first.default_width).to eq 100
       end
+
+      it "accepts max_width, the current spelling of the same option" do
+        c = TablePrint::ConfigResolver.new(Object, [:title], :title => {:max_width => 100})
+        expect(c.columns.first.default_width).to eq 100
+      end
+
+      it "prefers max_width when both spellings are given" do
+        c = TablePrint::ConfigResolver.new(Object, [:title], :title => {:width => 10, :max_width => 100})
+        expect(c.columns.first.default_width).to eq 100
+      end
     end
     context "formatters" do
       it "adds the formatters to the column" do

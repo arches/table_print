@@ -89,7 +89,7 @@ Second post! | John
 Ryan
 John
 
-> tp rows, {"0" => {:width => 8}}   # column options work by index too
+> tp rows, {"0" => {:max_width => 8}}   # column options work by index too
 ```
 
 ### Nested References
@@ -115,11 +115,11 @@ Milton Greene     | How I Learned     | Once upon a time, I was a sma...
 
 ### Column options
 
-Pass options to individual columns through the options hash by using the display method as the hash key. Eg, if you wanted a skinny email column, set the width explicitly:
+Pass options to individual columns through the options hash by using the display method as the hash key. Eg, if you wanted a skinny email column, cap its width:
 
 ```ruby
-tp User.all, :email => {:width => 12}
-tp User.all, :id, {:email => {:width => 12}}, :age
+tp User.all, :email => {:max_width => 12}
+tp User.all, :id, {:email => {:max_width => 12}}, :age
 ```
 
 Available column options:
@@ -127,7 +127,9 @@ Available column options:
 - **display_method** - string/symbol/proc - used to populate the column. Can be a method name or a proc. See below.
 - **formatters** - array of objects - each will be called in turn as the cells are printed. Must define a 'format' method. See below.
 - **time_format** - string - passed to [strftime](https://docs.ruby-lang.org/en/master/language/strftime_formatting_rdoc.html#conversion-specifiers), only affects time columns
-- **width** - integer - how wide you want your column.
+- **max_width** - integer - maximum width for this column. Overrides the global `max_width`.
+- **fixed_width** - integer - exact width for this column
+- **min_width** - integer - minimum width for this column
 - **display_name** - string - useful if you want spaces in your column name
 - **separator** - string - default is vertical bar for console and markdown, change it to a comma for CSV output
 
@@ -150,7 +152,7 @@ tp User.all, :email, :monthly_payment, yearly_payment: lambda{|u| u.monthly_paym
 Or if you want to pass other options along with the lambda:
 
 ```ruby
-tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :width => 10}
+tp User.all, :yearly_payment => {:display_method => lambda{|u| u.monthly_payment * 12}, :max_width => 10}
 ```
 
 Make sure to add curly braces if you have more than one column with a lambda or if this column isn't the last one.
@@ -233,7 +235,7 @@ To see the config for a given object, use tp.config_for.
 You can also set global options:
 
 ```ruby
-tp.set :max_width, 10 # columns won't exceed 10 characters
+tp.set :max_width, 10 # no column exceeds 10 characters, unless it sets its own width
 tp.set :time_format, "%Y" # date columns will only show the year
 tp.set :capitalize_headers, false # don't capitalize column headers
 tp.set :show_headers, false # no header row at all, and no line under it
