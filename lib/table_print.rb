@@ -19,6 +19,10 @@ module TablePrint
     def initialize(data, options={})
       # a single hash is one row, not a list of [key, value] pairs
       @data = data.is_a?(Hash) ? [data] : Array(data).compact
+
+      # Convert array of arrays into hashes
+      @data = @data.collect { |row| Array(row).each_with_index.to_h { |cell, i| [i.to_s, cell] } } if @data.first.is_a?(Array)
+
       @options = options
       @columns = nil
       @start_time = Time.now

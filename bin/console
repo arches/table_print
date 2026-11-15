@@ -37,6 +37,7 @@ end
 class Tag
   attr_accessor :label
   def initialize(label) = @label = label
+  def to_s = "##{@label}" # cells are rendered with to_s, so this one reads nicely
 end
 
 class Book
@@ -82,7 +83,15 @@ HASHES   = [{ a: 1, b: "two" }, { a: 3, b: nil }]                 # symbol keys,
 RAGGED   = [{ a: 1 }, { b: 2 }]                                   # columns come from row 0 only
 NESTED   = [{ a: 1, b: { c: 2 } }]                                # "b.c" raises - hashes aren't traversable
 ODD_KEYS = [{ 1 => "one", nil => "nil", [1] => "arr" }]           # non-string keys become columns
-ROWS     = [%w[a b], %w[c d], %w[e]]                              # array of arrays: all one VALUE column
+ROWS     = [%w[a b], %w[c d], %w[e]]                              # grid; row 2 is short
+# A grid whose cells aren't all strings. Objects print via to_s - Book has none,
+# so it shows as #<Book:0x...>, while Tag defines one. Reaching into a cell with
+# "1.title" raises: the row is a hash now, and hash keys aren't traversable.
+# A lambda column sees that hash, so index it with a string: row["1"].title
+GRID = [
+  ["alice", Book.new("Book A", 100, Time.at(0).utc), Tag.new("scifi"), 42],
+  ["bob",   Book.new("Book B", 200, nil),            Tag.new("short"), nil]
+]
 SCALARS  = ["hello", :sym, 42, 3.14]                              # single VALUE column
 STRUCTS  = [Struct.new(:title, :author).new("First", "ryan")]     # members as columns
 BOOLS    = [true, false]                                          # prints INSPECT | TO_S
@@ -194,7 +203,8 @@ FIXTURES = [
   { name: "RAGGED",        shape: "array of hashes", note: "columns sniffed from row 0 -> Method Missing" },
   { name: "NESTED",        shape: "array of hashes", note: 'nested hash; "b.c" raises NoMethodError' },
   { name: "ODD_KEYS",      shape: "array of hashes", note: "non-string keys become column names" },
-  { name: "ROWS",          shape: "array of arrays", note: "stacks into one VALUE column, no grid" },
+  { name: "ROWS",          shape: "array of arrays", note: "grid; short row 2 shows Method Missing" },
+  { name: "GRID",          shape: "array of arrays", note: 'mixed cells; try {"t" => lambda{|r| r["1"].title}}' },
   { name: "SCALARS",       shape: "array of scalars",note: "single VALUE column, inputs unharmed" },
   { name: "STRUCTS",       shape: "array of structs",note: "members become columns" },
   { name: "BOOLS",         shape: "array of scalars",note: "prints INSPECT | TO_S" },

@@ -25,6 +25,11 @@ Given /^a variable named (.*) with$/ do |variable, table|
   @objs.send("#{variable.downcase}=", table.hashes)
 end
 
+Given /^an array of arrays named (.*) with$/ do |variable, table|
+  @objs ||= OpenStruct.new
+  @objs.send("#{variable.downcase}=", table.raw) # raw: every row is data, no header
+end
+
 Given /^an array of structs named (.*) with$/ do |variable, table|
   @objs ||= OpenStruct.new
   struct = Struct.new(*(table.column_names.collect(&:to_sym)))

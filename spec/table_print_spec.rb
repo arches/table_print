@@ -24,8 +24,26 @@ describe TablePrint::Printer do
 
     it "prints strings nested in arrays without modifying them" do
       data = [["hello".dup, "world".dup]]
-      expect(Printer.new(data).table_print).to eq "VALUE\n-----\nhello\nworld"
+      expect(Printer.new(data).table_print).to eq "0     | 1    \n------|------\nhello | world"
       expect(data).to eq [["hello", "world"]]
+    end
+  end
+
+  describe "printing an array of arrays" do
+    it "prints one row per inner array, with the positions as columns" do
+      expect(Printer.new([[1, "alice"], [2, "bob"]]).table_print).to eq "0 | 1    \n--|------\n1 | alice\n2 | bob  "
+    end
+
+    it "takes its columns from the first row" do
+      # the short row has no cell for column 1; the long row's third cell is not shown
+      expect(Printer.new([["a", "b"], ["c"], ["d", "e", "f"]]).table_print).to eq(
+        "0 | 1             \n--|---------------\na | b             \nc | Method Missing\nd | e             "
+      )
+    end
+
+    it "lets you address the columns by index" do
+      expect(Printer.new([[1, "alice"], [2, "bob"]], ["1"]).table_print).to eq "1    \n-----\nalice\nbob  "
+      expect(Printer.new([[1, "alice"], [2, "bob"]], [{:except => "0"}]).table_print).to eq "1    \n-----\nalice\nbob  "
     end
   end
 

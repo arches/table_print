@@ -1,13 +1,10 @@
 # table_print
 
-[![CI](https://github.com/arches/table_print/actions/workflows/ci.yml/badge.svg)](https://github.com/arches/table_print/actions/workflows/ci.yml)
+![CI](https://github.com/arches/table_print/actions/workflows/ci.yml/badge.svg)
 
-TablePrint shows objects in nicely formatted columns for easy reading. It even lets you nest other tables
-of related objects, contextualizing data across tables. It's incredibly flexible, yet simple, making it easy to
-see exactly the data you care about.
+TablePrint shows objects in nicely formatted columns for easy reading. It even lets you nest other tables of related objects, contextualizing data across tables. It's incredibly flexible, yet simple, making it easy to see exactly the data you care about.
 
-This [three minute screencast](http://tableprintgem.com) will give you a quick overview of table_print's most
-powerful features and how to use them.
+This [three minute screencast](http://tableprintgem.com) will give you a quick overview of table_print's most powerful features and how to use them.
 
 ![table_print example](http://arches.io/tp_example.gif)
 
@@ -46,9 +43,7 @@ Manning Marable   | From acclaimed historian Ma...  | Malcolm X
 Tina Fey          | Worth it. -Trees                | Bossypants
 ```
 
-TablePrint tries to use sensible defaults to choose the columns to show. If you're inspecting ActiveRecord objects, it
-uses the ActiveRecord column names. You can customize the output to show fewer columns, or show other methods you've written
-on your model. Use symbols or strings to reference the columns.
+TablePrint tries to use sensible defaults to choose the columns to show. If you're inspecting ActiveRecord objects, it uses the ActiveRecord column names. You can customize the output to show fewer columns, or show other methods you've written on your model. Use symbols or strings to reference the columns.
 
 ```ruby
 # Maybe you store a user's hourly rate but you want to see their yearly income
@@ -58,9 +53,7 @@ tp User.limit(30), :include => :yearly_income, :except => :hourly_rate
 tp User.limit(30), :address, 'city', 'state', :zip
 ```
 
-If you're not using ActiveRecord, the TablePrint default is to show all the methods defined directly on your object (nothing
-from superclasses/mixins). If the objects are strings, symbols, numbers, or arrays, each one is shown in a single VALUE
-column instead:
+If you're not using ActiveRecord, the TablePrint default is to show all the methods defined directly on your object (nothing from superclasses/mixins). If the objects are strings, symbols, or numbers, each one is shown in a single VALUE column instead:
 
 ```
 > tp ["alice", "bob"]
@@ -80,8 +73,28 @@ HOST        | USER
 db.internal | app
 ```
 
-You can reference nested objects with the method chain required to reach them. Say you had some users who wrote books, and those
-books had photos.
+An array of arrays prints as a grid: one row per inner array, with each position as a column. This works by turning each inner array into a hash like `{"0" => [...first value...], "1" => [...second value...]}`, so you can address them by index:
+
+```
+> rows = [["First post!", "Ryan"], ["Second post!", "John"]]
+> tp rows
+0            | 1
+-------------|-----
+First post!  | Ryan
+Second post! | John
+
+> tp rows, "1"                      # just the second column
+1
+----
+Ryan
+John
+
+> tp rows, {"0" => {:width => 8}}   # column options work by index too
+```
+
+### Nested References
+
+You can reference nested objects with the method chain required to reach them. Say you had some users who wrote books, and those books had photos.
 
 ```
 > tp Author.limit(3), "name", "books.title", "books.photos.caption"
@@ -102,8 +115,7 @@ Milton Greene     | How I Learned     | Once upon a time, I was a sma...
 
 ### Column options
 
-Pass options to individual columns through the options hash by using the display method as the hash key. Eg, if you wanted
-a skinny email column, set the width explicitly:
+Pass options to individual columns through the options hash by using the display method as the hash key. Eg, if you wanted a skinny email column, set the width explicitly:
 
 ```ruby
 tp User.all, :email => {:width => 12}
@@ -149,8 +161,7 @@ tp User.all, :email, { daily_payment: lambda { |u| u.monthly_payment / 30} }, :m
 
 #### Column formatters
 
-Similar to a lambda column, you can use a column formatter to reuse code across prints. Any object with a 'format' method
-can be used to filter a column. This could also be used for coloring output.
+Similar to a lambda column, you can use a column formatter to reuse code across prints. Any object with a 'format' method can be used to filter a column. This could also be used for coloring output.
 
 ```ruby
 class NoNewlineFormatter
@@ -164,8 +175,7 @@ tp User.all, :bio => {:formatters => [NoNewlineFormatter.new]} # strip newlines 
 
 ### HTML Output
 
-Currently the best way to show table_print output on an HTML page is using a `<pre>` tag. You can create a helper
-method to send table_print output directly into your `<pre>` tag:
+Currently the best way to show table_print output on an HTML page is using a `<pre>` tag. You can create a helper method to send table_print output directly into your `<pre>` tag:
 
 ```ruby
 def tp_pre data, options={}
@@ -238,9 +248,7 @@ tp User.all # writing to STDOUT again
 
 ### Multibyte
 
-Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be
-working with a lot of multibyte characters, set the multibyte option first to enable the slower yet more precise
-width calculation:
+Unfortunately, the current approach to finding the width of multibyte strings is too slow. If you're going to be working with a lot of multibyte characters, set the multibyte option first to enable the slower yet more precise width calculation:
 
 ```ruby
 > tp.set :multibyte, true
