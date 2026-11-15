@@ -48,10 +48,18 @@ describe TablePrint::Config do
         expect(TablePrint::Config.for(Sandbox::Blog)).to eq [:title, :author]
       end
 
-      it "makes a copy on retrieval" do |variable|
+      it "hands out a copy, so a caller can't empty the stored config" do
         TablePrint::Config.set(Sandbox::Blog, [:title, :author])
         TablePrint::Config.for(Sandbox::Blog).clear
-        TablePrint::Config.for(Sandbox::Blog).should == [:title, :author]
+
+        expect(TablePrint::Config.for(Sandbox::Blog)).to eq [:title, :author]
+      end
+
+      it "copies the hashes inside it too, since that's what gets consumed" do
+        TablePrint::Config.set(Sandbox::Blog, [{ :except => :title }])
+        TablePrint::Config.for(Sandbox::Blog).first.delete(:except)
+
+        expect(TablePrint::Config.for(Sandbox::Blog)).to eq [{ :except => :title }]
       end
     end
 

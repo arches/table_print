@@ -85,6 +85,22 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "a class-level config" do
+    it "survives being printed more than once" do
+      Sandbox.add_class("Blog")
+      Sandbox.add_attributes("Blog", :title, :author)
+      blogs = [Sandbox::Blog.new(:title => "First post!", :author => "Ryan")]
+
+      tp.set Sandbox::Blog, :except => :title
+
+      # resolving the options used to consume them, so the second print ignored the config
+      expect(Printer.new(blogs).table_print).to eq "AUTHOR\n------\nRyan  "
+      expect(Printer.new(blogs).table_print).to eq "AUTHOR\n------\nRyan  "
+    ensure
+      tp.clear Sandbox::Blog
+    end
+  end
+
   describe "message" do
     it "defaults to the time the print took, but in string" do
       message = Printer.new([]).message

@@ -29,15 +29,17 @@ module TablePrint
       end
     end
 
+    # A copy, because resolving options consumes them: ConfigResolver reads an
+    # :include or :except out of the hash it's given with Hash#delete, which
+    # would empty the stored config after a single print. The copy is shallow on
+    # purpose - nested option hashes are never mutated, and a deep copy would
+    # break a config holding a lambda column.
     def self.for(klass)
       config = @@klasses.fetch(klass) {}
-      if config.is_a?(Array)
-        config.map { |c| c.is_a?(Hash) ? c.dup : c }
-      elsif config.is_a?(Hash)
-        config.dup
-      else
-        config    
-      end
+      return config.dup if config.is_a?(Hash)
+      return config unless config.is_a?(Array)
+
+      config.collect { |option| option.is_a?(Hash) ? option.dup : option }
     end
 
     def self.clear(klass)
