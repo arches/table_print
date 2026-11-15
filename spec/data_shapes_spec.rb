@@ -73,6 +73,26 @@ describe "printing" do
       TABLE
     end
 
+    it "treats a range as one value, not as the list it could expand into" do
+      expect(printed([(1..3), (4..6)])).to print_as <<~TABLE
+        VALUE
+        -----
+        1..3
+        4..6
+      TABLE
+    end
+
+    it "still expands a range handed over as the whole data set" do
+      # a collection at the top level is rows; a range inside one is a value
+      expect(printed(1..3)).to print_as <<~TABLE
+        VALUE
+        -----
+        1
+        2
+        3
+      TABLE
+    end
+
     it "treats booleans the same way" do
       expect(printed([true, false])).to print_as <<~TABLE
         VALUE
@@ -98,6 +118,14 @@ describe "printing" do
         --|----
         1 | two
         3 |
+      TABLE
+    end
+
+    it "prints a range in a cell as itself" do
+      expect(printed([{ "name" => "alice", "span" => (1..5) }])).to print_as <<~TABLE
+        NAME  | SPAN
+        ------|-----
+        alice | 1..5
       TABLE
     end
 

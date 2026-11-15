@@ -53,7 +53,7 @@ tp User.limit(30), :include => :yearly_income, :except => :hourly_rate
 tp User.limit(30), :address, 'city', 'state', :zip
 ```
 
-If you're not using ActiveRecord, the TablePrint default is to show all the methods defined directly on your object (nothing from superclasses/mixins). If the objects are strings, symbols, or numbers, each one is shown in a single VALUE column instead:
+If you're not using ActiveRecord, the TablePrint default is to show all the methods defined directly on your object (nothing from superclasses/mixins). If the objects are strings, symbols, numbers, booleans, or ranges, each one is shown in a single VALUE column instead:
 
 ```
 > tp ["alice", "bob"]

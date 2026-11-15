@@ -22,7 +22,7 @@ module TablePrint
       return target.to_h.keys if defined?(OpenStruct) and target.is_a? OpenStruct
 
       case target
-      when String, Symbol, Numeric, Array, TrueClass, FalseClass
+      when String, Symbol, Numeric, Array, TrueClass, FalseClass, Range
         # Show these as-is in a single VALUE column before hittint the loop below. Which call
         # their methods instead, including String#clear, which empties the string.
         # Arrays included for rows from CSV.read or .pluck, which hold strings.

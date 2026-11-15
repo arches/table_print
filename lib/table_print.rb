@@ -45,7 +45,7 @@ module TablePrint
       end
 
       # copy data from original objects into the group
-      group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct)) ? [@data] : @data
+      group_data = (@data.first.is_a?(Hash) || @data.first.is_a?(Struct) || @data.first.is_a?(Range)) ? [@data] : @data
       group_data.each do |data|
         group.add_children(Fingerprinter.new.lift(columns, data))
       end
