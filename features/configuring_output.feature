@@ -116,6 +116,19 @@ Feature: Configuring output
     Ryan
     """
 
+  Scenario: Removing the headers
+    Given a class named Blog
+
+    Given Blog has attributes title, author
+
+    When I instantiate a Blog with {:title => "post!", :author => 'Ryan'}
+    And I configure show_headers with false
+    And table_print Blog
+    Then the output should contain
+    """
+    post! | Ryan
+    """
+
   Scenario: Setting the horizontal separator character
     Given a class named Blog
 

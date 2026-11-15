@@ -5,6 +5,7 @@ module TablePrint
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     DEFAULT_IO = $stdout
     DEFAULT_CAPITALIZE_HEADERS = true
+    DEFAULT_SHOW_HEADERS = true
     DEFAULT_SEPARATOR = "|"
     DEFAULT_HORIZONTAL_SEPARATOR = "-"
     DEFAULT_MULTIBYTE = false
@@ -14,6 +15,7 @@ module TablePrint
     @@multibyte = DEFAULT_MULTIBYTE
     @@io = DEFAULT_IO
     @@capitalize_headers = DEFAULT_CAPITALIZE_HEADERS
+    @@show_headers = DEFAULT_SHOW_HEADERS
     @@separator = DEFAULT_SEPARATOR
     @@horizontal_separator = DEFAULT_HORIZONTAL_SEPARATOR
 
@@ -70,6 +72,14 @@ module TablePrint
 
     def self.capitalize_headers=(caps)
       @@capitalize_headers = caps
+    end
+
+    def self.show_headers
+      @@show_headers
+    end
+
+    def self.show_headers=(show)
+      @@show_headers = show
     end
 
     def self.separator

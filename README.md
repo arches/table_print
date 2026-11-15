@@ -236,6 +236,7 @@ You can also set global options:
 tp.set :max_width, 10 # columns won't exceed 10 characters
 tp.set :time_format, "%Y" # date columns will only show the year
 tp.set :capitalize_headers, false # don't capitalize column headers
+tp.set :show_headers, false # no header row at all, and no line under it
 tp.set :horizontal_separator, "=" # draw the line under the header with = instead of -
 tp.set :horizontal_separator, nil # don't draw a line under the header at all
 ```

@@ -55,7 +55,10 @@ module TablePrint
       return "No data." if group.columns.empty?
 
       # turn everything into a string for output
-      [group.header, group.horizontal_separator, group.format].compact.join("\n")
+      # the line under the header has nothing to be under when headers are off
+      lines = [group.format]
+      lines.unshift(group.header, group.horizontal_separator) if TablePrint::Config.show_headers
+      lines.compact.join("\n")
     end
 
     def message

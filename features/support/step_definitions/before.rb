@@ -1,6 +1,7 @@
 Before do
   Sandbox.cleanup!
   TablePrint::Config.clear(:capitalize_headers)
+  TablePrint::Config.clear(:show_headers)
   TablePrint::Config.clear(:separator)
   TablePrint::Config.clear(:horizontal_separator)
   TablePrint::Config.clear(:multibyte)

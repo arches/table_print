@@ -58,6 +58,20 @@ describe TablePrint::Config do
     end
   end
 
+  describe "show_headers" do
+    it "defaults to true" do
+      expect(TablePrint::Config.show_headers).to eq true
+    end
+
+    it "can be turned off and back on" do
+      TablePrint::Config.set(:show_headers, [false])
+      expect(TablePrint::Config.show_headers).to eq false
+
+      TablePrint::Config.clear(:show_headers)
+      expect(TablePrint::Config.show_headers).to eq true
+    end
+  end
+
   describe "horizontal_separator" do
     it "defaults to a hyphen" do
       expect(TablePrint::Config.horizontal_separator).to eq "-"
