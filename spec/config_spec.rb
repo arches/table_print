@@ -47,6 +47,12 @@ describe TablePrint::Config do
         TablePrint::Config.set(Sandbox::Blog, [:title, :author])
         expect(TablePrint::Config.for(Sandbox::Blog)).to eq [:title, :author]
       end
+
+      it "makes a copy on retrieval" do |variable|
+        TablePrint::Config.set(Sandbox::Blog, [:title, :author])
+        TablePrint::Config.for(Sandbox::Blog).clear
+        TablePrint::Config.for(Sandbox::Blog).should == [:title, :author]
+      end
     end
 
     describe "clearing" do
