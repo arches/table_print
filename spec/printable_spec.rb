@@ -14,6 +14,16 @@ describe TablePrint::Printable do
       expect(TablePrint::Printable.default_display_methods(p)).to eq %W(brand)
     end
 
+    it "uses an OpenStruct's attributes rather than its methods" do
+      expect(TablePrint::Printable.default_display_methods(OpenStruct.new(:name => "alice", :age => 30))).to eq [:name, :age]
+    end
+
+    it "shows booleans in a single value column" do
+      methods = TablePrint::Printable.default_display_methods(true)
+      expect(methods.length).to eq 1
+      expect(methods.first.keys).to eq ["value"]
+    end
+
     it "ignores dangerous methods" do
       Sandbox.add_class("Hat")
       Sandbox.add_method("Hat", "brand!") {}

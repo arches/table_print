@@ -23,6 +23,10 @@ module TablePrint
       # Convert array of arrays into hashes
       @data = @data.collect { |row| Array(row).each_with_index.to_h { |cell, i| [i.to_s, cell] } } if @data.first.is_a?(Array)
 
+      # Columns are looked up by name, so a key that isn't already a string or a
+      # symbol can never be found
+      @data = @data.collect { |row| stringify_exotic_keys(row) } if @data.first.is_a?(Hash)
+
       @options = options
       @columns = nil
       @start_time = Time.now
@@ -63,6 +67,14 @@ module TablePrint
     end
 
     private
+    def stringify_exotic_keys(row)
+      # Skip rows that aren't affected because transform_keys returns a plain Hash,
+      # which would strip a subclass like HashWithIndifferentAccess of the lookup a
+      # lambda column may rely on
+      return row if row.keys.all? { |key| key.is_a?(String) || key.is_a?(Symbol) }
+      row.transform_keys { |key| key.is_a?(String) || key.is_a?(Symbol) ? key : key.to_s }
+    end
+
     def configged?
       !!Config.for(@data.first.class)
     end

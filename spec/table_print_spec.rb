@@ -29,6 +29,28 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "printing a hash with keys that aren't strings or symbols" do
+    it "finds the values anyway" do
+      expect(Printer.new([{1 => "one", 2 => "two"}]).table_print).to eq "1   | 2  \n----|----\none | two"
+    end
+
+    it "leaves string and symbol keyed rows untouched, subclass and all" do
+      # A hash subclass gets clobbered by the transform_keys, which we would prefer to avoid when we can
+      indifferent = Class.new(Hash) do
+        def [](key)
+          super(key.to_s)
+        end
+      end
+      row = indifferent.new
+      row["author"] = "ryan"
+
+      # a lambda column gets the row as it was handed to us, so its own lookup still works
+      expect(Printer.new([row], [{:include => {:two => lambda { |r| r[:author] * 2 }}}]).table_print).to eq(
+        "AUTHOR | TWO     \n-------|---------\nryan   | ryanryan"
+      )
+    end
+  end
+
   describe "printing an array of arrays" do
     it "prints one row per inner array, with the positions as columns" do
       expect(Printer.new([[1, "alice"], [2, "bob"]]).table_print).to eq "0 | 1    \n--|------\n1 | alice\n2 | bob  "
