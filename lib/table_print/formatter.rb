@@ -35,6 +35,7 @@ module TablePrint
 
       value = value.to_s
       return value unless value.length > width
+      return value[0, width] if width < 4 # no room for the ellipsis
 
       "#{value[0..width-4]}..."
     end

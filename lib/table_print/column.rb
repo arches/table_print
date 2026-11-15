@@ -48,13 +48,18 @@ module TablePrint
     end
 
     def width
+      [configured_width, 0].max # a negative width has nothing to print, and crashes the formatters
+    end
+
+    private
+
+    def configured_width
       return fixed_width if fixed_width
 
       width = [(default_width || max_width), data_width].min
       [(min_width || 0), width].max
     end
 
-    private
     def max_width
       TablePrint::Config.max_width
     end

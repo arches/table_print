@@ -49,6 +49,12 @@ describe TablePrint::FixedWidthFormatter do
       expect(@f.format("asdf")).to eq "asdf      "
     end
 
+    it "truncates without the periods when the width can't fit them" do
+      expect(TablePrint::FixedWidthFormatter.new(3).format("1234567890")).to eq "123"
+      expect(TablePrint::FixedWidthFormatter.new(1).format("1234567890")).to eq "1"
+      expect(TablePrint::FixedWidthFormatter.new(0).format("1234567890")).to eq ""
+    end
+
     it "truncates long fields with periods" do
       expect(@f.format("1234567890123456")).to eq "1234567..."
     end

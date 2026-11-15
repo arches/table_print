@@ -68,6 +68,11 @@ describe Column do
   end
 
   describe "#width" do
+    it "never goes below zero" do
+      expect(Column.new(:name => :title, :fixed_width => -3).width).to eq 0
+      expect(Column.new(:name => :title, :min_width => -10, :default_width => -5).width).to eq 0
+    end
+
     context "when default width is specified" do
       it "uses the default width" do
         c.default_width = 10
