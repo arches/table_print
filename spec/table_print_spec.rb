@@ -85,6 +85,25 @@ describe TablePrint::Printer do
     end
   end
 
+  describe "unreachable cells" do
+    it "shows the configured value" do
+      TablePrint::Config.set(:unreachable_value, ["n/a"])
+
+      expect(Printer.new([{ :a => 1 }, { :b => 2 }]).table_print).to eq "A  \n---\n1  \nn/a"
+    ensure
+      TablePrint::Config.clear(:unreachable_value)
+    end
+
+    it "leaves the cell blank when the value is nil, keeping the column" do
+      TablePrint::Config.set(:unreachable_value, [nil])
+
+      # one trailing space: the column is still there, the cell is just empty
+      expect(Printer.new([{ :a => 1 }, { :b => 2 }]).table_print).to eq "A\n-\n1\n "
+    ensure
+      TablePrint::Config.clear(:unreachable_value)
+    end
+  end
+
   describe "a class-level config" do
     it "survives being printed more than once" do
       Sandbox.add_class("Blog")

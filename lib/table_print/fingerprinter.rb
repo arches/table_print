@@ -43,7 +43,7 @@ module TablePrint
         elsif target.respond_to? method
           cell_value ||= target.send(method)
         else
-          cell_value = "Method Missing"
+          cell_value = TablePrint::Config.unreachable_value
         end
         cells[@column_names_by_display_method[display_method]] = cell_value
       end

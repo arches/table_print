@@ -116,6 +116,21 @@ Feature: Configuring output
     Ryan
     """
 
+  Scenario: Setting the value for unreachable cells
+    Given a class named Blog
+
+    Given Blog has attributes title
+
+    When I instantiate a Blog with {:title => "post!"}
+    And I configure unreachable_value with 'unreachable'
+    And table_print Blog, [:title, :author]
+    Then the output should contain
+    """
+    TITLE | AUTHOR
+    ------|------------
+    post! | unreachable
+    """
+
   Scenario: Removing the headers
     Given a class named Blog
 

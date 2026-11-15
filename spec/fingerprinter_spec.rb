@@ -138,6 +138,28 @@ describe Fingerprinter do
         row = f.populate_row('', {'foo' => {}}, Hash.new)
         expect(row.cells).to eq({'foo' => 'Method Missing'})
       end
+
+      it "puts nil in the cell when unreachable_value is nil" do
+        TablePrint::Config.set(:unreachable_value, [nil])
+
+        f = Fingerprinter.new
+        f.instance_variable_set('@column_names_by_display_method', {'foo' => 'foo'})
+        row = f.populate_row('', {'foo' => {}}, Hash.new)
+        expect(row.cells).to eq({'foo' => nil})
+      ensure
+        TablePrint::Config.clear(:unreachable_value)
+      end
+
+      it "uses whatever the unreachable_value config says" do
+        TablePrint::Config.set(:unreachable_value, ["-"])
+
+        f = Fingerprinter.new
+        f.instance_variable_set('@column_names_by_display_method', {'foo' => 'foo'})
+        row = f.populate_row('', {'foo' => {}}, Hash.new)
+        expect(row.cells).to eq({'foo' => '-'})
+      ensure
+        TablePrint::Config.clear(:unreachable_value)
+      end
     end
   end
 

@@ -9,10 +9,12 @@ module TablePrint
     DEFAULT_SEPARATOR = "|"
     DEFAULT_HORIZONTAL_SEPARATOR = "-"
     DEFAULT_MULTIBYTE = false
+    DEFAULT_UNREACHABLE_VALUE = "Method Missing"
 
     @@max_width = DEFAULT_MAX_WIDTH
     @@time_format = DEFAULT_TIME_FORMAT
     @@multibyte = DEFAULT_MULTIBYTE
+    @@unreachable_value = DEFAULT_UNREACHABLE_VALUE
     @@io = DEFAULT_IO
     @@capitalize_headers = DEFAULT_CAPITALIZE_HEADERS
     @@show_headers = DEFAULT_SHOW_HEADERS
@@ -65,6 +67,17 @@ module TablePrint
 
     def self.multibyte=(width)
       @@multibyte = width
+    end
+
+    def self.unreachable_value
+      @@unreachable_value
+    end
+
+    # what to show in a cell whose value can't be reached - no such method, no
+    # such hash key - or nil to leave those cells blank. A value that exists and
+    # happens to be nil prints blank either way.
+    def self.unreachable_value=(value)
+      @@unreachable_value = value
     end
 
     def self.time_format

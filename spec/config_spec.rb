@@ -72,6 +72,23 @@ describe TablePrint::Config do
     end
   end
 
+  describe "unreachable_value" do
+    it "defaults to Method Missing" do
+      expect(TablePrint::Config.unreachable_value).to eq "Method Missing"
+    end
+
+    it "takes any string, or nil to leave those cells blank" do
+      TablePrint::Config.set(:unreachable_value, ["-"])
+      expect(TablePrint::Config.unreachable_value).to eq "-"
+
+      TablePrint::Config.set(:unreachable_value, [nil])
+      expect(TablePrint::Config.unreachable_value).to be_nil
+
+      TablePrint::Config.clear(:unreachable_value)
+      expect(TablePrint::Config.unreachable_value).to eq "Method Missing"
+    end
+  end
+
   describe "show_headers" do
     it "defaults to true" do
       expect(TablePrint::Config.show_headers).to eq true

@@ -5,4 +5,5 @@ Before do
   TablePrint::Config.clear(:separator)
   TablePrint::Config.clear(:horizontal_separator)
   TablePrint::Config.clear(:multibyte)
+  TablePrint::Config.clear(:unreachable_value)
 end
